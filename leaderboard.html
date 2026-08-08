@@ -1,0 +1,2795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Nexus — Championship Leaderboard</title>
+<link rel="stylesheet" href="navbar.css">
+  <style>
+    /* ============================================================
+       POKÉMON NEXUS — LEADERBOARD (AAA PORTAL POLISHED)
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;500;600;700;900&display=swap');
+
+    :root {
+      --radius-card: 24px;
+      --radius-sm: 14px;
+      --yellow: #ffcb05;
+      --red: #ff3d00;
+      --blue: #0c70ff;
+      --green: #10b981;
+      --purple: #a855f7;
+      --orange: #f97316;
+      --silver: #cbd5e1;
+      --bronze: #b45309;
+      --shadow-glow: 0 0 25px rgba(255, 107, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("background.jpg") center/cover no-repeat fixed;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Lighter overlay to show Ash and Charizard characters clearly */
+    body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6));
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Ambient Sparks & Volumetric Light Rays */
+    #sparks-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+      animation: floatSpark 8s linear infinite;
+    }
+
+    .spark.orange {
+      background: #ff5500;
+      box-shadow: 0 0 10px #ff5500, 0 0 20px #ff5500;
+    }
+
+    .spark.blue {
+      background: #00d0ff;
+      box-shadow: 0 0 10px #00d0ff, 0 0 20px #00d0ff;
+    }
+
+    @keyframes floatSpark {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0.8);
+        opacity: 0;
+      }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% {
+        transform: translateY(-10vh) translateX(100px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .cinematic-rays {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle at 80% 20%, rgba(12, 112, 255, 0.06) 0%, transparent 60%);
+      mix-blend-mode: color-dodge;
+      animation: rayPulse 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes rayPulse {
+      0% { opacity: 0.5; }
+      100% { opacity: 1.0; }
+    }
+
+    /* Lens Flare overlay */
+    .lens-flare {
+      position: fixed;
+      top: 15%;
+      left: 75%;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(255,203,5,0.2) 0%, rgba(255,203,5,0.05) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: screen;
+    }
+
+    /* Shared navbar styling is linked in navbar.css */
+
+    /* PAGE SHELL */
+    main.page {
+      max-width: 1220px;
+      width: 92vw;
+      margin: 72px auto 40px !important;
+      padding: 8px 22px 80px !important;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: pageLoad 0.6s ease-out;
+    }
+
+    @keyframes pageLoad {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HERO SECTION WRAPPER & CINEMATIC BACKGROUND */
+    .leaderboard-hero-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 0 !important;
+      z-index: 2;
+    }
+
+    .hero-fire-bg {
+      position: absolute;
+      top: -80px;
+      left: -22px;
+      right: -22px;
+      bottom: 0;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Lava Glow + Charizard Fire Light (Flickering) */
+    .lava-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 75% 65%, rgba(255, 68, 0, 0.55) 0%, rgba(255, 30, 0, 0.2) 40%, rgba(255, 100, 0, 0.05) 70%, transparent 100%);
+      mix-blend-mode: screen;
+      animation: pulseGlow 6s ease-in-out infinite alternate, fireFlicker 0.15s ease-in-out infinite;
+    }
+
+    /* Heat Wave Effect */
+    .heat-wave {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(255, 74, 0, 0.06) 0%, transparent 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      transform-origin: bottom center;
+      animation: heatRising 4s ease-in-out infinite;
+      opacity: 0.9;
+    }
+
+    /* Volumetric Orange Smoke Layer */
+    .smoke-layer {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 25% 75%, rgba(255, 80, 0, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 75% 25%, rgba(255, 110, 0, 0.1) 0%, transparent 50%);
+      filter: blur(30px);
+      mix-blend-mode: screen;
+      animation: smokeDrift 16s ease-in-out infinite alternate;
+    }
+
+    /* Floating Embers */
+    .embers-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ember {
+      position: absolute;
+      bottom: -20px;
+      width: var(--size, 4px);
+      height: var(--size, 4px);
+      background: var(--color, #ff7b00);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--color, #ff7b00), 0 0 15px var(--glow-color, #ff3c00);
+      opacity: 0;
+      animation: floatEmber var(--duration, 6s) linear infinite;
+      animation-delay: var(--delay, 0s);
+      left: var(--left, 50%);
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+
+    @keyframes fireFlicker {
+      0% { opacity: 0.85; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.9; }
+    }
+
+    @keyframes heatRising {
+      0% { transform: scaleY(1) skewX(0deg); filter: blur(1.5px); }
+      50% { transform: scaleY(1.05) skewX(1.5deg); filter: blur(2px); }
+      100% { transform: scaleY(1) skewX(0deg); filter: blur(1.5px); }
+    }
+
+    @keyframes smokeDrift {
+      0% { transform: translate(-20px, -20px) scale(1); }
+      100% { transform: translate(20px, 20px) scale(1.1); }
+    }
+
+    @keyframes floatEmber {
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.9;
+      }
+      90% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-400px) translateX(var(--drift, 40px)) scale(0.3);
+        opacity: 0;
+      }
+    }
+
+    /* HERO TITLE SECTION */
+    .hero-title-section {
+      position: relative;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      background: rgba(6, 11, 25, 0.45) !important;
+      border: 1.5px solid rgba(255, 107, 0, 0.28) !important;
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 2;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 
+                  0 0 30px rgba(255, 88, 0, 0.2), 
+                  inset 0 0 15px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .hero-title-section::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 123, 0, 0.1) 48%,
+        rgba(255, 203, 5, 0.25) 50%,
+        rgba(255, 123, 0, 0.1) 52%,
+        transparent 55%
+      );
+      transform: rotate(-15deg);
+      pointer-events: none;
+      z-index: 3;
+      animation: shineReflection 6s ease-in-out infinite;
+    }
+
+    /* Title gold/orange breathing gradient */
+    .hero-title-block h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(41px, 6.2vw, 58px);
+      background: linear-gradient(90deg, #ffcb05, #ff7b00, #ffd700, #ffcb05);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 1.5px #0757a8;
+      text-shadow: 0 0 25px rgba(255, 203, 5, 0.65), 0 0 10px rgba(255, 107, 0, 0.4);
+      margin: 0;
+      letter-spacing: 0.02em;
+      display: inline-block;
+      animation: titleBreath 3s ease-in-out infinite alternate, shineText 6s linear infinite;
+    }
+
+    @keyframes titleBreath {
+      0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 203, 5, 0.4)); }
+      100% { transform: scale(1.02); filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.7)); }
+    }
+
+    @keyframes shineText {
+      0% { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+
+    .hero-title-block p {
+      font-size: 0.88rem;
+      color: #eaf9ff;
+      margin: 8px 0 0 0;
+      opacity: 0.85;
+    }
+
+    /* LIVE badge slow pulse every 2 seconds */
+    .live-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+      animation: badgePulse 2s infinite ease-in-out;
+    }
+
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.25); }
+      50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(16, 185, 129, 0.45); }
+      100% { transform: scale(1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.25); }
+    }
+
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green);
+      animation: livePulse 1s infinite alternate;
+    }
+
+    @keyframes livePulse {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* STATISTICS CONTAINER */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      position: relative;
+      background: rgba(6, 11, 25, 0.45) !important;
+      border: 1.5px solid rgba(255, 107, 0, 0.25) !important;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 
+                  0 10px 30px rgba(0, 0, 0, 0.4), 
+                  0 0 15px rgba(255, 88, 0, 0.1),
+                  inset 0 0 15px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+
+    /* Soft sweeping fire reflection */
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 123, 0, 0.1) 48%,
+        rgba(255, 203, 5, 0.2) 50%,
+        rgba(255, 123, 0, 0.1) 52%,
+        transparent 55%
+      );
+      transform: rotate(-15deg);
+      pointer-events: none;
+      z-index: 3;
+      animation: shineReflection 7s ease-in-out infinite;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px) !important;
+      border-color: rgba(255, 107, 0, 0.48) !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 
+                  0 0 25px rgba(255, 88, 0, 0.25), 
+                  0 0 50px rgba(255, 61, 0, 0.15),
+                  inset 0 0 20px rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: #ffd86b;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    /* TOP 3 PODIUM SECTION */
+    .podium-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 24px;
+      margin: 20px 0;
+      padding-top: 30px;
+      z-index: 2;
+    }
+
+    /* Volcanic lava cracks background glow */
+    .podium-container::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 60px;
+      background: radial-gradient(ellipse at bottom, rgba(255, 68, 0, 0.45) 0%, rgba(255, 17, 0, 0.15) 50%, transparent 80%);
+      filter: blur(15px);
+      z-index: 1;
+      pointer-events: none;
+      animation: magmaPulsate 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes magmaPulsate {
+      0% { opacity: 0.5; transform: scaleY(0.9); }
+      100% { opacity: 1; transform: scaleY(1.1); }
+    }
+
+    @media (max-width: 768px) {
+      .podium-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .podium-container::before {
+        height: 120px;
+        left: 5%;
+        right: 5%;
+      }
+    }
+
+    /* Podium Cards styling with floating and custom particle triggers */
+    .podium-card {
+      background: rgba(5, 8, 18, 0.6);
+      border: 2px solid var(--accent-color);
+      border-radius: var(--radius-card);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      width: 250px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    /* Active float out of phase so podium feels alive */
+    .podium-card.rank-1 {
+      order: 2;
+      transform: translateY(-20px);
+      --accent-color: var(--yellow);
+      background: linear-gradient(135deg, rgba(255, 203, 5, 0.12) 0%, rgba(5, 8, 18, 0.9) 100%) !important;
+      border: 2px solid rgba(255, 203, 5, 0.5) !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
+                  0 0 30px rgba(255, 203, 5, 0.25), 
+                  0 0 60px rgba(255, 107, 0, 0.15),
+                  inset 0 0 15px rgba(255, 255, 255, 0.05);
+      animation: championFloat 4s ease-in-out infinite alternate, championGoldAura 2s ease-in-out infinite alternate;
+      z-index: 5;
+    }
+
+    .podium-card.rank-2 {
+      order: 1;
+      --accent-color: var(--silver);
+      background: linear-gradient(135deg, rgba(203, 213, 225, 0.1) 0%, rgba(5, 8, 18, 0.85) 100%) !important;
+      border: 1.5px solid rgba(203, 213, 225, 0.35) !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
+                  0 0 20px rgba(203, 213, 225, 0.15);
+      animation: cardFloatLeft 5s ease-in-out infinite alternate, silverAura 2.5s ease-in-out infinite alternate;
+    }
+
+    .podium-card.rank-3 {
+      order: 3;
+      --accent-color: var(--bronze);
+      background: linear-gradient(135deg, rgba(180, 83, 9, 0.1) 0%, rgba(5, 8, 18, 0.85) 100%) !important;
+      border: 1.5px solid rgba(180, 83, 9, 0.35) !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
+                  0 0 20px rgba(180, 83, 9, 0.15);
+      animation: cardFloatRight 4.5s ease-in-out infinite alternate, bronzeAura 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes championFloat {
+      0% { transform: translateY(-20px); }
+      100% { transform: translateY(-32px); }
+    }
+
+    @keyframes cardFloatLeft {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+
+    @keyframes cardFloatRight {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    @keyframes championGoldAura {
+      0% { border-color: rgba(255, 203, 5, 0.4); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 20px rgba(255, 203, 5, 0.2), 0 0 40px rgba(255, 107, 0, 0.1); }
+      100% { border-color: rgba(255, 203, 5, 0.8); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 40px rgba(255, 203, 5, 0.4), 0 0 80px rgba(255, 107, 0, 0.25); }
+    }
+
+    @keyframes silverAura {
+      0% { border-color: rgba(203, 213, 225, 0.25); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 15px rgba(203, 213, 225, 0.1); }
+      100% { border-color: rgba(203, 213, 225, 0.55); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 25px rgba(203, 213, 225, 0.25); }
+    }
+
+    @keyframes bronzeAura {
+      0% { border-color: rgba(180, 83, 9, 0.25); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 15px rgba(180, 83, 9, 0.1); }
+      100% { border-color: rgba(180, 83, 9, 0.55); box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 25px rgba(180, 83, 9, 0.25); }
+    }
+
+    /* Hover Zoom 1.03 scale */
+    .podium-card:hover {
+      transform: scale(1.03) !important;
+      box-shadow: 0 22px 50px var(--accent-color) !important;
+    }
+
+    .podium-badge {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      color: #000;
+      font-weight: 900;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--accent-color);
+    }
+
+    /* Volumetric Light Rays behind Champion */
+    .champion-wings {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      top: -90px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(255, 203, 5, 0.28) 0%, rgba(255, 107, 0, 0.08) 50%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+      animation: raysPulse 3.5s ease-in-out infinite alternate;
+      filter: blur(10px);
+    }
+
+    @keyframes raysPulse {
+      0% { transform: translateX(-50%) scale(0.9); opacity: 0.65; }
+      100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+    }
+
+    .champion-crown {
+      position: absolute;
+      top: -46px;
+      left: 50%;
+      transform: translateX(-50%) rotate(0deg);
+      width: 44px;
+      height: 44px;
+      fill: var(--yellow);
+      filter: drop-shadow(0 0 10px var(--yellow));
+      animation: crownGlint 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes crownGlint {
+      0% { transform: translateX(-50%) rotate(-3deg) scale(0.95); }
+      100% { transform: translateX(-50%) rotate(3deg) scale(1.05); }
+    }
+
+    /* Podium particle emitter styling */
+    .podium-particle-emitter {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      z-index: 1;
+    }
+
+    .podium-emit-sparkle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      opacity: 0.6;
+      animation: emitFloat 2.5s infinite linear;
+    }
+
+    @keyframes emitFloat {
+      0% { transform: translateY(110%) translateX(0); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.8; }
+      100% { transform: translateY(-10%) translateX(30px); opacity: 0; }
+    }
+
+    .podium-avatar-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 10px auto 14px;
+      border-radius: 50%;
+      border: 3px solid var(--accent-color);
+      box-shadow: 0 0 15px var(--accent-color);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .podium-name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.25rem;
+      color: #fff;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .podium-level-tag {
+      font-size: 0.72rem;
+      color: var(--accent-color);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: relative;
+      z-index: 2;
+    }
+
+    .podium-pokemon-art {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      margin-top: 10px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      position: relative;
+      z-index: 2;
+      transition: transform 0.2s;
+    }
+
+    .podium-card:hover .podium-pokemon-art {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .podium-stats-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px dashed rgba(255,255,255,0.12);
+      margin-top: 14px;
+      padding-top: 14px;
+      font-size: 0.75rem;
+      text-align: left;
+      position: relative;
+      z-index: 2;
+    }
+
+    .podium-stat-item {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .podium-stat-item b {
+      color: #fff;
+    }
+
+    /* SEARCH, FILTERS & MAIN GRID */
+    .main-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .main-grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .leaderboard-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Controls bar styling */
+    .controls-toolbar {
+      background: rgba(5, 8, 18, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 14px 20px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .controls-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 10px 16px 10px 42px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 12px rgba(255, 203, 5, 0.25);
+    }
+
+    .dropdown-selectors-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-select {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 9px 24px 9px 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='white'><polygon points='0,0 10,0 5,7'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 32px;
+    }
+
+    /* Seasonal segmented filters */
+    .season-tabs-row {
+      display: flex;
+      background: rgba(0,0,0,0.45);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      gap: 4px;
+    }
+
+    .season-tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .season-tab-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--yellow);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* LEADERBOARD TABLE styling */
+    .table-container {
+      background: rgba(5, 8, 18, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-card);
+      overflow-x: auto;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    }
+
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .ranking-table th {
+      padding: 18px 20px;
+      background: rgba(0, 0, 0, 0.35);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
+      color: #ffd86b;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Increased row height and alternate backgrounds */
+    .ranking-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .ranking-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .ranking-table tr:hover {
+      background: rgba(255, 255, 255, 0.04) !important;
+      transform: scale(1.002);
+      box-shadow: inset 0 0 15px rgba(12, 112, 255, 0.15);
+    }
+
+    .ranking-table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+    }
+
+    .table-rank-cell {
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rank-arrow {
+      font-size: 0.65rem;
+      display: inline-block;
+    }
+    .rank-arrow.up { color: var(--green); }
+    .rank-arrow.down { color: var(--red); }
+
+    .table-avatar-cell {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .table-name-cell {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .xp-progress-bar-outer {
+      width: 90px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .xp-progress-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), #3b82f6);
+      border-radius: 99px;
+      width: 0%; /* Animate from 0 on render */
+      transition: width 1.2s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    /* Tier badge glows according to rarity */
+    .tier-badge {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      display: inline-block;
+      letter-spacing: 0.04em;
+    }
+
+    .tier-badge.tier-champion { 
+      background: rgba(255, 203, 5, 0.15); 
+      color: var(--yellow); 
+      border: 1.5px solid var(--yellow); 
+      box-shadow: 0 0 10px rgba(255, 203, 5, 0.4);
+    }
+    .tier-badge.tier-master { 
+      background: rgba(168, 85, 247, 0.15); 
+      color: var(--purple); 
+      border: 1.5px solid var(--purple); 
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+    }
+    .tier-badge.tier-diamond { 
+      background: rgba(12, 112, 255, 0.15); 
+      color: var(--blue); 
+      border: 1.5px solid var(--blue); 
+      box-shadow: 0 0 10px rgba(12, 112, 255, 0.3);
+    }
+    .tier-badge.tier-gold { 
+      background: rgba(249, 115, 22, 0.15); 
+      color: var(--orange); 
+      border: 1.5px solid var(--orange); 
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+    }
+
+    /* Selected row glowing gold border */
+    .ranking-table tr.selected-row {
+      background: rgba(255, 203, 5, 0.12) !important;
+      border-left: 4px solid var(--yellow);
+      box-shadow: inset 0 0 15px rgba(255, 203, 5, 0.25);
+    }
+
+    /* HD Sprites */
+    .table-pkmn-icon {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      transition: transform 0.2s;
+    }
+
+    .ranking-table tr:hover .table-pkmn-icon {
+      transform: scale(1.15) rotate(2deg);
+    }
+
+    /* RIGHT COLUMN: Trainer details sidebar card */
+    .sidebar-details-card {
+      background: rgba(5, 8, 18, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), 0 12px 36px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    /* Larger trainer portrait */
+    .sidebar-header-portrait {
+      height: 160px;
+      background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .sidebar-portrait-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid var(--yellow);
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 15px rgba(255, 203, 5, 0.35);
+      z-index: 2;
+    }
+
+    /* Level badge animates */
+    .details-level-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: var(--yellow);
+      color: #000;
+      font-weight: 900;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px var(--yellow);
+      z-index: 3;
+      animation: pulseGlow 1.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 5px var(--yellow); }
+      to { box-shadow: 0 0 15px var(--yellow); }
+    }
+
+    .sidebar-details-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sidebar-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-trainer-name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+      color: #fff;
+      margin: 0;
+    }
+
+    .sidebar-tier-label {
+      font-size: 0.65rem;
+      color: var(--yellow);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Mini map */
+    .mini-ranking-map {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mini-map-svg {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .mini-map-pulse-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 10px var(--yellow);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pinPulse 1.4s infinite;
+      transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+    }
+
+    /* Active Roster Cards layout */
+    .trainer-roster-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.1);
+      padding-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .roster-pkmn-frame {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .roster-pkmn-frame:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: var(--yellow);
+      transform: translateY(-2px);
+    }
+
+    .roster-pkmn-sprite {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin: 0 auto;
+    }
+
+    .roster-pkmn-lvl-badge {
+      font-size: 0.58rem;
+      color: var(--yellow);
+      font-weight: 800;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Battle History Timeline */
+    .timeline-title {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #ffd86b;
+      letter-spacing: 0.05em;
+      margin: 0;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-left: 2px solid rgba(255,255,255,0.08);
+      padding-left: 14px;
+      margin-left: 6px;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.7);
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -19px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line-color, rgba(255,255,255,0.3));
+    }
+
+    .timeline-item.win { --line-color: var(--green); }
+    .timeline-item.loss { --line-color: var(--red); }
+
+    /* Interactive chart canvas */
+    .chart-container {
+      background: rgba(5, 8, 18, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    }
+
+    .chart-canvas {
+      width: 100%;
+      height: 180px;
+    }
+
+    /* HALL OF FAME / Previous Champions styling */
+    .fame-section-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.8rem;
+      color: var(--yellow);
+      -webkit-text-stroke: 1px #0757a8;
+      text-shadow: 0 0 10px rgba(255, 203, 5, 0.35);
+      margin: 24px 0 12px;
+    }
+
+    .fame-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* Fame cards slide up while scrolling */
+    .fame-card {
+      background: rgba(5, 8, 18, 0.55);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.4);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .fame-card.reveal-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fame-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--yellow);
+      box-shadow: 0 12px 30px rgba(255, 203, 5, 0.2);
+    }
+
+    .fame-year {
+      font-weight: 900;
+      color: var(--yellow);
+      font-size: 1.15rem;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      padding-right: 12px;
+    }
+
+    .fame-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .fame-trainer-name {
+      font-weight: 700;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .fame-pokemon-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .fame-pkmn-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    /* Achievements list row styling */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .achievement-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      text-align: left;
+      transition: border-color 0.25s;
+    }
+
+    .achievement-card:hover {
+      border-color: var(--yellow);
+    }
+
+    .achievement-name {
+      font-weight: 800;
+      font-size: 0.78rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .achievement-desc {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+
+    .achievement-progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .achievement-progress-fill {
+      height: 100%;
+      background: var(--yellow);
+    }
+
+    /* INTERACTIVE TEAM VIEW MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .team-modal-container {
+      background: rgba(5, 8, 18, 0.95);
+      border: 2px solid var(--yellow);
+      border-radius: 24px;
+      width: min(720px, 92vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 50px rgba(255, 203, 5, 0.35), inset 0 1px 2px rgba(255,255,255,0.25);
+      padding: 24px;
+      position: relative;
+      animation: modalSlide 0.4s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(40px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: background 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .modal-header-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.65rem;
+      color: var(--yellow);
+      margin: 0 0 4px 0;
+    }
+
+    .team-grid-modal {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .modal-pkmn-card {
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.25s;
+    }
+
+    .modal-pkmn-card:hover {
+      border-color: var(--yellow);
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+    }
+
+    .modal-pkmn-sprite {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin: 0 auto;
+    }
+
+    .modal-pkmn-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin: 8px 0 2px 0;
+    }
+
+    .modal-pkmn-level {
+      font-size: 0.72rem;
+      color: var(--yellow);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .modal-hp-bar-outer {
+      height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .modal-hp-bar-inner {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+    }
+
+    .modal-pkmn-meta {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.65);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-top: 1px dashed rgba(255,255,255,0.08);
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .modal-type-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    /* Type badge colors */
+    .type-electric { background: #facc15; color: #000; }
+    .type-fire { background: #ef4444; color: #fff; }
+    .type-flying { background: #a78bfa; color: #fff; }
+    .type-water { background: #3b82f6; color: #fff; }
+    .type-grass { background: #22c55e; color: #fff; }
+    .type-poison { background: #a855f7; color: #fff; }
+    .type-dragon { background: #6366f1; color: #fff; }
+    .type-steel { background: #64748b; color: #fff; }
+    .type-psychic { background: #ec4899; color: #fff; }
+    .type-ghost { background: #7c3aed; color: #fff; }
+    .type-dark { background: #475569; color: #fff; }
+    .type-fighting { background: #dc2626; color: #fff; }
+    .type-rock { background: #d97706; color: #fff; }
+    .type-ground { background: #ca8a04; color: #fff; }
+
+    /* CHAMPION CEREMONY FULL OVERLAY */
+    .ceremony-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.98) 100%);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .ceremony-overlay.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .ceremony-content {
+      text-align: center;
+      position: relative;
+      animation: ceremonyZoom 0.8s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    @keyframes ceremonyZoom {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .ceremony-spotlight {
+      position: absolute;
+      top: -300px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 600px;
+      background: radial-gradient(ellipse at top, rgba(255, 203, 5, 0.22) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .ceremony-trophy {
+      width: 140px;
+      height: 140px;
+      fill: var(--yellow);
+      filter: drop-shadow(0 0 25px var(--yellow));
+      animation: rotateTrophy 6s linear infinite;
+    }
+
+    @keyframes rotateTrophy {
+      0% { transform: rotateY(0deg) translateY(0); }
+      50% { transform: rotateY(180deg) translateY(-8px); }
+      100% { transform: rotateY(360deg) translateY(0); }
+    }
+
+    .ceremony-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.8rem;
+      color: var(--yellow);
+      -webkit-text-stroke: 1.5px #0757a8;
+      text-shadow: 0 0 30px var(--yellow);
+      margin: 16px 0 8px 0;
+    }
+
+    .ceremony-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid var(--yellow);
+      margin: 10px auto;
+      box-shadow: 0 0 25px var(--yellow);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .ceremony-trainer-name {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    /* Confetti spark elements */
+    .confetti-sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--yellow);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: fallConfetti 3s linear infinite;
+    }
+
+    @keyframes fallConfetti {
+      0% { transform: translateY(-50px) translateX(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(400px) translateX(80px) rotate(180deg); opacity: 0; }
+    }
+
+    /* Rank Rewards Items display layout */
+    .rewards-badges-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .reward-badge-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      transition: all 0.25s;
+    }
+
+    .reward-badge-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--yellow);
+      box-shadow: 0 4px 12px rgba(255, 203, 5, 0.15);
+    }
+
+    .reward-icon-svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--yellow);
+    }
+
+    /* CUSTOM TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid var(--yellow);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 203, 5, 0.25);
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  </style>
+
+  <script src="game-sync.js"></script>
+</head>
+<body>
+  <!-- Ambient Spark layers -->
+  <div id="sparks-container"></div>
+  
+  <div class="cinematic-rays"></div>
+  <div class="lens-flare"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pokedex.html">Pokédex</a>
+      <a href="battle.html">Battle</a>
+      <a href="kingdom-map.html">Kingdom Map</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="leaderboard.html" class="active">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="achievements.html">Achievements</a>
+      <a href="events.html">Events</a>
+      <a href="admin/admin.html" id="adminLink" style="display:none">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <main class="page">
+    <!-- HERO HEADER TITLE -->
+    <!-- HERO SECTION WRAPPER WITH CINEMATIC BACKGROUND -->
+    <div class="leaderboard-hero-wrapper">
+      <div class="hero-fire-bg">
+        <div class="lava-glow"></div>
+        <div class="smoke-layer"></div>
+        <div class="heat-wave"></div>
+        <div class="embers-layer">
+          <span class="ember" style="--left: 5%; --size: 3px; --duration: 6s; --delay: 0.5s; --drift: 30px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 15%; --size: 5px; --duration: 8s; --delay: 1.2s; --drift: -40px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 28%; --size: 2px; --duration: 5s; --delay: 0.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 38%; --size: 6px; --duration: 7s; --delay: 2.5s; --drift: -30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 48%; --size: 3px; --duration: 9s; --delay: 1.8s; --drift: 45px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 58%; --size: 2px; --duration: 6s; --delay: 0.8s; --drift: -15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 68%; --size: 5px; --duration: 8s; --delay: 3.0s; --drift: 35px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 78%; --size: 3px; --duration: 7s; --delay: 1.5s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 88%; --size: 6px; --duration: 5s; --delay: 0.4s; --drift: 30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 95%; --size: 2px; --duration: 9s; --delay: 2.1s; --drift: -40px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 12%; --size: 4px; --duration: 7.5s; --delay: 3.5s; --drift: 15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 32%; --size: 3px; --duration: 6.5s; --delay: 4.2s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 52%; --size: 6px; --duration: 8.5s; --delay: 2.8s; --drift: 40px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 72%; --size: 2px; --duration: 5.5s; --delay: 1.9s; --drift: -20px; --color: #ffa500; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 90%; --size: 5px; --duration: 6.8s; --delay: 4.8s; --drift: 35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 20%; --size: 3px; --duration: 6.2s; --delay: 2.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 42%; --size: 4px; --duration: 7.8s; --delay: 1.1s; --drift: -30px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 62%; --size: 2px; --duration: 5.8s; --delay: 3.7s; --drift: 25px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 82%; --size: 5px; --duration: 8.2s; --delay: 0.9s; --drift: -35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+        </div>
+      </div>
+      <header class="hero-title-section">
+        <div class="hero-title-block">
+          <h1>LEADERBOARD</h1>
+          <p>Compete with Trainers across the Pokémon world and become the strongest Pokémon Master.</p>
+        </div>
+        <div class="live-status-badge">
+          <div class="live-pulse-dot"></div>
+          LIVE Ranking Loop
+        </div>
+      </header>
+    </div>
+
+    <!-- HERO STATISTICS CARDS -->
+    <section class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#0c70ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Trainers</span>
+          <div class="stat-value" id="stat-total-trainers">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#29ffb6"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-3.3 0-6-2.7-6-6h12c0 3.3-2.7 6-6 6zm-6-8c.35-2.28 2.07-4.12 4.35-4.63V9c0 .55.45 1 1 1s1-.45 1-1V7.37c2.28.51 4 2.35 4.35 4.63H6.4z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Battles Played</span>
+          <div class="stat-value" id="stat-battles-played">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#a855f7"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Top Champion</span>
+          <div class="stat-value" style="font-size: 1.05rem;" id="stat-top-champion">Trainer Ash</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffcb05"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 10 10 10-4.48 10-10S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Current Season</span>
+          <div class="stat-value" style="font-size: 0.95rem;">Season 3 (14d left)</div>
+          <div class="stat-value-progress-bar">
+            <div class="stat-value-progress-fill" style="width: 75%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOP 3 PODIUM DISPLAY -->
+    <section class="podium-container" id="podium-container">
+      <!-- Generated dynamically by script -->
+    </section>
+
+    <!-- SEARCH TOOLBAR, FILTERS & MAIN GRID -->
+    <section class="main-grid-layout">
+      <!-- LEFT COLUMN: Toolbar and Ranking Table -->
+      <div class="leaderboard-column">
+        
+        <div class="controls-toolbar">
+          <!-- Search box -->
+          <div class="search-box">
+            <input type="text" id="search-input" class="search-input" placeholder="Search trainers...">
+            <svg style="position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; fill:rgba(255,255,255,0.4);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </div>
+
+          <!-- Dropdowns & tabs -->
+          <div class="dropdown-selectors-row">
+            <select id="filter-region" class="toolbar-select">
+              <option value="all">Region: All</option>
+              <option value="Kanto">Kanto</option>
+              <option value="Johto">Johto</option>
+              <option value="Hoenn">Hoenn</option>
+              <option value="Sinnoh">Sinnoh</option>
+              <option value="Unova">Unova</option>
+              <option value="Kalos">Kalos</option>
+              <option value="Alola">Alola</option>
+              <option value="Galar">Galar</option>
+              <option value="Paldea">Paldea</option>
+            </select>
+
+            <select id="filter-tier" class="toolbar-select">
+              <option value="all">Tier: All</option>
+              <option value="Champion">Champion</option>
+              <option value="Master">Master</option>
+              <option value="Diamond">Diamond</option>
+              <option value="Gold">Gold</option>
+            </select>
+
+            <select id="sort-order" class="toolbar-select">
+              <option value="xp">Sort by: XP</option>
+              <option value="wins">Sort by: Wins</option>
+              <option value="level">Sort by: Level</option>
+              <option value="rate">Sort by: Win Rate</option>
+            </select>
+
+            <!-- Seasonal Tabs -->
+            <div class="season-tabs-row">
+              <button class="season-tab-btn active" id="tab-all-time" onclick="setSeason('all-time', this)">All Time</button>
+              <button class="season-tab-btn" id="tab-monthly" onclick="setSeason('monthly', this)">Monthly</button>
+              <button class="season-tab-btn" id="tab-weekly" onclick="setSeason('weekly', this)">Weekly</button>
+              <button class="season-tab-btn" id="tab-daily" onclick="setSeason('daily', this)">Daily</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ranking Table -->
+        <div class="table-container">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Avatar</th>
+                <th>Trainer</th>
+                <th>Level</th>
+                <th>XP Progress</th>
+                <th>Wins</th>
+                <th>Losses</th>
+                <th>Win Rate</th>
+                <th>Region</th>
+                <th>Tier</th>
+                <th>Favorite</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Hall of Fame Section -->
+        <h2 class="fame-section-title">Hall of Fame</h2>
+        <div class="fame-grid" id="fame-grid-container">
+          <div class="fame-card">
+            <div class="fame-year">S1</div>
+            <div class="fame-details">
+              <span class="fame-trainer-name">Trainer Lance</span>
+              <span style="font-size: 10px; color: var(--yellow);">Champion 2026</span>
+              <div class="fame-pokemon-row">
+                <img class="fame-pkmn-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png" alt="Dragonite">
+                <img class="fame-pkmn-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" alt="Charizard">
+              </div>
+            </div>
+          </div>
+          <div class="fame-card">
+            <div class="fame-year">S2</div>
+            <div class="fame-details">
+              <span class="fame-trainer-name">Trainer Cynthia</span>
+              <span style="font-size: 10px; color: var(--yellow);">Champion 2025</span>
+              <div class="fame-pokemon-row">
+                <img class="fame-pkmn-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png" alt="Garchomp">
+                <img class="fame-pkmn-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png" alt="Lucario">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Season Ranking Graph -->
+        <div class="chart-container">
+          <span class="timeline-title">Season Rank Progression Graph</span>
+          <canvas id="progressChart" class="chart-canvas"></canvas>
+        </div>
+
+        <!-- Achievements list -->
+        <h2 class="fame-section-title">Championship Achievements</h2>
+        <div class="achievements-grid">
+          <div class="achievement-card">
+            <div class="achievement-name">Champion <span>15%</span></div>
+            <div class="achievement-desc">Reach Rank #1 on any season.</div>
+            <div class="achievement-progress-bar"><div class="achievement-progress-fill" style="width: 15%"></div></div>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-name">Legend Slayer <span>45%</span></div>
+            <div class="achievement-desc">Defeat 50 Legendary Pokemon teams.</div>
+            <div class="achievement-progress-bar"><div class="achievement-progress-fill" style="width: 45%"></div></div>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-name">Gym Master <span>100%</span></div>
+            <div class="achievement-desc">Claim all 8 badges in Kanto, Johto and Hoenn.</div>
+            <div class="achievement-progress-bar"><div class="achievement-progress-fill" style="width: 100%"></div></div>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-name">Battle King <span>80%</span></div>
+            <div class="achievement-desc">Win 500 battles in Matchmaking lobby.</div>
+            <div class="achievement-progress-bar"><div class="achievement-progress-fill" style="width: 80%"></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Trainer details Inspector card -->
+      <aside class="sidebar-column">
+        <article class="sidebar-details-card" id="details-card">
+          <div class="sidebar-header-portrait">
+            <div class="sidebar-portrait-avatar" id="details-avatar"></div>
+            <span class="details-level-badge" id="details-level-badge">LV 80</span>
+          </div>
+          <div class="sidebar-details-body">
+            <div class="sidebar-title-row">
+              <h2 class="sidebar-trainer-name" id="details-name">Trainer Ash</h2>
+              <span class="sidebar-tier-label" id="details-tier">Champion</span>
+            </div>
+            
+            <div style="font-size: 0.72rem; color: rgba(255,255,255,0.7); display: flex; flex-direction: column; gap: 4px;">
+              <div>XP Points: <b><span id="details-xp">958,400</span></b></div>
+              <div class="xp-progress-bar-outer" style="width:100%"><div class="xp-progress-bar-inner" id="details-xp-fill" style="width: 95%"></div></div>
+            </div>
+
+            <!-- Mini Pulse Map -->
+            <div class="mini-ranking-map">
+              <svg class="mini-map-svg" viewBox="0 0 100 100">
+                <rect x="0" y="0" width="100" height="100" fill="#080e1a"/>
+                <path d="M10,20 Q20,10 30,25 T50,30 T70,20 T90,30" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+                <path d="M15,45 Q40,30 55,50 T80,60" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
+                <circle cx="22" cy="46" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="34" cy="42" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="63" cy="38" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="50" cy="21" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="45" cy="55" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="58" cy="55" r="3" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="28" cy="62" r="3" fill="rgba(255,255,255,0.1)"/>
+              </svg>
+              <div class="mini-map-pulse-marker" id="details-map-marker" style="left: 22%; top: 46%;"></div>
+            </div>
+
+            <!-- 6-Pokémon Roster Cards -->
+            <div class="timeline-title">Active Roster Team</div>
+            <div class="trainer-roster-row" id="details-roster" onclick="openTeamModal()">
+              <!-- Generated dynamically by script -->
+            </div>
+
+            <!-- Recent Battle History timeline -->
+            <div class="timeline-title">Recent Battle Log</div>
+            <div class="timeline-list" id="details-timeline">
+              <!-- Generated dynamically by script -->
+            </div>
+
+            <!-- Rank Rewards list with Icons -->
+            <div class="timeline-title">Rank Reward Display</div>
+            <div class="rewards-badges-row" id="details-rewards-row">
+              <!-- Populated dynamically with beautiful hovered items -->
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <!-- INTERACTIVE TEAM VIEW MODAL -->
+  <div class="modal-backdrop" id="team-modal" onclick="closeTeamModal()">
+    <div class="team-modal-container" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closeTeamModal()">&times;</button>
+      <h2 class="modal-header-title" id="modal-title">Trainer's Pokémon Team</h2>
+      <div style="font-size: 0.72rem; color: var(--yellow); margin-bottom: 12px;" id="modal-score">Team Power Rating: 4,850</div>
+      <div class="team-grid-modal" id="modal-team-grid">
+        <!-- Dynamic modal slots -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAMPION CEREMONY FULL OVERLAY -->
+  <div class="ceremony-overlay" id="ceremony-overlay" onclick="closeCeremony()">
+    <div class="ceremony-content" onclick="event.stopPropagation()">
+      <div class="ceremony-spotlight"></div>
+      
+      <!-- Trophy SVG icon -->
+      <svg class="ceremony-trophy" viewBox="0 0 24 24">
+        <path d="M19 2h-4v2h4v3c0 2.21-1.79 4-4 4h-2v2h2c1.75 0 3.29-.98 4.07-2.42C19.78 9.94 20 9 20 8V4c0-1.1-.9-2-2-2zM5 2c-1.1 0-2 .9-2 2v4c0 1 .22 1.94.8 2.58C4.58 12.02 6.13 13 7.88 13h2v-2h-2c-2.21 0-4-1.79-4-4V4h4V2H5zm7 11c-2.76 0-5 2.24-5 5v2h10v-2c0-2.76-2.24-5-5-5z"/>
+      </svg>
+
+      <h1 class="ceremony-title">SEASON CHAMPION</h1>
+      <div class="ceremony-avatar" id="ceremony-avatar"></div>
+      <div class="ceremony-trainer-name" id="ceremony-name">Trainer Ash</div>
+      <div style="color:#ffd86b; font-size:14px; font-weight:800; text-transform:uppercase; margin-top:8px;">Crown Level 80 reached!</div>
+      
+      <button class="btn-explore-region" style="margin:20px auto 0;" onclick="closeCeremony()">Dismiss Ceremony</button>
+    </div>
+  </div>
+
+  <div id="toast">Message</div>
+
+  <script>
+    // Web Audio Synthesis engine
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        if (type === 'hover') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
+          gain.gain.setValueAtTime(0.015, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'select') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(550, now);
+          osc.frequency.setValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'victory') {
+          // Championship Fanfare arpeggio
+          const notes = [523, 659, 784, 1046, 1318];
+          notes.forEach((freq, idx) => {
+            const t = now + idx * 0.07;
+            const nodeOsc = audioCtx.createOscillator();
+            const nodeGain = audioCtx.createGain();
+            nodeOsc.connect(nodeGain);
+            nodeGain.connect(audioCtx.destination);
+            
+            nodeOsc.type = 'sine';
+            nodeOsc.frequency.setValueAtTime(freq, t);
+            nodeGain.gain.setValueAtTime(0.06, t);
+            nodeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+            nodeOsc.start(t);
+            nodeOsc.stop(t + 0.25);
+          });
+        } else if (type === 'unlock') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.setValueAtTime(300, now + 0.05);
+          gain.gain.setValueAtTime(0.03, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        }
+      } catch (err) {
+        console.warn("Audio Context blocked:", err);
+      }
+    }
+
+    // REGIONS COORDINATES MAP
+    const regionCoords = {
+      "Kanto": { x: 22, y: 46 },
+      "Johto": { x: 34, y: 42 },
+      "Hoenn": { x: 63, y: 38 },
+      "Sinnoh": { x: 50, y: 21 },
+      "Unova": { x: 45, y: 55 },
+      "Kalos": { x: 58, y: 55 },
+      "Alola": { x: 28, y: 62 },
+      "Galar": { x: 48, y: 72 },
+      "Paldea": { x: 67, y: 72 }
+    };
+
+    // GENERATOR SEED DATA FOR TRAINERS
+    const adjectives = ["Crimson", "Shadow", "Apex", "Elite", "Legendary", "Mystic", "Savage", "Giga", "Nova", "Cyber", "Zen", "Void", "Spectral", "Cosmic", "Primal"];
+    const nouns = ["Red", "Blue", "Gold", "Silver", "Ruby", "Sapphire", "Emerald", "Diamond", "Pearl", "Platinum", "Ash", "Gary", "Cynthia", "Leon", "Steven", "Lance", "Red", "Leaf", "Ethan", "Lyra", "Brendan", "May", "Lucas", "Dawn", "Hilbert", "Hilda", "Nate", "Rosa", "Calem", "Serena", "Elio", "Selene", "Victor", "Gloria", "Florian", "Juliana"];
+    
+    // Pokemon Metadata
+    const pokemonArtworks = {
+      "Pikachu": { id: 25, types: ["Electric"], ability: "Static" },
+      "Charizard": { id: 6, types: ["Fire", "Flying"], ability: "Blaze" },
+      "Blastoise": { id: 9, types: ["Water"], ability: "Torrent" },
+      "Venusaur": { id: 3, types: ["Grass", "Poison"], ability: "Overgrow" },
+      "Lugia": { id: 249, types: ["Psychic", "Flying"], ability: "Multiscale" },
+      "Ho-Oh": { id: 250, types: ["Fire", "Flying"], ability: "Regenerator" },
+      "Rayquaza": { id: 384, types: ["Dragon", "Flying"], ability: "Air Lock" },
+      "Dialga": { id: 483, types: ["Steel", "Dragon"], ability: "Pressure" },
+      "Palkia": { id: 484, types: ["Water", "Dragon"], ability: "Pressure" },
+      "Garchomp": { id: 445, types: ["Dragon", "Ground"], ability: "Sand Veil" },
+      "Metagross": { id: 376, types: ["Steel", "Psychic"], ability: "Clear Body" },
+      "Dragonite": { id: 149, types: ["Dragon", "Flying"], ability: "Inner Focus" },
+      "Lucario": { id: 448, types: ["Fighting", "Steel"], ability: "Inner Focus" },
+      "Greninja": { id: 658, types: ["Water", "Dark"], ability: "Battle Bond" },
+      "Lycanroc": { id: 745, types: ["Rock"], ability: "Tough Claws" },
+      "Decidueye": { id: 724, types: ["Grass", "Ghost"], ability: "Overgrow" }
+    };
+    
+    const pokemonList = Object.keys(pokemonArtworks).map(name => ({
+      name: name,
+      id: pokemonArtworks[name].id,
+      types: pokemonArtworks[name].types,
+      ability: pokemonArtworks[name].ability
+    }));
+
+    let dbTrainers = [];
+    let selectedTrainerId = null;
+    let selectedSeason = "all-time";
+    let chartDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    function generateTrainerDatabase() {
+      // Seed Rank 1 as Ash Ketchum
+      dbTrainers = [
+        {
+          id: "trainer-ash",
+          name: "Trainer Ash",
+          level: 80,
+          xp: 958400,
+          wins: 584,
+          losses: 82,
+          winRate: 88,
+          region: "Kanto",
+          tier: "Champion",
+          pokemon: "Pikachu",
+          avatarSeed: 25,
+          historyDir: "up",
+          team: [
+            { name: "Pikachu", lvl: 80, hp: 100, item: "Light Ball" },
+            { name: "Charizard", lvl: 78, hp: 100, item: "Charizardite X" },
+            { name: "Lucario", lvl: 75, hp: 100, item: "Lucarionite" },
+            { name: "Garchomp", lvl: 76, hp: 100, item: "Life Orb" },
+            { name: "Greninja", lvl: 79, hp: 100, item: "Focus Sash" },
+            { name: "Dragonite", lvl: 74, hp: 100, item: "Leftovers" }
+          ]
+        }
+      ];
+
+      // Generate 105 more trainers
+      const items = ["Life Orb", "Choice Band", "Leftovers", "Focus Sash", "Expert Belt", "Assault Vest", "Heavy-Duty Boots", "Rocky Helmet"];
+      
+      for (let i = 2; i <= 110; i++) {
+        const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const noun = nouns[Math.floor(Math.random() * nouns.length)];
+        const tName = `${adj} ${noun}`;
+        
+        const lvl = Math.floor(Math.random() * 45) + 25; 
+        const wins = Math.floor(Math.random() * 300) + 50;
+        const losses = Math.floor(Math.random() * 150) + 20;
+        const winRate = Math.round((wins / (wins + losses)) * 100);
+        
+        const xp = lvl * 12000 + wins * 85;
+        const regionKeys = Object.keys(regionCoords);
+        const region = regionKeys[Math.floor(Math.random() * regionKeys.length)];
+        
+        let tier = "Gold";
+        if (i < 10) tier = "Master";
+        else if (i < 30) tier = "Diamond";
+        
+        const pkmnObj = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+
+        // Generate team
+        const team = [];
+        for (let j = 0; j < 6; j++) {
+          const randPkmn = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+          team.push({
+            name: randPkmn.name,
+            lvl: lvl - Math.floor(Math.random() * 8),
+            hp: 100,
+            item: items[Math.floor(Math.random() * items.length)]
+          });
+        }
+
+        dbTrainers.push({
+          id: `trainer-${i}`,
+          name: tName,
+          level: lvl,
+          xp: xp,
+          wins: wins,
+          losses: losses,
+          winRate: winRate,
+          region: region,
+          tier: tier,
+          pokemon: pkmnObj.name,
+          avatarSeed: pkmnObj.id,
+          historyDir: Math.random() > 0.5 ? "up" : "down",
+          team: team
+        });
+      }
+
+      sortTrainerDatabase();
+    }
+
+    function sortTrainerDatabase() {
+      dbTrainers.sort((a, b) => b.xp - a.xp);
+      dbTrainers.forEach((t, idx) => {
+        if (t.id === "trainer-ash") return;
+        t.xp = 900000 - idx * 6000;
+        t.level = Math.min(72, Math.max(25, 75 - Math.floor(idx / 2)));
+      });
+      dbTrainers.sort((a, b) => b.xp - a.xp);
+    }
+
+    // Live ranking loop engine
+    function startLiveUpdatesEngine() {
+      setInterval(() => {
+        const idx = Math.floor(Math.random() * 18) + 2; 
+        const trainer = dbTrainers[idx];
+        if (!trainer) return;
+
+        const increment = Math.floor(Math.random() * 8000) + 2000;
+        trainer.xp += increment;
+
+        const aboveTrainer = dbTrainers[idx - 1];
+        if (aboveTrainer && trainer.xp > aboveTrainer.xp) {
+          // Swap ranks
+          dbTrainers[idx] = aboveTrainer;
+          dbTrainers[idx - 1] = trainer;
+          
+          trainer.historyDir = "up";
+          aboveTrainer.historyDir = "down";
+          
+          showToast(`LIVE update: ${trainer.name} climbed to Rank #${idx}!`);
+          playSound("unlock");
+          
+          renderPodium();
+          renderTable();
+          if (selectedTrainerId === trainer.id || selectedTrainerId === aboveTrainer.id) {
+            inspectTrainer(selectedTrainerId);
+          }
+        } else {
+          renderTable();
+        }
+      }, 5000);
+    }
+
+    function updateHeroStats() {
+      const totalBattles = dbTrainers.reduce((sum, t) => sum + t.wins + t.losses, 0);
+      animateCounter("stat-total-trainers", 0, dbTrainers.length + 12340, "", true);
+      animateCounter("stat-battles-played", 0, totalBattles + 87000, "", true);
+    }
+
+    function animateCounter(elemId, start, end, suffix = "", isInt = true) {
+      const obj = document.getElementById(elemId);
+      if (!obj) return;
+      
+      let current = start;
+      const duration = 700; 
+      const stepTime = 20; 
+      const increment = (end - start) / (duration / stepTime);
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment >= 0 && current >= end) || (increment < 0 && current <= end)) {
+          current = end;
+          clearInterval(timer);
+        }
+        obj.textContent = isInt ? Math.round(current).toLocaleString() + suffix : `${Math.round(current)}${suffix}`;
+      }, stepTime);
+    }
+
+    // Render podium with floating elements and background particle loops
+    function renderPodium() {
+      const container = document.getElementById("podium-container");
+      container.innerHTML = "";
+
+      const top3 = dbTrainers.slice(0, 3);
+      
+      top3.forEach((trainer, idx) => {
+        const rank = idx + 1;
+        const card = document.createElement("div");
+        card.className = `podium-card rank-${rank}`;
+        
+        // Add absolute particle layer
+        const particles = document.createElement("div");
+        particles.className = "podium-particle-emitter";
+        for (let i = 0; i < 6; i++) {
+          const spark = document.createElement("div");
+          spark.className = "podium-emit-sparkle";
+          spark.style.left = Math.random() * 90 + "%";
+          spark.style.animationDelay = Math.random() * 2 + "s";
+          particles.appendChild(spark);
+        }
+        card.appendChild(particles);
+
+        const cardContent = document.createElement("div");
+        cardContent.innerHTML = `
+          ${rank === 1 ? '<div class="champion-wings"></div>' : ''}
+          ${rank === 1 ? `
+            <svg class="champion-crown" viewBox="0 0 24 24">
+              <path d="M5 16h14v2H5zm14-8l-3.5 4.5-3.5-4.5-3.5 4.5L5 8V6h14z"/>
+            </svg>
+          ` : ''}
+          <div class="podium-badge">${rank}</div>
+          <div class="podium-avatar-wrapper" style="background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png')"></div>
+          <h3 class="podium-name">${trainer.name}</h3>
+          <span class="podium-level-tag">LV ${trainer.level} — ${trainer.tier}</span>
+          <img class="podium-pokemon-art" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png" alt="Mascot">
+          
+          <div class="podium-stats-list">
+            <div class="podium-stat-item">XP Points: <b>${trainer.xp.toLocaleString()}</b></div>
+            <div class="podium-stat-item">Win Rate: <b>${trainer.winRate}%</b></div>
+            <div class="podium-stat-item">Wins: <b>${trainer.wins}</b></div>
+          </div>
+        `;
+        card.appendChild(cardContent);
+
+        card.addEventListener("click", () => {
+          if (rank === 1) {
+            triggerChampionCeremony(trainer);
+          } else {
+            selectTrainer(trainer.id);
+          }
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // Render Table rows with width animations on progress bar load
+    function renderTable() {
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = "";
+
+      const query = document.getElementById("search-input").value.trim().toLowerCase();
+      const regionFilter = document.getElementById("filter-region").value;
+      const tierFilter = document.getElementById("filter-tier").value;
+      const sortBy = document.getElementById("sort-order").value;
+
+      let filtered = dbTrainers.filter(t => {
+        const nameMatch = t.name.toLowerCase().includes(query);
+        const regionMatch = regionFilter === "all" || t.region === regionFilter;
+        const tierMatch = tierFilter === "all" || t.tier === tierFilter;
+        return nameMatch && regionMatch && tierMatch;
+      });
+
+      if (sortBy === "xp") {
+        filtered.sort((a, b) => b.xp - a.xp);
+      } else if (sortBy === "wins") {
+        filtered.sort((a, b) => b.wins - a.wins);
+      } else if (sortBy === "level") {
+        filtered.sort((a, b) => b.level - a.level);
+      } else if (sortBy === "rate") {
+        filtered.sort((a, b) => b.winRate - a.winRate);
+      }
+
+      filtered.forEach((trainer) => {
+        const rank = dbTrainers.indexOf(trainer) + 1;
+        const row = document.createElement("tr");
+        if (trainer.id === selectedTrainerId) {
+          row.classList.add("selected-row");
+        }
+
+        row.innerHTML = `
+          <td>
+            <div class="table-rank-cell">
+              #${rank}
+              <span class="rank-arrow ${trainer.historyDir === 'up' ? 'up' : 'down'}">
+                ${trainer.historyDir === 'up' ? '▲' : '▼'}
+              </span>
+            </div>
+          </td>
+          <td>
+            <div class="table-avatar-cell" style="background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png')"></div>
+          </td>
+          <td class="table-name-cell">${trainer.name}</td>
+          <td>LV ${trainer.level}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="xp-progress-bar-outer">
+                <div class="xp-progress-bar-inner" data-xp-target="${Math.min(100, Math.round(trainer.xp / 10000))}"></div>
+              </div>
+              <span style="font-size:10px">${trainer.xp.toLocaleString()}</span>
+            </div>
+          </td>
+          <td>${trainer.wins}</td>
+          <td>${trainer.losses}</td>
+          <td style="font-weight:700">${trainer.winRate}%</td>
+          <td>${trainer.region}</td>
+          <td><span class="tier-badge tier-${trainer.tier.toLowerCase()}">${trainer.tier}</span></td>
+          <td>
+            <img class="table-pkmn-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png" alt="PKMN">
+          </td>
+        `;
+
+        row.addEventListener("click", () => {
+          selectTrainer(trainer.id);
+        });
+
+        row.addEventListener("mouseenter", () => {
+          playSound("hover");
+        });
+
+        tbody.appendChild(row);
+      });
+
+      // Animate progress bars from 0 to target on load
+      requestAnimationFrame(() => {
+        document.querySelectorAll(".xp-progress-bar-inner").forEach(bar => {
+          const targetWidth = bar.getAttribute("data-xp-target");
+          bar.style.width = targetWidth + "%";
+        });
+      });
+    }
+
+    function selectTrainer(trainerId) {
+      playSound("select");
+      selectedTrainerId = trainerId;
+      inspectTrainer(trainerId);
+      
+      document.querySelectorAll(".ranking-table tr").forEach(r => r.classList.remove("selected-row"));
+      renderTable();
+    }
+
+    function inspectTrainer(trainerId) {
+      const trainer = dbTrainers.find(x => x.id === trainerId);
+      if (!trainer) return;
+
+      document.getElementById("details-avatar").style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png')`;
+      document.getElementById("details-name").textContent = trainer.name;
+      document.getElementById("details-tier").textContent = trainer.tier;
+      document.getElementById("details-level-badge").textContent = `LV ${trainer.level}`;
+      document.getElementById("details-xp").textContent = trainer.xp.toLocaleString();
+      document.getElementById("details-xp-fill").style.width = `${Math.min(100, Math.round(trainer.xp / 10000))}%`;
+
+      // Mini map pulse
+      const coord = regionCoords[trainer.region] || { x: 50, y: 50 };
+      const marker = document.getElementById("details-map-marker");
+      marker.style.left = coord.x + "%";
+      marker.style.top = coord.y + "%";
+
+      // Render Active Roster
+      const roster = document.getElementById("details-roster");
+      roster.innerHTML = trainer.team.map(pkmn => {
+        const match = pokemonList.find(p => p.name === pkmn.name) || { id: 25 };
+        return `
+          <div class="roster-pkmn-frame" title="${pkmn.name}">
+            <img class="roster-pkmn-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${match.id}.png" alt="PKMN">
+            <div class="roster-pkmn-lvl-badge">LV ${pkmn.lvl}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Timeline log with icons
+      const timeline = document.getElementById("details-timeline");
+      timeline.innerHTML = "";
+      
+      const opponentArtworks = [25, 6, 9, 3, 249, 445];
+      const opponents = ["Cynthia", "Steven", "Leon", "Lance", "Blue", "Gary", "Red"];
+      
+      for (let i = 0; i < 5; i++) {
+        const isWin = Math.random() > 0.3;
+        const opponentName = opponents[Math.floor(Math.random() * opponents.length)];
+        const opponentAvatar = opponentArtworks[Math.floor(Math.random() * opponentArtworks.length)];
+        const time = `${Math.floor(Math.random() * 5) + 3}m`;
+        
+        const item = document.createElement("div");
+        item.className = `timeline-item ${isWin ? 'win' : 'loss'}`;
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:20px; height:20px; border-radius:50%; background:url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${opponentAvatar}.png') center/cover; border:1px solid rgba(255,255,255,0.2)"></div>
+            <span>vs ${opponentName} (${time})</span>
+          </div>
+          <b style="color: ${isWin ? 'var(--green)' : 'var(--red)'}">${isWin ? 'WIN' : 'LOSS'}</b>
+        `;
+        timeline.appendChild(item);
+      }
+
+      // Rewards items with interactive badges
+      const rewardsRow = document.getElementById("details-rewards-row");
+      rewardsRow.innerHTML = "";
+      
+      if (trainer.tier === "Champion") {
+        rewardsRow.innerHTML = `
+          <div class="reward-badge-item" title="Champion Trophy">
+            <svg class="reward-icon-svg" viewBox="0 0 24 24"><path d="M19 2h-4v2h4v3c0 2.21-1.79 4-4 4h-2v2h2c1.75 0 3.29-.98 4.07-2.42C19.78 9.94 20 9 20 8V4c0-1.1-.9-2-2-2z"/></svg>
+            Trophy
+          </div>
+          <div class="reward-badge-item" title="Legendary Badge">
+            <svg class="reward-icon-svg" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99z"/></svg>
+            Badge
+          </div>
+        `;
+      } else if (trainer.tier === "Master") {
+        rewardsRow.innerHTML = `
+          <div class="reward-badge-item" title="Master Ball Bundle">
+            <svg class="reward-icon-svg" viewBox="0 0 24 24" fill="#a855f7"><circle cx="12" cy="12" r="10"/></svg>
+            Master Ball
+          </div>
+        `;
+      } else {
+        rewardsRow.innerHTML = `
+          <div class="reward-badge-item" title="Rare Candy Bundle">
+            <svg class="reward-icon-svg" viewBox="0 0 24 24" fill="#22c55e"><path d="M12 2l10 10-10 10-10-10z"/></svg>
+            Rare Candy
+          </div>
+        `;
+      }
+
+      drawProgressChart();
+    }
+
+    function drawProgressChart() {
+      const canvas = document.getElementById("progressChart");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const y = 30 + i * 40;
+        ctx.beginPath();
+        ctx.moveTo(10, y);
+        ctx.lineTo(290, y);
+        ctx.stroke();
+      }
+
+      // Graph curves
+      ctx.strokeStyle = "var(--yellow)";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(15, 120);
+      
+      // Dynamic curves depending on tab
+      if (selectedSeason === "daily") {
+        ctx.bezierCurveTo(90, 80, 180, 100, 280, 50);
+      } else if (selectedSeason === "weekly") {
+        ctx.bezierCurveTo(60, 140, 190, 20, 280, 40);
+      } else {
+        ctx.bezierCurveTo(80, 110, 150, 40, 280, 30);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(280, 30, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Modal Team Viewer with custom types
+    function openTeamModal() {
+      const trainer = dbTrainers.find(x => x.id === selectedTrainerId);
+      if (!trainer) return;
+
+      playSound("unlock");
+      
+      document.getElementById("modal-title").textContent = `${trainer.name}'s Pokémon Team`;
+      
+      const powerScore = trainer.team.reduce((sum, p) => sum + p.lvl * 10 + 500, 0);
+      document.getElementById("modal-score").textContent = `Team Power Score: ${powerScore.toLocaleString()}`;
+      
+      const grid = document.getElementById("modal-team-grid");
+      grid.innerHTML = trainer.team.map(pkmn => {
+        const match = pokemonList.find(p => p.name === pkmn.name) || { id: 25, types: ["Electric"], ability: "Static" };
+        const typeBadges = match.types.map(t => `<span class="modal-type-badge type-${t.toLowerCase()}">${t}</span>`).join('');
+        
+        return `
+          <div class="modal-pkmn-card">
+            <img class="modal-pkmn-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${match.id}.png" alt="PKMN">
+            <h4 class="modal-pkmn-name">${pkmn.name}</h4>
+            <div class="modal-pkmn-level">Level ${pkmn.lvl}</div>
+            
+            <div class="modal-hp-bar-outer">
+              <div class="modal-hp-bar-inner" style="width: ${pkmn.hp}%"></div>
+            </div>
+            
+            <div class="modal-pkmn-meta">
+              <div>Type: ${typeBadges}</div>
+              <div>Ability: <b>${match.ability}</b></div>
+              <div>Held Item: <b>${pkmn.item}</b></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const modal = document.getElementById("team-modal");
+      modal.style.display = "flex";
+      setTimeout(() => {
+        modal.classList.add("show");
+      }, 50);
+    }
+
+    function closeTeamModal() {
+      playSound("click");
+      const modal = document.getElementById("team-modal");
+      modal.classList.remove("show");
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+
+    // CHAMPION CEREMONY cinematic overlay
+    function triggerChampionCeremony(trainer) {
+      playSound("victory");
+      
+      document.getElementById("ceremony-name").textContent = trainer.name;
+      document.getElementById("ceremony-avatar").style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${trainer.avatarSeed}.png')`;
+
+      const overlay = document.getElementById("ceremony-overlay");
+      overlay.style.display = "flex";
+      setTimeout(() => {
+        overlay.classList.add("show");
+      }, 50);
+
+      // Gold confetti sparks falling
+      const center = document.querySelector(".ceremony-content");
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti-sparkle";
+        confetti.style.left = (Math.random() * 200 - 100) + "px";
+        confetti.style.top = (Math.random() * -100) + "px";
+        confetti.style.animationDuration = (2 + Math.random() * 2.5) + "s";
+        confetti.style.animationDelay = (Math.random() * 1.5) + "s";
+        center.appendChild(confetti);
+      }
+    }
+
+    function closeCeremony() {
+      playSound("click");
+      const overlay = document.getElementById("ceremony-overlay");
+      overlay.classList.remove("show");
+      setTimeout(() => {
+        overlay.style.display = "none";
+        document.querySelectorAll(".confetti-sparkle").forEach(c => c.remove());
+      }, 300);
+    }
+
+    function setSeason(seasonVal, btn) {
+      playSound("click");
+      selectedSeason = seasonVal;
+      document.querySelectorAll(".season-tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      
+      dbTrainers.forEach(t => {
+        if (t.id === "trainer-ash") return;
+        t.xp += Math.floor(Math.random() * 15000) - 7500;
+      });
+      sortTrainerDatabase();
+      renderPodium();
+      renderTable();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    // Scroll reveal observer for Hall of Fame
+    function setupScrollReveal() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("reveal-active");
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll(".fame-card").forEach(card => {
+        observer.observe(card);
+      });
+    }
+
+    // Input listeners
+    document.getElementById("search-input").addEventListener("input", renderTable);
+    document.getElementById("filter-region").addEventListener("change", renderTable);
+    document.getElementById("filter-tier").addEventListener("change", renderTable);
+    document.getElementById("sort-order").addEventListener("change", renderTable);
+
+    // Initializers
+    
+    
+    checkUserWelcome();
+    generateTrainerDatabase();
+    updateHeroStats();
+    renderPodium();
+    renderTable();
+    selectTrainer("trainer-ash");
+    startLiveUpdatesEngine();
+    setupScrollReveal();
+
+    // Floating Sparks
+    const sparksContainer = document.getElementById("sparks-container");
+    for (let i = 0; i < 40; i++) {
+      const spark = document.createElement("div");
+      spark.className = `spark ${Math.random() > 0.5 ? 'orange' : 'blue'}`;
+      spark.style.left = Math.random() * 100 + "vw";
+      spark.style.animationDuration = (7 + Math.random() * 8) + "s";
+      spark.style.animationDelay = Math.random() * 5 + "s";
+      sparksContainer.appendChild(spark);
+    }
+
+    function checkUserWelcome() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user) {
+            if (user.role === 'admin' || user.isAdmin) {
+              const adminLink = document.getElementById("adminLink") || document.getElementById("adminNavLink");
+              if (adminLink) {
+                adminLink.style.display = "inline-flex";
+                adminLink.style.visibility = "visible";
+                adminLink.style.opacity = "1";
+              }
+            }
+            if (user.trainerName) {
+              document.getElementById("trainerWelcome").textContent = "Welcome, " + user.trainerName;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    // Page load console print
+    console.log("userRole =", localStorage.getItem("userRole"));
+
+    // Admin visibility logic
+    let parsedIsAdmin = false;
+    const userStr = localStorage.getItem("pokemonNexusUser");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && (user.role === "admin" || user.isAdmin)) {
+          parsedIsAdmin = true;
+        }
+      } catch (e) {}
+    }
+
+    const role =
+      localStorage.getItem("userRole") ||
+      localStorage.getItem("currentUserRole") ||
+      localStorage.getItem("role");
+
+    const isAdmin =
+      role === "admin" ||
+      localStorage.getItem("isAdmin") === "true" ||
+      parsedIsAdmin;
+
+    const adminNavLink = document.getElementById("adminNavLink") || document.getElementById("adminLink");
+    if (adminNavLink) {
+      if (isAdmin) {
+        adminNavLink.style.display = "inline-flex";
+        adminNavLink.style.visibility = "visible";
+        adminNavLink.style.opacity = "1";
+      } else {
+        adminNavLink.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>

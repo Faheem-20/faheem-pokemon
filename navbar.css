@@ -1,0 +1,106 @@
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1200px, 94vw);
+  height: 60px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  border-radius: 20px;
+  background: rgba(5, 8, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 25px rgba(255, 88, 0, 0.2);
+}
+
+.nav-brand {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 24px;
+  color: #ffcb05;
+  -webkit-text-stroke: 1.2px #0757a8;
+  text-shadow: 0 0 12px #ff6b00;
+  display: flex;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover {
+  background: rgba(255, 100, 0, 0.2);
+  text-shadow: 0 0 10px #ff7a00;
+}
+
+.nav-links a.active {
+  background: rgba(255, 100, 0, 0.3);
+  text-shadow: 0 0 10px #ff7a00;
+  box-shadow: inset 0 0 8px rgba(255, 100, 0, 0.4);
+  border: 1px solid rgba(255, 100, 0, 0.3);
+}
+
+.trainer-profile-card-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+  padding: 4px 10px 4px 5px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.trainer-avatar-nav {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffd86b url("trainer_character.png?v=12") no-repeat center 15%/210%;
+  border: 1.5px solid #ffcb05;
+}
+
+.trainer-info-block-nav {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.trainer-info-name-nav {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.trainer-info-level-nav {
+  font-size: 0.6rem;
+  color: #ffcb05;
+  font-weight: 700;
+}
+
+.fire-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, #ff3000, #ffd000, #ff3000, transparent);
+  filter: blur(5px);
+  opacity: .8;
+}

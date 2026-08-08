@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Nexus — Kingdom Map</title>
+  <link rel="stylesheet" href="navbar.css">
+  <style>
+    /* ============================================================
+       POKÉMON NEXUS — KINGDOM MAP (AAA EXPERIENCE UPGRADE)
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;500;600;700;900&display=swap');
+
+    :root {
+      --radius-card: 20px;
+      --radius-sm: 12px;
+      --yellow: #ffcb05;
+      --red: #ff3d00;
+      --blue: #0c70ff;
+      --green: #10b981;
+      --purple: #a855f7;
+      --orange: #f97316;
+      --shadow-glow: 0 0 25px rgba(255, 107, 0, 0.35);
+      
+      --rarity-common: #9ca3af;
+      --rarity-uncommon: #10b981;
+      --rarity-rare: #3b82f6;
+      --rarity-epic: #a855f7;
+      --rarity-legendary: #ffcb05;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("background.jpg") center/cover no-repeat fixed;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Ambient Sparks & Fog Layers */
+    #sparks-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+      animation: floatSpark 8s linear infinite;
+    }
+
+    .spark.orange {
+      background: #ff5500;
+      box-shadow: 0 0 10px #ff5500, 0 0 20px #ff5500;
+    }
+
+    .spark.blue {
+      background: #00d0ff;
+      box-shadow: 0 0 10px #00d0ff, 0 0 20px #00d0ff;
+    }
+
+    @keyframes floatSpark {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0.8);
+        opacity: 0;
+      }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% {
+        transform: translateY(-10vh) translateX(100px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .cinematic-rays {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle at 80% 20%, rgba(12, 112, 255, 0.08) 0%, transparent 60%);
+      mix-blend-mode: color-dodge;
+      animation: rayPulse 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes rayPulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1.1; }
+    }
+
+    .fog-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
+      opacity: 0.25;
+      animation: fogMove 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes fogMove {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.1) translate(20px, 10px); }
+    }
+
+    /* Shared navbar styling is linked in navbar.css */
+
+    /* PAGE SHELL */
+    main.page {
+      max-width: 1220px;
+      width: 92vw;
+      margin: 72px auto 40px !important;
+      padding: 8px 22px 80px !important;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: pageLoad 0.6s ease-out;
+    }
+
+    @keyframes pageLoad {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HEADER CONTAINER GRID */
+    .header-layout {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .header-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .header-left-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* HERO SECTION WRAPPER & CINEMATIC BACKGROUND */
+    .kingdom-hero-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 0 !important;
+      z-index: 2;
+    }
+
+    .hero-fire-bg {
+      position: absolute;
+      top: -80px;
+      left: -22px;
+      right: -22px;
+      bottom: 0;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Lava Glow + Charizard Fire Light (Flickering) */
+    .lava-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 75% 65%, rgba(255, 68, 0, 0.55) 0%, rgba(255, 30, 0, 0.2) 40%, rgba(255, 100, 0, 0.05) 70%, transparent 100%);
+      mix-blend-mode: screen;
+      animation: pulseGlow 6s ease-in-out infinite alternate, fireFlicker 0.15s ease-in-out infinite;
+    }
+
+    /* Heat Wave Effect */
+    .heat-wave {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(255, 74, 0, 0.06) 0%, transparent 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      transform-origin: bottom center;
+      animation: heatRising 4s ease-in-out infinite;
+      opacity: 0.9;
+    }
+
+    /* Volumetric Orange Smoke Layer */
+    .smoke-layer {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 25% 75%, rgba(255, 80, 0, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 75% 25%, rgba(255, 110, 0, 0.1) 0%, transparent 50%);
+      filter: blur(30px);
+      mix-blend-mode: screen;
+      animation: smokeDrift 16s ease-in-out infinite alternate;
+    }
+
+    /* Floating Embers */
+    .embers-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ember {
+      position: absolute;
+      bottom: -20px;
+      width: var(--size, 4px);
+      height: var(--size, 4px);
+      background: var(--color, #ff7b00);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--color, #ff7b00), 0 0 15px var(--glow-color, #ff3c00);
+      opacity: 0;
+      animation: floatEmber var(--duration, 6s) linear infinite;
+      animation-delay: var(--delay, 0s);
+      left: var(--left, 50%);
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+
+    @keyframes fireFlicker {
+      0% { opacity: 0.85; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.9; }
+    }
+
+    @keyframes heatRising {
+      0% { transform: scaleY(1) skewX(0deg); filter: blur(1.5px); }
+      50% { transform: scaleY(1.05) skewX(1.5deg); filter: blur(2px); }
+      100% { transform: scaleY(1) skewX(0deg); filter: blur(1.5px); }
+    }
+
+    @keyframes smokeDrift {
+      0% { transform: translate(-20px, -20px) scale(1); }
+      100% { transform: translate(20px, 20px) scale(1.1); }
+    }
+
+    @keyframes floatEmber {
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.9;
+      }
+      90% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-400px) translateX(var(--drift, 40px)) scale(0.3);
+        opacity: 0;
+      }
+    }
+
+    /* HERO SECTION CARD (Glassmorphism & Depth) */
+    .hero-section {
+      position: relative;
+      text-align: left;
+      background: rgba(6, 11, 25, 0.45) !important;
+      border: 1.5px solid rgba(255, 107, 0, 0.28) !important;
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 2;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 
+                  0 0 30px rgba(255, 88, 0, 0.2), 
+                  0 0 60px rgba(255, 61, 0, 0.1),
+                  inset 0 0 15px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+
+    /* Animated diagonal light reflection sheen */
+    .hero-section::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 123, 0, 0.15) 48%,
+        rgba(255, 203, 5, 0.3) 50%,
+        rgba(255, 123, 0, 0.15) 52%,
+        transparent 55%
+      );
+      transform: rotate(-15deg);
+      pointer-events: none;
+      z-index: 3;
+      animation: shineReflection 6s ease-in-out infinite;
+    }
+
+    .hero-section:hover {
+      border-color: rgba(255, 107, 0, 0.48) !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 
+                  0 0 50px rgba(255, 88, 0, 0.3), 
+                  0 0 80px rgba(255, 61, 0, 0.2),
+                  inset 0 0 20px rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes shineReflection {
+      0% {
+        transform: translate(-30%, -30%) rotate(-15deg);
+      }
+      50%, 100% {
+        transform: translate(30%, 30%) rotate(-15deg);
+      }
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .compass-logo {
+      width: 44px;
+      height: 44px;
+      fill: var(--yellow);
+      filter: drop-shadow(0 0 10px rgba(255, 203, 5, 0.45));
+    }
+
+    .hero-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(32px, 4.5vw, 42px);
+      color: var(--yellow);
+      -webkit-text-stroke: 1.2px #0757a8;
+      text-shadow: 0 0 20px rgba(255, 107, 0, 0.45);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-subtitle {
+      font-size: 0.88rem;
+      color: #eaf9ff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      margin: 6px 0 0 0;
+      opacity: 0.85;
+    }
+
+    /* HERO STATISTICS CARDS */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: rgba(5, 8, 18, 0.55);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--yellow);
+      box-shadow: 0 0 15px rgba(255, 203, 5, 0.2), inset 0 1px 2px rgba(255,255,255,0.15);
+    }
+
+    .stat-icon-wrapper {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover .stat-icon-wrapper {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .stat-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: #ffd86b;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .stat-value-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .stat-value-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--yellow), #ffd86b);
+      width: 0%;
+      transition: width 1s ease-in-out;
+    }
+
+    /* RIGHT HEADER LANDSCAPE BANNER */
+    .header-right-banner {
+      background: url("ash_pikachu_sunset.png") center/cover no-repeat;
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-card);
+      position: relative;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.4), 0 8px 30px rgba(0,0,0,0.5);
+      min-height: 140px;
+      overflow: hidden;
+    }
+
+    .header-right-banner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    }
+
+    /* MAIN MAP AND PANEL LAYOUT */
+    .map-content-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .map-content-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* LEFT COLUMN: Map Viewport */
+    .map-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-viewport {
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-card);
+      height: 600px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+    }
+
+    /* Zoom and Pan Container */
+    .map-zoom-pan-layer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      transition: transform 0.8s cubic-bezier(0.25, 1, 0.2, 1);
+      transform-origin: center center;
+      background: url("pokemon_world_map.png") center/cover no-repeat;
+      filter: brightness(1.08) contrast(1.08) saturate(1.12);
+    }
+
+    /* Dynamic Clouds Overlay */
+    .map-clouds {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 45%);
+      z-index: 2;
+      animation: driftClouds 60s linear infinite alternate;
+    }
+
+    @keyframes driftClouds {
+      0% { transform: translate(-30px, -10px); }
+      100% { transform: translate(30px, 10px); }
+    }
+
+    /* Ocean Shimmer Layer */
+    .ocean-shimmer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(12, 112, 255, 0.06) 0%, transparent 80%);
+      mix-blend-mode: overlay;
+      z-index: 1;
+      animation: waterShimmer 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes waterShimmer {
+      0% { opacity: 0.4; transform: scale(0.96); }
+      100% { opacity: 0.95; transform: scale(1.04); }
+    }
+
+    /* Glowing Rivers and Waterfalls Layer */
+    .glowing-waterways {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 35% 55%, rgba(0, 208, 255, 0.06) 0%, transparent 15%),
+                  radial-gradient(circle at 15% 42%, rgba(0, 208, 255, 0.08) 0%, transparent 12%);
+      z-index: 2;
+      mix-blend-mode: color-dodge;
+      animation: waterGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes waterGlow {
+      0% { opacity: 0.5; filter: brightness(1); }
+      100% { opacity: 0.95; filter: brightness(1.4); }
+    }
+
+    /* Animated waterfall mist */
+    .waterfall-mist {
+      position: absolute;
+      left: 25%;
+      top: 48%;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 4;
+      animation: mistPulse 2s infinite alternate;
+    }
+
+    @keyframes mistPulse {
+      0% { transform: scale(0.8) translateY(0); opacity: 0.3; }
+      100% { transform: scale(1.5) translateY(4px); opacity: 0.75; }
+    }
+
+    /* Volcano Smoke clouds */
+    .volcano-smoke {
+      position: absolute;
+      left: 61%;
+      top: 38%;
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(circle, rgba(255, 61, 0, 0.3) 0%, transparent 80%);
+      pointer-events: none;
+      z-index: 4;
+      border-radius: 50%;
+      animation: floatSmoke 5s infinite linear;
+    }
+
+    @keyframes floatSmoke {
+      0% { transform: translateY(0) scale(0.6) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.4; }
+      100% { transform: translateY(-40px) scale(1.4) rotate(45deg); opacity: 0; }
+    }
+
+    .map-grid-tactical {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 2;
+    }
+
+    /* SVG connections layers */
+    .paths-svg-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .travel-path {
+      stroke: rgba(255, 203, 5, 0.15);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 4 6;
+      transition: opacity 0.5s;
+    }
+
+    .travel-path-pulse {
+      stroke: var(--yellow);
+      stroke-width: 3;
+      fill: none;
+      stroke-dasharray: 8 40;
+      stroke-dashoffset: 0;
+      animation: pathMove 3.5s linear infinite;
+      transition: opacity 0.5s;
+    }
+
+    @keyframes pathMove {
+      from { stroke-dashoffset: 160; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Small glowing interactive location markers - FIXED POSITIONS */
+    .region-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      cursor: pointer;
+      outline: none;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border: 3px solid var(--node-color);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--node-color);
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.25s, background 0.25s;
+      animation: none; /* Make sure it never floats, drifts or wanders */
+    }
+
+    /* Hover State - Scale up while keeping center fixed */
+    .region-pin:hover {
+      transform: translate(-50%, -50%) scale(1.35);
+      border-color: var(--yellow);
+      background: var(--yellow);
+      box-shadow: 0 0 25px var(--node-color);
+    }
+
+    /* Active selected state */
+    .region-pin.selected {
+      transform: translate(-50%, -50%) scale(1.45);
+      border-color: var(--yellow);
+      background: var(--yellow);
+      box-shadow: 0 0 30px var(--node-color);
+      z-index: 15;
+    }
+
+    /* Outer glowing ring that expands and fades */
+    .region-pin::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid var(--node-color);
+      animation: pulseRing 1.8s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Floating label tooltip showing on hover */
+    .region-pin-name-tag {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: rgba(5, 8, 18, 0.92);
+      border: 1px solid var(--node-color);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 15;
+      color: #fff;
+    }
+
+    .region-pin:hover .region-pin-name-tag {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .region-pin.selected .region-pin-name-tag {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      background: var(--yellow);
+      color: #000;
+      border-color: #fff;
+    }
+
+    /* Special Legendaries Gold animated border filter */
+    .region-pin.legendary-zone {
+      animation: goldGlowPulse 1.5s infinite alternate;
+    }
+
+    @keyframes goldGlowPulse {
+      0% { box-shadow: 0 0 10px rgba(255, 203, 5, 0.4); }
+      100% { box-shadow: 0 0 25px rgba(255, 203, 5, 0.9); }
+    }
+
+    /* Darken rest of map when zoom targeting area */
+    .map-dimmed-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.08);
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .map-zoom-pan-layer.focused .map-dimmed-overlay {
+      opacity: 1;
+    }
+
+    /* Dynamic fade status for filters */
+    .region-pin.filtered-out {
+      opacity: 0.18 !important;
+      pointer-events: none !important;
+    }
+
+    .travel-path.filtered-out,
+    .travel-path-pulse.filtered-out {
+      opacity: 0.15 !important;
+    }
+
+    /* Mobile Manual Zoom Controls HUD */
+    .zoom-hud-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .zoom-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(5, 8, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .zoom-btn:hover {
+      background: rgba(5, 8, 18, 0.98);
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    /* RIGHT COLUMN: Search, Filters & Selection details panel */
+    .sidebar-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-search-box {
+      position: relative;
+    }
+
+    .sidebar-search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      padding: 10px 14px 10px 40px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .sidebar-search-input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      background: rgba(0,0,0,0.7);
+      box-shadow: 0 0 12px rgba(255, 203, 5, 0.25);
+    }
+
+    .filter-tabs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      background: rgba(0,0,0,0.45);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .filter-tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 8px 0;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .filter-tab-btn:hover {
+      color: #fff;
+    }
+
+    .filter-tab-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--yellow);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-sort-select {
+      width: 100%;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Detailed Static Side Card */
+    .region-details-card {
+      background: rgba(5, 8, 18, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), 0 12px 36px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .details-media-container {
+      position: relative;
+      height: 150px;
+      overflow: hidden;
+    }
+
+    .details-landscape-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .details-landscape-img:hover {
+      transform: scale(1.05);
+    }
+
+    .details-status-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      z-index: 5;
+    }
+
+    .details-status-badge.locked {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .details-body {
+      padding: 18px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .details-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .details-name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.4rem;
+      color: #fff;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Biome Ring Layout */
+    .progress-ring-container {
+      width: 50px;
+      height: 50px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .progress-ring-svg {
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring-circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 4;
+    }
+
+    .progress-ring-circle-fill {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .progress-ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .details-description {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.8);
+      margin: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 10px;
+    }
+
+    /* Key properties grid */
+    .details-props-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.65);
+      border-bottom: 1px dashed rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+    }
+
+    .details-prop-item b {
+      color: #fff;
+      display: block;
+      margin-top: 1px;
+    }
+
+    .details-stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .details-stat-row span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .details-stat-row b {
+      color: #fff;
+    }
+
+    /* Roster Icons Row */
+    .details-icon-roster-title {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #ffd86b;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+
+    .details-badges-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge-icon {
+      font-size: 0.68rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 99px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #e2f2f7;
+    }
+
+    .badge-icon.completed {
+      background: rgba(255, 203, 5, 0.08);
+      border-color: rgba(255, 203, 5, 0.4);
+      color: var(--yellow);
+      box-shadow: 0 0 10px rgba(255, 203, 5, 0.15);
+    }
+
+    .btn-explore-region {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: linear-gradient(90deg, #ff3d00, #ffcb05);
+      color: #130700;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(255, 61, 0, 0.4);
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-explore-region::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-explore-region:hover::before {
+      left: 100%;
+    }
+
+    .btn-explore-region:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 61, 0, 0.65);
+    }
+
+    .btn-explore-region.locked {
+      background: #374151 !important;
+      color: #9ca3af !important;
+      box-shadow: none !important;
+      cursor: not-allowed;
+    }
+
+    /* MAP LEGEND LIST (bottom left of viewport wrapper) */
+    .map-legend-bar {
+      background: rgba(5, 8, 18, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    @media (max-width: 600px) {
+      .map-legend-bar {
+        gap: 10px;
+        justify-content: center;
+      }
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .legend-indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-indicator-dot.unlocked { background: var(--blue); box-shadow: 0 0 8px var(--blue); }
+    .legend-indicator-dot.locked { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .legend-indicator-dot.in-progress { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .legend-indicator-dot.legendary { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+    .legend-indicator-dot.current { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+
+    /* ORNAMENT FLOATING POKEBALL */
+    .floating-pokeball-ornament {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 70px;
+      height: 70px;
+      z-index: 10;
+      opacity: 0.45;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+      animation: floatOrbit 6s ease-in-out infinite alternate, rotateBall 15s linear infinite;
+    }
+
+    @keyframes floatOrbit {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    @keyframes rotateBall {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* CUSTOM TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid var(--yellow);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 203, 5, 0.25);
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    /* KEYBOARD focus visualizer */
+    .region-pin:focus-visible {
+      outline: 2px solid var(--yellow);
+      outline-offset: 4px;
+    }
+
+    /* Map Overlay protections to guarantee clarity and remove dark overlays */
+    .map-viewport::before,
+    .map-viewport::after,
+    .map-zoom-pan-layer::before,
+    .map-zoom-pan-layer::after {
+      background: none !important;
+      backdrop-filter: none !important;
+      opacity: 0 !important;
+    }
+    
+  </style>
+
+  <script src="game-sync.js"></script>
+</head>
+<body>
+  <!-- Ambient Spark layers -->
+  <div id="sparks-container"></div>
+  
+  <div class="cinematic-rays"></div>
+  <div class="fog-layer"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pokedex.html">Pokédex</a>
+      <a href="battle.html">Battle</a>
+      <a href="kingdom-map.html" class="active">Kingdom Map</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="achievements.html">Achievements</a>
+      <a href="events.html">Events</a>
+      <a href="admin/admin.html" id="adminLink" style="display:none">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <main class="page">
+    <!-- TOP HEADER GRID LAYOUT -->
+    <header class="header-layout">
+      <div class="header-left-block">
+        <div class="kingdom-hero-wrapper">
+          <div class="hero-fire-bg">
+            <div class="lava-glow"></div>
+            <div class="smoke-layer"></div>
+            <div class="heat-wave"></div>
+            <div class="embers-layer">
+              <span class="ember" style="--left: 5%; --size: 3px; --duration: 6s; --delay: 0.5s; --drift: 30px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 15%; --size: 5px; --duration: 8s; --delay: 1.2s; --drift: -40px; --color: #ffa500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 28%; --size: 2px; --duration: 5s; --delay: 0.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+              <span class="ember" style="--left: 38%; --size: 6px; --duration: 7s; --delay: 2.5s; --drift: -30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 48%; --size: 3px; --duration: 9s; --delay: 1.8s; --drift: 45px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 58%; --size: 2px; --duration: 6s; --delay: 0.8s; --drift: -15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 68%; --size: 5px; --duration: 8s; --delay: 3.0s; --drift: 35px; --color: #ffa500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 78%; --size: 3px; --duration: 7s; --delay: 1.5s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+              <span class="ember" style="--left: 88%; --size: 6px; --duration: 5s; --delay: 0.4s; --drift: 30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 95%; --size: 2px; --duration: 9s; --delay: 2.1s; --drift: -40px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 12%; --size: 4px; --duration: 7.5s; --delay: 3.5s; --drift: 15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 32%; --size: 3px; --duration: 6.5s; --delay: 4.2s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+              <span class="ember" style="--left: 52%; --size: 6px; --duration: 8.5s; --delay: 2.8s; --drift: 40px; --color: #ff4500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 72%; --size: 2px; --duration: 5.5s; --delay: 1.9s; --drift: -20px; --color: #ffa500; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 90%; --size: 5px; --duration: 6.8s; --delay: 4.8s; --drift: 35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 20%; --size: 3px; --duration: 6.2s; --delay: 2.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+              <span class="ember" style="--left: 42%; --size: 4px; --duration: 7.8s; --delay: 1.1s; --drift: -30px; --color: #ffa500; --glow-color: #ff0000;"></span>
+              <span class="ember" style="--left: 62%; --size: 2px; --duration: 5.8s; --delay: 3.7s; --drift: 25px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+              <span class="ember" style="--left: 82%; --size: 5px; --duration: 8.2s; --delay: 0.9s; --drift: -35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+            </div>
+          </div>
+          <div class="hero-section">
+            <div class="title-row">
+              <!-- Compass SVG icon -->
+              <svg class="compass-logo" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" />
+                <polygon points="50,18 53,47 50,50" fill="currentColor" />
+                <polygon points="50,18 47,47 50,50" fill="#fff" />
+                <polygon points="50,82 47,53 50,50" fill="#fff" />
+                <polygon points="50,82 53,53 50,50" fill="currentColor" />
+                <polygon points="82,50 53,47 50,50" fill="#fff" />
+                <polygon points="82,50 53,53 50,50" fill="currentColor" />
+                <polygon points="18,50 47,53 50,50" fill="#fff" />
+                <polygon points="18,50 47,47 50,50" fill="currentColor" />
+                <circle cx="50" cy="50" r="4" fill="currentColor" />
+              </svg>
+              <h1 class="hero-title">Kingdom Map</h1>
+            </div>
+            <p class="hero-subtitle">Explore regions, unlock kingdoms, discover gyms, caves, forests and legendary zones.</p>
+          </div>
+        </div>
+
+        <!-- HERO STATISTICS row -->
+        <section class="stats-container">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#0c70ff"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-3.3 0-6-2.7-6-6h12c0 3.3-2.7 6-6 6zm-6-8c.35-2.28 2.07-4.12 4.35-4.63V9c0 .55.45 1 1 1s1-.45 1-1V7.37c2.28.51 4 2.35 4.35 4.63H6.4z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Regions Unlocked</span>
+              <div class="stat-value" id="stat-regions-unlocked">5 / 9</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#29ffb6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Gyms Discovered</span>
+              <div class="stat-value" id="stat-gyms-discovered">42 / 72</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#a855f7"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Legendary Zones</span>
+              <div class="stat-value" id="stat-legendary-zones">7 / 18</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffcb05"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Travel Progress</span>
+              <div class="stat-value" id="stat-travel-progress">56%</div>
+              <div class="stat-value-progress-bar">
+                <div class="stat-value-progress-fill" id="stat-travel-progress-bar" style="width: 56%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT HEADER ASH BANNER -->
+      <div class="header-right-banner"></div>
+    </header>
+
+    <!-- MIDDLE MAIN LAYOUT -->
+    <section class="map-content-layout">
+      <!-- LEFT COLUMN: The Map Viewport -->
+      <div class="map-column">
+        <div class="map-viewport" id="map-viewport">
+          
+          <div class="map-grid-tactical"></div>
+          
+          <!-- Zoom and pan inner layer wrapper -->
+          <div class="map-zoom-pan-layer" id="map-zoom-layer">
+            <!-- Dark Dimming overlay when centered focus -->
+            <div class="map-dimmed-overlay"></div>
+
+            <!-- Cinematic Clouds, waterways mist, volcano smoke -->
+            <div class="map-clouds"></div>
+            <div class="ocean-shimmer"></div>
+            <div class="glowing-waterways"></div>
+            <div class="waterfall-mist"></div>
+            <div class="volcano-smoke"></div>
+
+            <!-- SVG connection routes -->
+            <svg class="paths-svg-overlay" id="paths-overlay"></svg>
+
+            <!-- Dynamic Pin Markers populated by script -->
+            <div id="pins-nodes-container"></div>
+          </div>
+
+          <!-- Zoom HUD controls -->
+          <div class="zoom-hud-controls">
+            <button class="zoom-btn" onclick="adjustZoom(0.15)">+</button>
+            <button class="zoom-btn" onclick="adjustZoom(-0.15)">-</button>
+          </div>
+        </div>
+
+        <!-- LEGEND BAR below map -->
+        <div class="map-legend-bar">
+          <div class="legend-item">
+            <div class="legend-indicator-dot unlocked"></div>
+            Unlocked
+          </div>
+          <div class="legend-item">
+            <div class="legend-indicator-dot locked"></div>
+            Locked
+          </div>
+          <div class="legend-item">
+            <div class="legend-indicator-dot in-progress"></div>
+            In Progress
+          </div>
+          <div class="legend-item">
+            <div class="legend-indicator-dot legendary"></div>
+            Legendary Zone
+          </div>
+          <div class="legend-item">
+            <div class="legend-indicator-dot current"></div>
+            Current Location
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Sidebar (Search, filters & Selection details card) -->
+      <div class="sidebar-column">
+        <!-- Search bar -->
+        <div class="sidebar-search-box">
+          <input type="text" id="search-input" class="sidebar-search-input" placeholder="Search regions...">
+          <svg style="position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; fill:rgba(255,255,255,0.4);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </div>
+
+        <!-- Filters Segmented tabs -->
+        <div class="filter-tabs-row">
+          <button class="filter-tab-btn active" id="tab-all" onclick="setFilter('all')">All</button>
+          <button class="filter-tab-btn" id="tab-unlocked" onclick="setFilter('unlocked')">Unlocked</button>
+          <button class="filter-tab-btn" id="tab-locked" onclick="setFilter('locked')">Locked</button>
+        </div>
+
+        <!-- Sort dropdown -->
+        <select id="sort-order" class="sidebar-sort-select">
+          <option value="progress">Sort by: Progress</option>
+          <option value="alphabetical">Sort by: Name</option>
+          <option value="gyms">Sort by: Gyms Count</option>
+        </select>
+
+        <!-- Static Details Card updating on click -->
+        <article class="region-details-card" id="details-card">
+          <div class="details-media-container">
+            <span class="details-status-badge" id="details-status">Unlocked</span>
+            <img class="details-landscape-img" id="details-img" src="pokemon_region_landscape.png" alt="Region landscape">
+          </div>
+          <div class="details-body">
+            <div class="details-title-row">
+              <h2 class="details-name" id="details-name">Kanto Region</h2>
+              
+              <!-- Progress Ring -->
+              <div class="progress-ring-container">
+                <svg class="progress-ring-svg" width="46" height="46">
+                  <circle class="progress-ring-circle-bg" cx="23" cy="23" r="19"></circle>
+                  <circle class="progress-ring-circle-fill" id="details-progress-ring" cx="23" cy="23" r="19" stroke-dasharray="119.38" stroke-dashoffset="119.38"></circle>
+                </svg>
+                <div class="progress-ring-text" id="details-progress-ring-text">0%</div>
+              </div>
+            </div>
+            
+            <p class="details-description" id="details-desc">The starting region of your journey. A land filled with diverse cities, vast routes, and powerful Gym Leaders.</p>
+            
+            <!-- Upgraded properties grid -->
+            <div class="details-props-grid">
+              <div class="details-prop-item">Difficulty <b><span id="details-difficulty">★☆☆☆☆</span></b></div>
+              <div class="details-prop-item">Terrain <b><span id="details-terrain">Forests</span></b></div>
+              <div class="details-prop-item">Weather <b><span id="details-weather">Sunny</span></b></div>
+              <div class="details-prop-item">Unlock Code <b><span id="details-code">Rank 1</span></b></div>
+            </div>
+
+            <div class="details-stat-row">
+              <span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#0c70ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                Gym Discoveries
+              </span>
+              <b><span id="details-gyms">8</span> / 8</b>
+            </div>
+            
+            <!-- Badges list row -->
+            <div class="details-icon-roster-title">Gym Badges</div>
+            <div class="details-badges-row" id="details-gym-badges-list"></div>
+
+            <div class="details-stat-row" style="margin-top: 4px;">
+              <span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#29ffb6"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-3.3 0-6-2.7-6-6h12c0 3.3-2.7 6-6 6zm-6-8c.35-2.28 2.07-4.12 4.35-4.63V9c0 .55.45 1 1 1s1-.45 1-1V7.37c2.28.51 4 2.35 4.35 4.63H6.4z"/></svg>
+                Wild Pokémon
+              </span>
+              <b><span id="details-wild">152</span> Species</b>
+            </div>
+
+            <div class="details-stat-row">
+              <span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#a855f7"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99zM13 16h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
+                Legendary Pokémon
+              </span>
+              <b><span id="details-legendary">3</span> Entities</b>
+            </div>
+
+            <div class="details-stat-row">
+              <span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffcb05"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Travel Progress
+              </span>
+              <b><span id="details-progress">100%</span></b>
+            </div>
+
+            <div class="details-progress-bar-container">
+              <div class="details-progress-bar-outer">
+                <div class="details-progress-bar-inner" id="details-progress-fill" style="width: 100%"></div>
+              </div>
+            </div>
+
+            <button id="details-explore-btn" class="btn-explore-region" onclick="exploreRegion()">Explore Region</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Orb floating Poké Ball decorative element -->
+  <svg class="floating-pokeball-ornament" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="6" />
+    <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff2e2e" stroke="#000" stroke-width="6" />
+    <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="6" />
+    <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="6" />
+    <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+  </svg>
+
+  <div id="toast">Message</div>
+
+  <script>
+    // Web Audio Synthesizer Engine
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        if (type === 'hover') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
+          gain.gain.setValueAtTime(0.015, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'select') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(750, now + 0.35);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'explore') {
+          osc.type = 'sine';
+          const notes = [523, 659, 784, 1046];
+          notes.forEach((freq, idx) => {
+            const t = now + idx * 0.09;
+            const nodeOsc = audioCtx.createOscillator();
+            const nodeGain = audioCtx.createGain();
+            nodeOsc.connect(nodeGain);
+            nodeGain.connect(audioCtx.destination);
+            nodeOsc.type = 'sine';
+            nodeOsc.frequency.setValueAtTime(freq, t);
+            nodeGain.gain.setValueAtTime(0.05, t);
+            nodeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+            nodeOsc.start(t);
+            nodeOsc.stop(t + 0.22);
+          });
+        } else if (type === 'success') {
+          const notes = [587, 698, 880, 987, 1174];
+          notes.forEach((freq, idx) => {
+            const t = now + idx * 0.07;
+            const nodeOsc = audioCtx.createOscillator();
+            const nodeGain = audioCtx.createGain();
+            nodeOsc.connect(nodeGain);
+            nodeGain.connect(audioCtx.destination);
+            nodeOsc.type = 'sine';
+            nodeOsc.frequency.setValueAtTime(freq, t);
+            nodeGain.gain.setValueAtTime(0.04, t);
+            nodeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            nodeOsc.start(t);
+            nodeOsc.stop(t + 0.3);
+          });
+        } else if (type === 'back') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.setValueAtTime(200, now + 0.05);
+          gain.gain.setValueAtTime(0.03, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+      } catch (err) {
+        console.warn("AudioContext block:", err);
+      }
+    }
+
+    // REGIONS REGISTRY DATABASE - FIXED COORDINATES CORRESPONDING TO USER SPECIFICATION
+    const regionsList = [
+      {
+        id: "kanto",
+        name: "Kanto",
+        status: "unlocked",
+        biome: "Forests",
+        color: "#0c70ff", 
+        progress: 100,
+        gyms: 8,
+        wildCount: 152,
+        legendaryCount: 3,
+        difficulty: "★☆☆☆☆",
+        terrain: "Grassland & Forests",
+        weather: "Sunny",
+        code: "Starter Tier",
+        desc: "The starting region of your journey. A land filled with diverse cities, vast routes, and powerful Gym Leaders.",
+        x: 22, y: 46,
+        connections: ["johto"]
+      },
+      {
+        id: "johto",
+        name: "Johto",
+        status: "unlocked",
+        biome: "Temples",
+        color: "#10b981", 
+        progress: 85,
+        gyms: 8,
+        wildCount: 100,
+        legendaryCount: 4,
+        difficulty: "★★☆☆☆",
+        terrain: "Ancient Shrines & Pagodas",
+        weather: "Autumn Leaves",
+        code: "Rank 2",
+        desc: "A region steeped in historical lore, featuring traditional pagodas, shrines, and beautiful autumn forests.",
+        x: 34, y: 42,
+        connections: ["hoenn"]
+      },
+      {
+        id: "hoenn",
+        name: "Hoenn",
+        status: "unlocked",
+        biome: "Volcano",
+        color: "#f97316", 
+        progress: 75,
+        gyms: 8,
+        wildCount: 135,
+        legendaryCount: 5,
+        difficulty: "★★★☆☆",
+        terrain: "Volcanic Island & Oceans",
+        weather: "Rainy/Sunny Cycle",
+        code: "Rank 4",
+        desc: "A volcanic island region surrounded by clear tropical oceans, deep-sea trenches, and active volcanoes.",
+        x: 63, y: 38,
+        connections: ["sinnoh"]
+      },
+      {
+        id: "sinnoh",
+        name: "Sinnoh",
+        status: "unlocked",
+        biome: "Snow Peak",
+        color: "#a855f7", 
+        progress: 70,
+        gyms: 8,
+        wildCount: 107,
+        legendaryCount: 6,
+        difficulty: "★★★★☆",
+        terrain: "Mountainous Ice & Ruins",
+        weather: "Hailstorm",
+        code: "Rank 6",
+        desc: "A mountainous, snowy region divided in half by the massive Mt. Coronet range. Famous for spacetime myths.",
+        x: 50, y: 21,
+        connections: ["unova"]
+      },
+      {
+        id: "unova",
+        name: "Unova",
+        status: "unlocked",
+        biome: "Metropolis",
+        color: "#0c70ff", 
+        progress: 60,
+        gyms: 8,
+        wildCount: 156,
+        legendaryCount: 4,
+        difficulty: "★★★☆☆",
+        terrain: "Metropolitan Spire & Bridges",
+        weather: "Cloudy",
+        code: "Rank 8",
+        desc: "A highly urbanized, futuristic landscape characterized by skyscrapers, steel bridges, and industrial ports.",
+        x: 45, y: 55,
+        connections: ["kalos"]
+      },
+      {
+        id: "kalos",
+        name: "Kalos",
+        status: "unlocked",
+        biome: "Castles",
+        color: "#f472b6", 
+        progress: 45,
+        gyms: 8,
+        wildCount: 132,
+        legendaryCount: 3,
+        difficulty: "★★☆☆☆",
+        terrain: "European Gardens & Castles",
+        weather: "Windy",
+        code: "Rank 10",
+        desc: "A star-shaped, European-themed region featuring ancient stone castles, flower gardens, and Prism Tower.",
+        x: 58, y: 55,
+        connections: ["alola"]
+      },
+      {
+        id: "alola",
+        name: "Alola",
+        status: "unlocked",
+        biome: "Islands",
+        color: "#10b981", 
+        progress: 55,
+        gyms: 7,
+        wildCount: 109,
+        legendaryCount: 3,
+        difficulty: "★★★☆☆",
+        terrain: "Archipelago & Reefs",
+        weather: "Tropical Breeze",
+        code: "Trial Badge",
+        desc: "A warm tropical paradise comprised of four natural islands. Famous for volcano park trials and Alolan variants.",
+        x: 28, y: 62,
+        connections: ["galar"]
+      },
+      {
+        id: "galar",
+        name: "Galar",
+        status: "locked",
+        biome: "Steampunk",
+        color: "#ffd86b", 
+        progress: 0,
+        gyms: 8,
+        wildCount: 89,
+        legendaryCount: 4,
+        difficulty: "★★★★☆",
+        terrain: "Industrial Brick & Snowfields",
+        weather: "Overcast",
+        code: "Quest Unlock",
+        desc: "An elongated region featuring industrial brick cities, snowfields, and the Dynamax Energy wild areas.",
+        x: 48, y: 72,
+        connections: ["paldea"]
+      },
+      {
+        id: "paldea",
+        name: "Paldea",
+        status: "locked",
+        biome: "Desert",
+        color: "#a855f7", 
+        progress: 0,
+        gyms: 9,
+        wildCount: 103,
+        legendaryCount: 5,
+        difficulty: "★★★★★",
+        terrain: "Peninsula & Crater Canyons",
+        weather: "Dust Storm",
+        code: "Elite League",
+        desc: "A vast peninsula surrounding the mysterious, swirling Great Crater. Diverse biomes range from snow to deserts.",
+        x: 67, y: 72,
+        connections: []
+      }
+    ];
+
+    let dbRegions = [];
+    let selectedRegionId = "kanto"; 
+    let activeFilter = "all";
+    let currentZoom = 1.0;
+
+    function initMapData() {
+      const stored = localStorage.getItem("pokemonNexusMapData_v4");
+      if (stored) {
+        dbRegions = JSON.parse(stored);
+      } else {
+        dbRegions = [...regionsList];
+        saveMapData();
+      }
+    }
+
+    function saveMapData() {
+      localStorage.setItem("pokemonNexusMapData_v4", JSON.stringify(dbRegions));
+    }
+
+    function checkUserWelcome() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user) {
+            if (user.role === 'admin' || user.isAdmin) {
+              const adminLink = document.getElementById("adminLink") || document.getElementById("adminNavLink");
+              if (adminLink) {
+                adminLink.style.display = "inline-flex";
+                adminLink.style.visibility = "visible";
+                adminLink.style.opacity = "1";
+              }
+            }
+            if (user.trainerName) {
+              document.getElementById("trainerWelcome").textContent = "Welcome, " + user.trainerName;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    function updateHeroStats() {
+      const totalRegions = dbRegions.length;
+      const unlockedCount = dbRegions.filter(x => x.status === "unlocked").length;
+      const totalGyms = dbRegions.reduce((sum, r) => sum + (r.status === "unlocked" ? r.gyms : 0), 0);
+      const totalLegendaries = dbRegions.reduce((sum, r) => sum + (r.status === "unlocked" ? r.legendaryCount : 0), 0);
+      const overallProgress = Math.round(dbRegions.reduce((sum, r) => sum + r.progress, 0) / totalRegions);
+
+      animateCounter("stat-regions-unlocked", 0, unlockedCount, ` / ${totalRegions}`, false);
+      animateCounter("stat-gyms-discovered", 0, totalGyms, ` / 72`, false);
+      animateCounter("stat-legendary-zones", 0, totalLegendaries, ` / 18`, false);
+      
+      const travelVal = document.getElementById("stat-travel-progress");
+      travelVal.innerHTML = `${overallProgress}% <div class="stat-value-progress-bar"><div class="stat-value-progress-fill" id="stat-travel-progress-bar" style="width: ${overallProgress}%"></div></div>`;
+    }
+
+    function animateCounter(elemId, start, end, suffix = "", isInt = true) {
+      const obj = document.getElementById(elemId);
+      if (!obj) return;
+      
+      let current = start;
+      const duration = 700; 
+      const stepTime = 20; 
+      const increment = (end - start) / (duration / stepTime);
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment >= 0 && current >= end) || (increment < 0 && current <= end)) {
+          current = end;
+          clearInterval(timer);
+        }
+        obj.textContent = isInt ? Math.round(current) + suffix : `${Math.round(current)}${suffix}`;
+      }, stepTime);
+    }
+
+    function drawConnectingPaths() {
+      const svg = document.getElementById("paths-overlay");
+      svg.innerHTML = "";
+      const drawn = new Set();
+
+      dbRegions.forEach(region => {
+        region.connections.forEach(targetId => {
+          const target = dbRegions.find(x => x.id === targetId);
+          if (!target) return;
+
+          const key1 = `${region.id}-${target.id}`;
+          const key2 = `${target.id}-${region.id}`;
+          
+          if (!drawn.has(key1) && !drawn.has(key2)) {
+            drawn.add(key1);
+
+            const midX = (region.x + target.x) / 2;
+            const midY = (region.y + target.y) / 2 - 3; 
+
+            const pathData = `M ${region.x} ${region.y} Q ${midX} ${midY} ${target.x} ${target.y}`;
+
+            const baseLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            baseLine.setAttribute("d", pathData);
+            baseLine.setAttribute("class", `travel-path path-connection-${region.id} path-connection-${target.id}`);
+            svg.appendChild(baseLine);
+
+            if (region.status === "unlocked" && target.status === "unlocked") {
+              const pulseLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              pulseLine.setAttribute("d", pathData);
+              pulseLine.setAttribute("class", `travel-path-pulse path-pulse-${region.id} path-pulse-${target.id}`);
+              svg.appendChild(pulseLine);
+            }
+          }
+        });
+      });
+    }
+
+    function renderMapIslands() {
+      const container = document.getElementById("pins-nodes-container");
+      container.innerHTML = "";
+
+      const query = document.getElementById("search-input").value.trim().toLowerCase();
+
+      dbRegions.forEach(region => {
+        const pinNode = document.createElement("div");
+        pinNode.className = "region-pin"; // Stay fixed at coordinate points, transform none for main pos
+        pinNode.style.left = region.x + "%";
+        pinNode.style.top = region.y + "%";
+        pinNode.style.setProperty("--node-color", region.color);
+        pinNode.id = `marker-pin-${region.id}`;
+
+        if (region.id === "sinnoh" || region.id === "paldea") {
+          pinNode.classList.add("legendary-zone");
+        }
+
+        pinNode.setAttribute("tabindex", "0");
+        pinNode.setAttribute("role", "button");
+        pinNode.setAttribute("aria-label", `${region.name} Region, Biome: ${region.biome}, Status: ${region.status}`);
+
+        const matchesQuery = query === "" || region.name.toLowerCase().includes(query);
+        const matchesFilter = (activeFilter === "all") || (region.status === activeFilter);
+
+        if (!matchesQuery || !matchesFilter) {
+          pinNode.classList.add("filtered-out");
+          document.querySelectorAll(`.path-connection-${region.id}`).forEach(p => p.classList.add("filtered-out"));
+          document.querySelectorAll(`.path-pulse-${region.id}`).forEach(p => p.classList.add("filtered-out"));
+        } else {
+          pinNode.classList.remove("filtered-out");
+          document.querySelectorAll(`.path-connection-${region.id}`).forEach(p => p.classList.remove("filtered-out"));
+          document.querySelectorAll(`.path-pulse-${region.id}`).forEach(p => p.classList.remove("filtered-out"));
+          
+          if (region.status === "locked") {
+            pinNode.style.filter = "brightness(0.4)";
+          } else {
+            pinNode.style.filter = "brightness(1) drop-shadow(0 0 10px " + region.color + ")";
+          }
+        }
+
+        if (region.id === selectedRegionId) {
+          pinNode.classList.add("selected");
+        }
+
+        pinNode.innerHTML = `
+          <div class="marker-ring"></div>
+          <div class="marker-dot"></div>
+          <div class="marker-wave"></div>
+          <div class="region-pin-name-tag" style="--node-color: ${region.color}">${region.name}</div>
+        `;
+
+        // Click zoom
+        pinNode.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectRegion(region.id);
+        });
+
+        // Enter key support
+        pinNode.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            selectRegion(region.id);
+          }
+        });
+
+        pinNode.addEventListener("mouseenter", () => {
+          playSound("hover");
+        });
+
+        container.appendChild(pinNode);
+      });
+    }
+
+    function selectRegion(regionId) {
+      if (selectedRegionId !== regionId) {
+        playSound("select");
+      }
+      
+      selectedRegionId = regionId;
+
+      const region = dbRegions.find(x => x.id === regionId);
+      if (!region) return;
+
+      document.querySelectorAll(".region-pin").forEach(pin => {
+        pin.classList.remove("selected");
+      });
+      const currentPin = document.getElementById(`marker-pin-${regionId}`);
+      if (currentPin) currentPin.classList.add("selected");
+
+      // Focus Zoom
+      const zoomLayer = document.getElementById("map-zoom-layer");
+      zoomLayer.classList.add("focused");
+
+      const dx = 50 - region.x;
+      const dy = 50 - region.y;
+      const shiftX = dx - 10;
+      
+      zoomLayer.style.transform = `scale(1.35) translate(${shiftX}%, ${dy}%)`;
+
+      // Update static details panel info
+      document.getElementById("details-name").textContent = `${region.name} Region`;
+      document.getElementById("details-desc").textContent = region.desc;
+      document.getElementById("details-gyms").textContent = region.status === "unlocked" ? region.gyms : 0;
+      document.getElementById("details-wild").textContent = region.status === "unlocked" ? region.wildCount : "???";
+      document.getElementById("details-legendary").textContent = region.status === "unlocked" ? region.legendaryCount : "???";
+      document.getElementById("details-progress").textContent = region.progress + "%";
+      
+      document.getElementById("details-difficulty").textContent = region.difficulty;
+      document.getElementById("details-terrain").textContent = region.terrain;
+      document.getElementById("details-weather").textContent = region.weather;
+      document.getElementById("details-code").textContent = region.code;
+
+      const fillBar = document.getElementById("details-progress-fill");
+      fillBar.style.width = region.progress + "%";
+
+      const statusBadge = document.getElementById("details-status");
+      statusBadge.textContent = region.status;
+      if (region.status === "unlocked") {
+        statusBadge.className = "details-status-badge";
+      } else {
+        statusBadge.className = "details-status-badge locked";
+      }
+
+      // Progress Ring
+      const circleFill = document.getElementById("details-progress-ring");
+      const ringText = document.getElementById("details-progress-ring-text");
+      const radius = 19;
+      const circumference = 2 * Math.PI * radius; 
+      const offset = circumference - (region.progress / 100) * circumference;
+      
+      circleFill.style.strokeDashoffset = offset;
+      ringText.textContent = region.progress + "%";
+      circleFill.style.stroke = region.color;
+
+      // Badges
+      const badgesContainer = document.getElementById("details-gym-badges-list");
+      badgesContainer.innerHTML = "";
+      
+      const maxGyms = region.gyms;
+      for (let i = 1; i <= 8; i++) {
+        if (i <= maxGyms) {
+          const isCompleted = region.status === "unlocked" && region.progress >= (i * 12);
+          const badge = document.createElement("span");
+          badge.className = `badge-icon ${isCompleted ? 'completed' : ''}`;
+          badge.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99z"/></svg>
+            G${i}
+          `;
+          badgesContainer.appendChild(badge);
+        }
+      }
+
+      const expBtn = document.getElementById("details-explore-btn");
+      if (region.status === "unlocked") {
+        expBtn.textContent = region.progress === 100 ? "Explore (100% Cleared)" : "Explore Region";
+        expBtn.classList.remove("locked");
+      } else {
+        expBtn.textContent = "Unlock (Locked)";
+        expBtn.classList.add("locked");
+      }
+    }
+
+    function adjustZoom(amount) {
+      currentZoom = Math.min(2.0, Math.max(0.8, currentZoom + amount));
+      const zoomLayer = document.getElementById("map-zoom-layer");
+      
+      const region = dbRegions.find(x => x.id === selectedRegionId);
+      if (region) {
+        const dx = 50 - region.x;
+        const dy = 50 - region.y;
+        const shiftX = dx - 10;
+        zoomLayer.style.transform = `scale(${currentZoom * 1.35}) translate(${shiftX}%, ${dy}%)`;
+      } else {
+        zoomLayer.style.transform = `scale(${currentZoom}) translate(0, 0)`;
+      }
+    }
+
+    function deselectRegion() {
+      if (!selectedRegionId) return;
+      playSound("back");
+
+      const activeEl = document.getElementById(`marker-pin-${selectedRegionId}`);
+      if (activeEl) activeEl.classList.remove("selected");
+
+      selectedRegionId = null;
+
+      const zoomLayer = document.getElementById("map-zoom-layer");
+      zoomLayer.classList.remove("focused");
+      zoomLayer.style.transform = "scale(1) translate(0,0)";
+      currentZoom = 1.0;
+
+      renderMapIslands();
+    }
+
+    function exploreRegion() {
+      const region = dbRegions.find(x => x.id === selectedRegionId);
+      if (!region) return;
+
+      if (region.status === "locked") {
+        showToast(`This region is locked! Advance through paths to unlock.`);
+        playSound("back");
+        return;
+      }
+
+      playSound("explore");
+
+      if (region.progress < 100) {
+        region.progress = Math.min(100, region.progress + 10);
+        saveMapData();
+        updateHeroStats();
+        renderMapIslands();
+        showToast(`Explored ${region.name}! Region completion is now ${region.progress}%.`);
+
+        if (region.progress === 100) {
+          setTimeout(() => {
+            playSound("success");
+            showToast(`Reward Unlocked! ${region.name} is now 100% Cleared!`);
+          }, 600);
+        }
+
+        selectRegion(region.id);
+      } else {
+        showToast(`You have fully explored ${region.name}!`);
+      }
+    }
+
+    function setFilter(statusVal) {
+      playSound("select");
+      activeFilter = statusVal;
+      document.querySelectorAll(".filter-tab-btn").forEach(btn => btn.classList.remove("active"));
+      
+      if (statusVal === "all") document.getElementById("tab-all").classList.add("active");
+      if (statusVal === "unlocked") document.getElementById("tab-unlocked").classList.add("active");
+      if (statusVal === "locked") document.getElementById("tab-locked").classList.add("active");
+      
+      renderMapIslands();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    // Ocean click resets zoom focus
+    document.getElementById("map-viewport").addEventListener("click", (e) => {
+      if (e.target.id === "map-viewport" || e.target.id === "map-zoom-layer" || e.target.className === "map-dimmed-overlay" || e.target.className === "map-grid-tactical" ) {
+        deselectRegion();
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        deselectRegion();
+      }
+    });
+
+    // Listeners
+    document.getElementById("search-input").addEventListener("input", renderMapIslands);
+    document.getElementById("sort-order").addEventListener("change", renderMapIslands);
+
+    // Initializers
+    checkUserWelcome();
+    initMapData();
+    updateHeroStats();
+    drawConnectingPaths();
+    renderMapIslands();
+    selectRegion("kanto"); 
+
+    // Background sparks
+    const sparksContainer = document.getElementById("sparks-container");
+    for (let i = 0; i < 40; i++) {
+      const spark = document.createElement("div");
+      spark.className = `spark ${Math.random() > 0.5 ? 'orange' : 'blue'}`;
+      spark.style.left = Math.random() * 100 + "vw";
+      spark.style.animationDuration = (7 + Math.random() * 8) + "s";
+      spark.style.animationDelay = Math.random() * 5 + "s";
+      sparksContainer.appendChild(spark);
+    }
+
+    // Page load console print
+    console.log("userRole =", localStorage.getItem("userRole"));
+
+    // Admin visibility logic
+    let parsedIsAdmin = false;
+    const userStr = localStorage.getItem("pokemonNexusUser");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && (user.role === "admin" || user.isAdmin)) {
+          parsedIsAdmin = true;
+        }
+      } catch (e) {}
+    }
+
+    const role =
+      localStorage.getItem("userRole") ||
+      localStorage.getItem("currentUserRole") ||
+      localStorage.getItem("role");
+
+    const isAdmin =
+      role === "admin" ||
+      localStorage.getItem("isAdmin") === "true" ||
+      parsedIsAdmin;
+
+    const adminNavLink = document.getElementById("adminNavLink") || document.getElementById("adminLink");
+    if (adminNavLink) {
+      if (isAdmin) {
+        adminNavLink.style.display = "inline-flex";
+        adminNavLink.style.visibility = "visible";
+        adminNavLink.style.opacity = "1";
+      } else {
+        adminNavLink.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
