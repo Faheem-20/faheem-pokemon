@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon Nexus User Management</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="css/users.css" />
+
+  <script src="../game-sync.js"></script>
+</head>
+<body>
+  <div class="electric-bg"></div>
+  <div class="dark-layer"></div>
+  <div id="particles"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <h1>Pokémon</h1>
+        <span>NEXUS ADMIN</span>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="admin.html">🏠 Dashboard</a>
+      <a class="active" href="users.html">👥 Trainers</a>
+      <a href="#">⚡ Pokémon</a>
+      <a href="#">⚔ Battles</a>
+      <a href="#">🎯 Missions</a>
+      <a href="#">🏆 Leaderboard</a>
+      <a href="#">📊 Analytics</a>
+      <a href="#">🛒 Shop</a>
+      <a href="#">⚙ Settings</a>
+      <a href="#" id="logoutBtn">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h2>User Management</h2>
+        <p>Manage registered trainers, update profiles, change roles, and oversee database records.</p>
+      </div>
+      <div class="top-actions">
+        <button id="refreshBtn">🔄 Refresh Data</button>
+        <button class="active">👑 Admin</button>
+      </div>
+      <div class="fire-line"></div>
+    </header>
+
+    <div class="users-container">
+      <!-- Search & Controls Card -->
+      <div class="controls-card">
+        <div class="control-grid">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by username or email..." />
+          </div>
+          <div class="stats-summary">
+            <span>Total Registered Trainers:</span>
+            <span id="totalUsersCount">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table Card -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="data-table" id="usersTable">
+            <thead>
+              <tr>
+                <th data-sort="id">User ID</th>
+                <th data-sort="username">Username</th>
+                <th data-sort="email">Email</th>
+                <th data-sort="role">Role</th>
+                <th data-sort="date_joined">Date Joined</th>
+                <th data-sort="last_login">Last Login</th>
+                <th data-sort="is_active">Status</th>
+                <th style="cursor: default;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rendered dynamically via users.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="spinner-container">
+          <div class="spinner"></div>
+          <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Fetching trainer records...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">📂</div>
+          <h3>No Trainers Found</h3>
+          <p>We couldn't find any registered user records matching your query.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-controls" id="paginationSection">
+          <div class="page-info" id="paginationInfo">
+            Showing 0 to 0 of 0 entries
+          </div>
+          <div class="pagination-nav">
+            <button class="btn-page" id="prevPageBtn" disabled>Previous</button>
+            <button class="btn-page" id="nextPageBtn" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- View Modal -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Trainer Profile Details</h3>
+        <button class="modal-close-btn" onclick="closeModal('viewModal')">&times;</button>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">User ID</div>
+          <div class="detail-value" id="viewId">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Username</div>
+          <div class="detail-value highlight" id="viewUsername">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Email Address</div>
+          <div class="detail-value" id="viewEmail">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Role</div>
+          <div class="detail-value" id="viewRole">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Trainer Name</div>
+          <div class="detail-value highlight" id="viewTrainerName">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Trainer Level</div>
+          <div class="detail-value" id="viewLevel">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Experience Points (XP)</div>
+          <div class="detail-value" id="viewXp">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Coins Balance</div>
+          <div class="detail-value" id="viewCoins">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Date Joined</div>
+          <div class="detail-value" id="viewDateJoined">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Last Login</div>
+          <div class="detail-value" id="viewLastLogin">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Status</div>
+          <div class="detail-value" id="viewStatus">-</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('viewModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Trainer Profile</h3>
+        <button class="modal-close-btn" onclick="closeModal('editModal')">&times;</button>
+      </div>
+      <form id="editForm">
+        <input type="hidden" id="editUserId" />
+        <div class="form-group">
+          <label for="editUsername">Username</label>
+          <input type="text" id="editUsername" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="editEmail">Email Address</label>
+          <input type="email" id="editEmail" class="form-control" required />
+        </div>
+        <div class="detail-grid" style="margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label for="editRole">User Role</label>
+            <select id="editRole" class="form-control">
+              <option value="admin">Admin</option>
+              <option value="trainer">Trainer</option>
+              <option value="player">Player</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editTrainerName">Trainer Name</label>
+            <input type="text" id="editTrainerName" class="form-control" />
+          </div>
+        </div>
+        <div class="detail-grid" style="margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label for="editLevel">Level</label>
+            <input type="number" id="editLevel" class="form-control" min="1" required />
+          </div>
+          <div class="form-group">
+            <label for="editCoins">Coins</label>
+            <input type="number" id="editCoins" class="form-control" min="0" required />
+          </div>
+        </div>
+        <div class="form-group switch-container">
+          <label>Account Status (Active)</label>
+          <label class="switch">
+            <input type="checkbox" id="editStatus" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header" style="border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+        <h3 class="modal-title" style="color: #ff4757;">⚠️ Delete Trainer Account</h3>
+        <button class="modal-close-btn" onclick="closeModal('deleteModal')">&times;</button>
+      </div>
+      <div>
+        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin-bottom: 1.5rem;">
+          Are you sure you want to permanently delete user <strong id="deleteTargetUsername" style="color: #ffd86b;"></strong>? 
+          This action is irreversible and will remove all their trainer stats and credentials from the system.
+        </p>
+      </div>
+      <div class="modal-footer" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+        <button class="btn-danger" id="confirmDeleteBtn">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/admin.js"></script>
+  <script src="js/users.js"></script>
+</body>
+</html>

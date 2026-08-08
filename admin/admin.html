@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon Nexus Admin Dashboard</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="../navbar.css" />
+  <style>
+    /* ==========================================
+       Premium Single-Page Admin Custom Styles
+       ========================================== */
+    /* Shift admin dashboard down to accommodate top navbar */
+    .sidebar {
+      top: 110px !important;
+    }
+    .main {
+      padding-top: 110px !important;
+    }
+    @media (max-width: 1100px) {
+      .sidebar {
+        top: auto !important;
+      }
+      .main {
+        padding-top: 14px !important;
+      }
+    }
+    .admin-section {
+      display: none;
+    }
+    .admin-section.active-section {
+      display: block;
+    }
+
+    /* Subtab styles */
+    .btn-sub-tab {
+      background: rgba(10, 20, 45, 0.6);
+      border: 1px solid var(--border-blue);
+      color: var(--text-gray);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-sub-tab:hover {
+      color: white;
+      border-color: var(--blue);
+    }
+    .btn-sub-tab.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+      box-shadow: 0 0 12px rgba(12, 112, 255, 0.4);
+    }
+
+    /* All buttons transition & hover enhancements */
+    button, .menu a {
+      transition: all 0.25s ease-in-out;
+    }
+    button:hover {
+      filter: brightness(1.25) drop-shadow(0 0 10px rgba(12,112,255,0.45));
+      transform: translateY(-2px);
+      cursor: pointer;
+    }
+    .menu a:hover {
+      background: rgba(12, 112, 255, 0.15) !important;
+      text-shadow: 0 0 8px rgba(12,112,255,0.8);
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+
+    /* Table styling fixes */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .data-table th, .data-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .data-table th {
+      color: var(--yellow);
+      font-weight: 600;
+    }
+
+    /* Custom form overlays & inputs */
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      color: var(--text-gray);
+    }
+    .form-group input, .form-group select {
+      padding: 10px;
+      background: rgba(10, 20, 45, 0.7);
+      border: 1px solid var(--border-blue);
+      border-radius: 6px;
+      color: white;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 8px rgba(255,203,5,0.2);
+    }
+
+    /* Toggle switch slider control */
+    .switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .switch-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .switch-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .switch-desc {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(255,255,255,0.1);
+      border: 1px solid var(--border-blue);
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #0c70ff;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Modal overlays */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 3, 9, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      width: 90%;
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mission Grid */
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+      margin-top: 15px;
+    }
+    .mission-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-blue);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mission-difficulty {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .difficulty-easy { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .difficulty-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .difficulty-hard { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .difficulty-mythic { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .progress-bar-outer {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 4px;
+    }
+
+    /* Shop Grid */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+      margin-top: 15px;
+    }
+    .shop-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-blue);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Pokémon Grid */
+    .pokemon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+      margin-top: 15px;
+    }
+    .pokemon-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-blue);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .pokemon-thumb {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+    }
+  </style>
+  <script>
+    (function() {
+      const token = localStorage.getItem("pokemonNexusAccess") || localStorage.getItem("pokemonNexusToken");
+      const userJson = localStorage.getItem("pokemonNexusUser");
+      
+      if (!token || !userJson) {
+        alert("Access Denied: Please log in first.");
+        window.location.href = "../index.html";
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userJson);
+        if (user.role !== "admin" && !user.isAdmin) {
+          alert("Access Denied: Admin privileges required to access this dashboard.");
+          window.location.href = "../index.html";
+          return;
+        }
+      } catch (e) {
+        alert("Authentication Error: Invalid session data.");
+        window.location.href = "../index.html";
+      }
+    })();
+  </script>
+
+  <script src="../game-sync.js"></script>
+</head>
+<body>
+  <div class="electric-bg"></div>
+  <div class="dark-layer"></div>
+  <div id="particles"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='../index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../pokedex.html">Pokédex</a>
+      <a href="../battle.html">Battle</a>
+      <a href="../kingdom-map.html">Kingdom Map</a>
+      <a href="../inventory.html">Inventory</a>
+      <a href="../leaderboard.html">Leaderboard</a>
+      <a href="../profile.html">Profile</a>
+      <a href="../rewards.html">Rewards</a>
+      <a href="../achievements.html">Achievements</a>
+      <a href="../events.html">Events</a>
+      <a href="admin.html" class="active" id="adminLink">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='../profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <h1>Pokémon</h1>
+        <span>NEXUS ADMIN</span>
+      </div>
+    </div>
+
+    <nav class="menu" id="adminMenu">
+      <a class="active" href="#" data-section="dashboard">🏠 Dashboard</a>
+      <a href="#" data-section="trainers">👥 Trainers</a>
+      <a href="#" data-section="pokemon">⚡ Pokémon</a>
+      <a href="#" data-section="battles">⚔ Battles</a>
+      <a href="#" data-section="missions">🎯 Missions</a>
+      <a href="#" data-section="leaderboard">🏆 Leaderboard</a>
+      <a href="#" data-section="analytics">📊 Analytics</a>
+      <a href="#" data-section="shop">🛒 Shop</a>
+      <a href="#" data-section="rewards">💎 Rewards Management</a>
+      <a href="#" data-section="settings">⚙ Settings</a>
+      <a href="#" id="logoutBtn">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h2 id="topbar-title">Admin Dashboard</h2>
+        <p id="topbar-desc">Control Pokémon Nexus kingdom from one command center.</p>
+      </div>
+      <div class="top-actions">
+        <button id="btn-topbar-notify">🔔 Notifications</button>
+        <button id="btn-topbar-events">🔥 Live Events</button>
+        <button id="btn-topbar-admin" class="active">👑 Admin</button>
+      </div>
+      <div class="fire-line"></div>
+    </header>
+
+    <!-- SECTION 1: DASHBOARD -->
+    <div id="section-dashboard" class="admin-section active-section">
+      <section class="cards">
+        <div class="card"><span>👥</span><h3>250K+</h3><p>Total Players</p></div>
+        <div class="card"><span>⚡</span><h3>12,450</h3><p>Online Players</p></div>
+        <div class="card"><span>⚔</span><h3>1.2M</h3><p>Total Battles</p></div>
+        <div class="card"><span>🐉</span><h3>900+</h3><p>Captured Pokémon</p></div>
+        <div class="card"><span>🪙</span><h3>50K</h3><p>Total Coins</p></div>
+        <div class="card"><span>🎯</span><h3>126</h3><p>Active Missions</p></div>
+      </section>
+
+      <section class="grid">
+        <div class="panel large">
+          <div class="panel-title">
+            <h3>📊 Battle Analytics</h3>
+            <button id="dashboard-export-btn">Export</button>
+          </div>
+          <div class="bars">
+            <div style="--h:70%"><span></span><p>Mon</p></div>
+            <div style="--h:45%"><span></span><p>Tue</p></div>
+            <div style="--h:82%"><span></span><p>Wed</p></div>
+            <div style="--h:60%"><span></span><p>Thu</p></div>
+            <div style="--h:95%"><span></span><p>Fri</p></div>
+            <div style="--h:76%"><span></span><p>Sat</p></div>
+            <div style="--h:88%"><span></span><p>Sun</p></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><h3>⚡ Pokémon Control</h3></div>
+          <div class="action-list">
+            <button id="control-add-pkmn">Add Pokémon</button>
+            <button id="control-edit-stats">Edit Stats</button>
+            <button id="control-set-legendary">Set Legendary</button>
+            <button id="control-remove-pkmn">Remove Pokémon</button>
+          </div>
+        </div>
+
+        <div class="panel table-panel">
+          <div class="panel-title">
+            <h3>👥 Recent Trainers</h3>
+            <button id="dashboard-view-all-btn">View All</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Trainer</th><th>Level</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="dashboard-trainers-tbody">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><h3>🏆 Leaderboard</h3></div>
+          <div class="leader" id="dashboard-leaderboard-list">
+            <!-- Rendered Dynamically -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SECTION 2: TRAINERS -->
+    <div id="section-trainers" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>👥 Registered Trainers</h3>
+          <div style="display: flex; gap: 10px;">
+            <button id="trainers-add-btn">+ Add Trainer</button>
+            <button id="trainers-export-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Trainer Name</th>
+                <th>Level</th>
+                <th>Region</th>
+                <th>Rank</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="trainers-table-tbody">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: POKÉMON -->
+    <div id="section-pokemon" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>⚡ Pokémon Database</h3>
+          <button id="pokemon-add-btn">+ Add Pokémon</button>
+        </div>
+        <div class="pokemon-grid" id="pokemon-grid-container">
+          <!-- Rendered Dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: BATTLES -->
+    <div id="section-battles" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>⚔ Live Battle History</h3>
+          <button id="battles-export-btn">Export History</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Trainer</th>
+                <th>Opponent</th>
+                <th>Winner</th>
+                <th>Arena</th>
+                <th>Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="battles-table-tbody">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: MISSIONS -->
+    <div id="section-missions" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>🎯 Active Missions & Quests</h3>
+          <button id="missions-add-btn">+ Add Mission</button>
+        </div>
+        <div class="mission-grid" id="missions-grid-container">
+          <!-- Rendered Dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: LEADERBOARD -->
+    <div id="section-leaderboard" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>🏆 Seasonal Leaderboard</h3>
+          <button id="leaderboard-reset-btn" class="danger">Reset Season</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Trainer Name</th>
+                <th>Total XP</th>
+                <th>Wins</th>
+                <th>Win Rate</th>
+                <th>Tier</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-tbody">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: ANALYTICS -->
+    <div id="section-analytics" class="admin-section">
+      <section class="cards">
+        <div class="card"><span>📈</span><h3>82.4%</h3><p>Win Rate Avg</p></div>
+        <div class="card"><span>⏱</span><h3>2m 45s</h3><p>Avg Match Duration</p></div>
+        <div class="card"><span>💎</span><h3>₹4.2L</h3><p>Shop Sales</p></div>
+        <div class="card"><span>⚡</span><h3>Pikachu</h3><p>Most Used PKMN (34%)</p></div>
+      </section>
+      <section class="grid">
+        <div class="panel large">
+          <div class="panel-title"><h3>📊 Server Traffic Distribution</h3></div>
+          <div class="bars">
+            <div style="--h:30%"><span></span><p>00:00</p></div>
+            <div style="--h:55%"><span></span><p>04:00</p></div>
+            <div style="--h:85%"><span></span><p>08:00</p></div>
+            <div style="--h:98%"><span></span><p>12:00</p></div>
+            <div style="--h:90%"><span></span><p>16:00</p></div>
+            <div style="--h:75%"><span></span><p>20:00</p></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h3>🔥 Top Pokémon Usage</h3></div>
+          <div class="leader">
+            <p><span>1. Pikachu</span><b>34%</b></p>
+            <p><span>2. Charizard</span><b>28%</b></p>
+            <p><span>3. Garchomp</span><b>15%</b></p>
+            <p><span>4. Lucario</span><b>12%</b></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SECTION 8: SHOP -->
+    <div id="section-shop" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title">
+          <h3>🛒 Shop Item Inventory</h3>
+          <button id="shop-add-btn">+ Add New Item</button>
+        </div>
+        <div class="shop-grid" id="shop-grid-container">
+          <!-- Rendered Dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 8.5: REWARDS MANAGEMENT -->
+    <div id="section-rewards" class="admin-section">
+      <!-- Rewards Analytics Dashboard -->
+      <div class="analytics-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        <div class="card">
+          <span>💎</span>
+          <h3 id="stat-total-claims">0</h3>
+          <p>Total Claims</p>
+        </div>
+        <div class="card">
+          <span>🔥</span>
+          <h3 id="stat-most-claimed" style="font-size:1.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">None</h3>
+          <p>Most Claimed Type</p>
+        </div>
+        <div class="card">
+          <span>🪙</span>
+          <h3 id="stat-coins-dist">0</h3>
+          <p>Coins Distributed</p>
+        </div>
+        <div class="card">
+          <span>🎫</span>
+          <h3 id="stat-xp-dist">0</h3>
+          <p>XP Distributed</p>
+        </div>
+        <div class="card">
+          <span>✨</span>
+          <h3 id="stat-crystals-dist">0</h3>
+          <p>Crystals Distributed</p>
+        </div>
+        <div class="card">
+          <span>📅</span>
+          <h3 id="stat-daily-claims">0</h3>
+          <p>Daily Claims</p>
+        </div>
+        <div class="card">
+          <span>🎯</span>
+          <h3 id="stat-mission-claims">0</h3>
+          <p>Mission Claims</p>
+        </div>
+        <div class="card">
+          <span>⚔</span>
+          <h3 id="stat-battle-claims">0</h3>
+          <p>Battle Claims</p>
+        </div>
+      </div>
+      
+      <!-- Sub-Tabs Navigation Panel -->
+      <div class="panel large">
+        <div class="panel-header" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; justify-content: flex-start; align-items: center; border-top: none; padding-top: 0; margin-top: 0;">
+          <button class="btn-sub-tab active" data-subtab="daily">📅 Daily Rewards</button>
+          <button class="btn-sub-tab" data-subtab="level">🏆 Level Milestones</button>
+          <button class="btn-sub-tab" data-subtab="mission">🎯 Mission Rewards</button>
+          <button class="btn-sub-tab" data-subtab="battle">⚔ Battle Drop Rates</button>
+          <button class="btn-sub-tab" data-subtab="event">🔥 Event Rewards</button>
+          <button class="btn-sub-tab" data-subtab="history">📜 Reward History</button>
+          <button class="btn-sub-tab" data-subtab="settings">⚙ Settings</button>
+        </div>
+        
+        <!-- SUBTAB 1: DAILY REWARDS -->
+        <div id="subtab-daily" class="subtab-content">
+          <div class="panel-title" style="margin-bottom: 15px;">
+            <h3>📅 Configure 30-Day Daily Login Calendar</h3>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Reward Type</th>
+                  <th>Quantity / Amount</th>
+                  <th>Reward Item Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-daily-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- SUBTAB 2: LEVEL REWARDS -->
+        <div id="subtab-level" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>🏆 Configure Level-Up Milestones</h3>
+            <button class="btn-sub-tab" id="admin-level-add-btn" style="background: var(--blue); color: white;">+ Add Milestone</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Level Milestone</th>
+                  <th>Reward Type</th>
+                  <th>Quantity / Amount</th>
+                  <th>Reward Item Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-level-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- SUBTAB 3: MISSION REWARDS -->
+        <div id="subtab-mission" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>🎯 Configure Mission & Quest Rewards</h3>
+            <button class="btn-sub-tab" id="admin-mission-add-btn" style="background: var(--blue); color: white;">+ Add Mission</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mission Title</th>
+                  <th>Category</th>
+                  <th>Target Progress</th>
+                  <th>XP Reward</th>
+                  <th>Coins Reward</th>
+                  <th>Item Rewards</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-mission-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- SUBTAB 4: BATTLE REWARDS -->
+        <div id="subtab-battle" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="margin-bottom: 20px;">
+            <h3>⚔ Configure Battle Victory Drop Rates</h3>
+          </div>
+          <form id="admin-battle-form" onsubmit="event.preventDefault(); saveBattleRatesConfig();">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+              <div class="form-group">
+                <label>Victory XP Reward</label>
+                <input type="number" id="battle-win-xp" min="0" required style="width:100%; box-sizing:border-box;" />
+              </div>
+              <div class="form-group">
+                <label>Victory Coins Reward</label>
+                <input type="number" id="battle-win-coins" min="0" required style="width:100%; box-sizing:border-box;" />
+              </div>
+              <div class="form-group">
+                <label>Battle Pass / Reward Points Reward</label>
+                <input type="number" id="battle-win-points" min="0" required style="width:100%; box-sizing:border-box;" />
+              </div>
+              <div class="form-group">
+                <label>Chance of Random Item Drop (0.0 to 1.0)</label>
+                <input type="number" id="battle-item-chance" min="0" max="1" step="0.01" required style="width:100%; box-sizing:border-box;" />
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 15px;">
+              <h4>Item Drop Probability Weights</h4>
+              <p style="font-size: 0.78rem; color: var(--text-gray); margin-bottom: 12px;">Specify the weight ratio for each rollable item relative to the total sum of weights.</p>
+              <div id="battle-item-weights-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+            <button class="btn-sub-tab" type="submit" style="background: var(--green); color: white; width: 150px; border:none; padding:10px 15px; border-radius:8px;">Save Drop Rates</button>
+          </form>
+        </div>
+        
+        <!-- SUBTAB 5: EVENT REWARDS -->
+        <div id="subtab-event" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>🔥 Live Limited-Time Event Rewards</h3>
+            <button class="btn-sub-tab" id="admin-event-add-btn" style="background: var(--blue); color: white;">+ Add Event</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Event Name</th>
+                  <th>Description</th>
+                  <th>Reward Item</th>
+                  <th>Amount</th>
+                  <th>Expiration Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-event-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- SUBTAB 6: REWARD HISTORY -->
+        <div id="subtab-history" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+            <h3>📜 Global Reward History Log</h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-sub-tab" onclick="exportHistoryData('csv')" style="background: rgba(255,255,255,0.1); color: white;">📤 Export CSV</button>
+              <button class="btn-sub-tab" onclick="exportHistoryData('excel')" style="background: rgba(255,255,255,0.1); color: white;">📈 Export Excel</button>
+            </div>
+          </div>
+          
+          <!-- Filter & Search Controls -->
+          <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; width: 100%;">
+            <div class="form-group" style="flex: 2; min-width: 200px;">
+              <input type="text" id="admin-history-search" placeholder="Search by username, reward, event name..." style="padding: 8px 12px; width:100%; box-sizing:border-box;" />
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+              <select id="admin-history-filter" style="padding: 8px 12px; width:100%; box-sizing:border-box; background: rgba(10, 20, 45, 0.7); border:1px solid var(--border-blue); color:white; border-radius:6px;">
+                <option value="">All Categories</option>
+                <option value="Daily">Daily Login</option>
+                <option value="Level">Level Milestones</option>
+                <option value="Battle">Battle Victory</option>
+                <option value="Mission">Mission Completed</option>
+                <option value="Event">Live Events</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Trainer</th>
+                  <th>Reward Class</th>
+                  <th>Earned From</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-history-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination Control -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+            <span id="history-page-info" style="font-size: 0.85rem; color: var(--text-gray);">Page 1 of 1</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-sub-tab" id="btn-admin-history-prev" style="padding: 5px 10px;">◀ Prev</button>
+              <button class="btn-sub-tab" id="btn-admin-history-next" style="padding: 5px 10px;">Next ▶</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- SUBTAB 7: REWARD SETTINGS -->
+        <div id="subtab-settings" class="subtab-content" style="display: none;">
+          <div class="panel-title" style="margin-bottom: 20px;">
+            <h3>⚙ General Reward Multipliers & Boosts</h3>
+          </div>
+          <div class="switch-row">
+            <div class="switch-label">
+              <span class="switch-title">Streak Multiplier</span>
+              <span class="switch-desc">Boost daily login check-in values on milestones (Day 7, 14, 21, 28, 30)</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="streak-multiplier-toggle" onchange="saveGeneralSettings()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="switch-row">
+            <div class="switch-label">
+              <span class="switch-title">Weekend XP Boost (1.5x)</span>
+              <span class="switch-desc">Applies multiplier factor on victory XP values during Saturday & Sunday</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="weekend-xp-boost-toggle" onchange="saveGeneralSettings()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Change Log Audit panel at bottom -->
+      <div class="panel large" style="margin-top: 25px;">
+        <div class="panel-title"><h3>🛡 Admin Change Log Audit Trail</h3></div>
+        <div class="table-container" style="max-height: 250px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Admin Name</th>
+                <th>Change Action</th>
+                <th>Metadata Details</th>
+              </tr>
+            </thead>
+            <tbody id="admin-audit-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 9: SETTINGS -->
+    <div id="section-settings" class="admin-section">
+      <div class="panel large">
+        <div class="panel-title"><h3>⚙ Admin System Configurations</h3></div>
+        
+        <div class="switch-row">
+          <div class="switch-label">
+            <span class="switch-title">Website Live Status</span>
+            <span class="switch-desc">Toggle the primary user portals online/offline</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked id="toggle-site-status" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="switch-row">
+          <div class="switch-label">
+            <span class="switch-title">Maintenance Mode</span>
+            <span class="switch-desc">Restricts non-admin connections for database tuning</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-maintenance" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="switch-row">
+          <div class="switch-label">
+            <span class="switch-title">Leaderboard Double XP Week</span>
+            <span class="switch-desc">Boosts win rewards to all ranks</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked id="toggle-double-xp" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <h3>👑 Admin Profile Management</h3>
+          <div class="form-group" style="margin-top: 15px;">
+            <label>Admin Username</label>
+            <input type="text" value="MasterAdmin" id="settings-admin-user" />
+          </div>
+          <div class="form-group">
+            <label>Master Contact Email</label>
+            <input type="email" value="admin@pokemonnexus.com" id="settings-admin-email" />
+          </div>
+          <div class="form-group">
+            <label>System Access Key (Password)</label>
+            <input type="password" value="••••••••••••" id="settings-admin-pass" />
+          </div>
+          <button id="settings-save-btn" style="margin-top: 10px; background: var(--blue); border: none; padding: 10px 24px; border-radius: 6px; color: white;">Save System Configurations</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODALS & OVERLAYS
+       ========================================== -->
+
+  <!-- Universal Custom Modal -->
+  <div class="modal-overlay" id="customModal" style="display: none;">
+    <div class="modal-content glass-panel" style="max-width: 450px; padding: 20px; border: 1.5px solid var(--border-blue); color: white;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <h3 id="modalTitle" style="margin: 0; color: #ffcb05; font-size: 1.25rem;">Modal Title</h3>
+        <button id="customModalCloseBtn" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody" style="padding: 15px 0;">
+        <!-- Dynamic Form Fields Go Here -->
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+        <button id="customModalCancelBtn" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer;">Cancel</button>
+        <button id="modalConfirmBtn" style="padding: 8px 16px; background: #0c70ff; border: none; border-radius: 6px; color: white; cursor: pointer;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div class="modal-overlay" id="logoutModal" style="display: none;">
+    <div class="modal-content glass-panel" style="max-width: 400px; padding: 20px; border: 1.5px solid var(--border-blue); color: white; text-align: center;">
+      <h3 style="color: #ff3d00; margin-top: 0;">🚪 Confirm Logout</h3>
+      <p style="margin: 15px 0; color: rgba(255, 255, 255, 0.85);">Are you sure you want to logout of the Admin Dashboard?</p>
+      <div style="display: flex; justify-content: center; gap: 14px; margin-top: 20px;">
+        <button id="logoutCancelBtn" style="padding: 8px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer;">Cancel</button>
+        <button id="logoutConfirmBtn" style="padding: 8px 20px; background: #ff3d00; border: none; border-radius: 6px; color: white; cursor: pointer;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="admin-toast" style="position: fixed; bottom: 20px; right: 20px; background: rgba(6, 11, 28, 0.95); border: 1.5px solid var(--border-blue); padding: 12px 24px; border-radius: 8px; box-shadow: 0 0 15px rgba(12, 112, 255, 0.4); color: white; font-weight: 500; display: none; z-index: 9999; transition: opacity 0.3s;"></div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    // ==========================================
+    // JavaScript Section Switching & Databases
+    // ==========================================
+
+    const trainersDb = [
+      { name: "Ash", level: 89, region: "Kanto", status: "Active", rank: "Master" },
+      { name: "Red", level: 95, region: "Kanto", status: "Active", rank: "Champion" },
+      { name: "Blue", level: 82, region: "Kanto", status: "Active", rank: "Elite Four" },
+      { name: "Leon", level: 100, region: "Galar", status: "Active", rank: "Monarch" },
+      { name: "Cynthia", level: 92, region: "Sinnoh", status: "Active", rank: "Champion" },
+      { name: "Steven", level: 88, region: "Hoenn", status: "Active", rank: "Champion" },
+      { name: "Iris", level: 75, region: "Unova", status: "Banned", rank: "Trainer" }
+    ];
+
+    const pokemonDb = [
+      { name: "Pikachu", type: "Electric", level: 80, rarity: "Rare", hp: 210, attack: 180, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" },
+      { name: "Charizard", type: "Fire", level: 82, rarity: "Epic", hp: 240, attack: 220, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" },
+      { name: "Blastoise", type: "Water", level: 80, rarity: "Epic", hp: 250, attack: 200, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png" },
+      { name: "Venusaur", type: "Grass", level: 80, rarity: "Epic", hp: 260, attack: 190, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png" },
+      { name: "Gengar", type: "Ghost", level: 81, rarity: "Epic", hp: 220, attack: 210, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png" },
+      { name: "Mewtwo", type: "Psychic", level: 90, rarity: "Legendary", hp: 290, attack: 280, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png" }
+    ];
+
+    const battlesDb = [
+      { trainer: "Ash", opponent: "Gary", winner: "Ash", arena: "Volcano", duration: "2m 14s", status: "Completed" },
+      { trainer: "Red", opponent: "Wild Mewtwo", winner: "Red", arena: "Ancient Temple", duration: "4m 02s", status: "Completed" },
+      { trainer: "Blue", opponent: "Lance", winner: "Lance", arena: "Night Arena", duration: "3m 15s", status: "Completed" },
+      { trainer: "Leon", opponent: "Raihan", winner: "Leon", arena: "Beach", duration: "1m 45s", status: "Completed" },
+      { trainer: "Cynthia", opponent: "Flint", winner: "Cynthia", arena: "Forest", duration: "2m 50s", status: "Completed" },
+      { trainer: "Steven", opponent: "Wallace", winner: "Steven", arena: "Snow", duration: "3m 05s", status: "Disconnected" }
+    ];
+
+    const missionsDb = [
+      { name: "Volcano Conqueror", reward: "500 XP, 50 Poké Coins", difficulty: "hard", progress: 80, status: "Active" },
+      { name: "Catch 10 Pokémon", reward: "200 XP, 20 Great Balls", difficulty: "easy", progress: 100, status: "Completed" },
+      { name: "Unstoppable Win Streak", reward: "1000 XP, 1 Master Ball", difficulty: "mythic", progress: 40, status: "Active" },
+      { name: "Defeat the Elite Champion", reward: "1500 XP, Legend Title", difficulty: "mythic", progress: 0, status: "Locked" },
+      { name: "Forest Exploration", reward: "300 XP, 5 Hyper Potions", difficulty: "medium", progress: 100, status: "Completed" }
+    ];
+
+    const leaderboardDb = [
+      { rank: 1, trainer: "Red", xp: "98,400 XP", wins: 142, rate: "78%", tier: "Master" },
+      { rank: 2, trainer: "Ash", xp: "91,200 XP", wins: 120, rate: "70%", tier: "Diamond" },
+      { rank: 3, trainer: "Leon", xp: "89,900 XP", wins: 115, rate: "72%", tier: "Diamond" },
+      { rank: 4, trainer: "Cynthia", xp: "85,100 XP", wins: 98, rate: "68%", tier: "Platinum" },
+      { rank: 5, trainer: "Steven", xp: "82,300 XP", wins: 88, rate: "65%", tier: "Platinum" }
+    ];
+
+    const shopDb = [
+      { name: "Poké Ball", price: 200, stock: 999, category: "Balls" },
+      { name: "Great Ball", price: 600, stock: 450, category: "Balls" },
+      { name: "Ultra Ball", price: 1200, stock: 200, category: "Balls" },
+      { name: "Master Ball", price: 50000, stock: 5, category: "Special" },
+      { name: "Potion", price: 300, stock: 500, category: "Heals" },
+      { name: "Revive", price: 1500, stock: 120, category: "Special" }
+    ];
+    
+    // Expose database arrays to window for game-sync.js integration
+    window.trainersDb = trainersDb;
+    window.pokemonDb = pokemonDb;
+    window.battlesDb = battlesDb;
+    window.missionsDb = missionsDb;
+    window.leaderboardDb = leaderboardDb;
+    window.shopDb = shopDb;
+
+    // Toast Notification System
+    function showToast(msg) {
+      const toast = document.getElementById("admin-toast");
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.style.display = "block";
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 300);
+      }, 2500);
+    }
+
+    // Dynamic Section Titles Config
+    function updateTopbarHeaders(sectionId) {
+      const titles = {
+        'dashboard': { t: 'Admin Dashboard', d: 'Control Pokémon Nexus kingdom from one command center.' },
+        'trainers': { t: 'Trainer Management', d: 'Monitor, edit and moderate registered trainers.' },
+        'pokemon': { t: 'Pokémon Management', d: 'Register, modify, and balance Pokémon stats.' },
+        'battles': { t: 'Battle Logs', d: 'View recent matches and arena records.' },
+        'missions': { t: 'Missions & Quests', d: 'Manage game quests and check user progress.' },
+        'leaderboard': { t: 'Season Leaderboard', d: 'View top-ranked players and reset season rankings.' },
+        'analytics': { t: 'Deep Analytics', d: 'Analyze user retention, active battles, and metrics.' },
+        'shop': { t: 'Shop Inventory', d: 'Add, modify, and restock items in the Poké Shop.' },
+        'rewards': { t: 'Rewards Management', d: 'Configure daily logins, milestones, battle drops, and event rewards.' },
+        'settings': { t: 'System Settings', d: 'Configure server status, game rules, and admin profiles.' }
+      };
+
+      if (titles[sectionId]) {
+        document.getElementById("topbar-title").textContent = titles[sectionId].t;
+        document.getElementById("topbar-desc").textContent = titles[sectionId].d;
+      }
+    }
+
+    // Dynamic Re-render Dispatcher
+    function refreshSectionContent(sectionId) {
+      if (sectionId === 'dashboard') {
+        renderDashboard();
+      } else if (sectionId === 'trainers') {
+        renderTrainers();
+      } else if (sectionId === 'pokemon') {
+        renderPokemon();
+      } else if (sectionId === 'battles') {
+        renderBattles();
+      } else if (sectionId === 'missions') {
+        renderMissions();
+      } else if (sectionId === 'leaderboard') {
+        renderLeaderboard();
+      } else if (sectionId === 'shop') {
+        renderShop();
+      }
+    }
+
+    // Modal Control System
+    function openCustomModal(title, bodyHtml, confirmCallback) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = bodyHtml;
+      
+      const confirmBtn = document.getElementById("modalConfirmBtn");
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      
+      newConfirmBtn.addEventListener("click", () => {
+        confirmCallback();
+        closeCustomModal();
+      });
+      
+      document.getElementById("customModal").style.display = "flex";
+    }
+
+    function closeCustomModal() {
+      document.getElementById("customModal").style.display = "none";
+    }
+
+    // Logout Modal Control
+    function openLogoutModal() {
+      document.getElementById("logoutModal").style.display = "flex";
+    }
+    function closeLogoutModal() {
+      document.getElementById("logoutModal").style.display = "none";
+    }
+    function confirmLogout() {
+      localStorage.removeItem("pokemonNexusAccess");
+      localStorage.removeItem("pokemonNexusRefresh");
+      localStorage.removeItem("pokemonNexusToken");
+      localStorage.removeItem("pokemonNexusUser");
+      window.location.href = "../index.html";
+    }
+
+    // Export Dummy CSV
+    function exportToCSV(filename, data) {
+      if (!data || !data.length) return;
+      const headers = Object.keys(data[0]).join(",");
+      const rows = data.map(row => 
+        Object.values(row).map(val => `"${val}"`).join(",")
+      );
+      const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${filename} successfully!`);
+    }
+
+    // RENDER FUNCTIONS
+
+    function renderDashboard() {
+      // Recent Trainers
+      const trainersTbody = document.getElementById("dashboard-trainers-tbody");
+      trainersTbody.innerHTML = "";
+      trainersDb.slice(0, 4).forEach((t, idx) => {
+        const tr = document.createElement("tr");
+        const statusClass = t.status === "Active" ? "online" : "offline";
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td>${t.level}</td>
+          <td><b class="${statusClass}">${t.status}</b></td>
+          <td><button class="btn-dashboard-edit-trainer" data-index="${idx}">Edit</button></td>
+        `;
+        trainersTbody.appendChild(tr);
+      });
+
+      // Bind listeners inside dynamic dashboard trainers list
+      document.querySelectorAll(".btn-dashboard-edit-trainer").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = parseInt(btn.getAttribute("data-index"));
+          console.log("Clicked: Edit trainer");
+          editTrainer(idx);
+        });
+      });
+
+      // Leaderboard
+      const leaderList = document.getElementById("dashboard-leaderboard-list");
+      leaderList.innerHTML = "";
+      leaderboardDb.slice(0, 3).forEach(l => {
+        const p = document.createElement("p");
+        p.innerHTML = `<span>${l.rank}. ${l.trainer}</span><b>${l.xp}</b>`;
+        leaderList.appendChild(p);
+      });
+      const resetBtn = document.createElement("button");
+      resetBtn.className = "danger";
+      resetBtn.id = "dashboard-reset-btn";
+      resetBtn.textContent = "Reset Season";
+      leaderList.appendChild(resetBtn);
+
+      // Re-bind dashboard-reset-btn listener
+      resetBtn.addEventListener("click", () => {
+        console.log("Clicked: Reset Season");
+        openResetSeasonModal();
+      });
+    }
+
+    function renderTrainers() {
+      const tbody = document.getElementById("trainers-table-tbody");
+      tbody.innerHTML = "";
+      trainersDb.forEach((t, idx) => {
+        const tr = document.createElement("tr");
+        const statusClass = t.status === "Active" ? "online" : "offline";
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td>${t.level}</td>
+          <td>${t.region}</td>
+          <td>${t.rank}</td>
+          <td><b class="${statusClass}">${t.status}</b></td>
+          <td>
+            <button class="btn-trainer-edit" data-index="${idx}" style="padding: 4px 8px; font-size:0.8rem; margin-right:5px;">Edit</button>
+            <button class="btn-trainer-ban" data-index="${idx}" style="padding: 4px 8px; font-size:0.8rem;">Ban/Unban</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Bind table action buttons listeners
+      document.querySelectorAll(".btn-trainer-edit").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Edit trainer");
+          editTrainer(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+      document.querySelectorAll(".btn-trainer-ban").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Ban/Unban Trainer");
+          toggleTrainerStatus(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+    }
+
+    function renderPokemon() {
+      const container = document.getElementById("pokemon-grid-container");
+      container.innerHTML = "";
+      pokemonDb.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "pokemon-card";
+        card.innerHTML = `
+          <img src="${p.sprite}" class="pokemon-thumb" alt="${p.name}" />
+          <h4 style="margin: 5px 0 2px; color: var(--yellow); font-size: 1.1rem;">${p.name}</h4>
+          <span style="font-size:0.8rem; opacity:0.8; text-transform:uppercase;">${p.type} / ${p.rarity}</span>
+          <div style="display:flex; gap:10px; font-size:0.85rem; color:var(--text-gray); margin-top:5px;">
+            <span>Level: <b>${p.level}</b></span>
+            <span>HP: <b>${p.hp}</b></span>
+            <span>ATK: <b>${p.attack}</b></span>
+          </div>
+          <div style="display:flex; gap:8px; width:100%; margin-top:10px;">
+            <button class="btn-pkmn-edit" data-index="${idx}" style="flex:1; padding:6px; font-size:0.85rem;">Edit</button>
+            <button class="btn-pkmn-delete" data-index="${idx}" style="flex:1; padding:6px; font-size:0.85rem;">Delete</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Bind Pokemon grid actions listeners
+      document.querySelectorAll(".btn-pkmn-edit").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Edit Pokémon");
+          editPokemon(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+      document.querySelectorAll(".btn-pkmn-delete").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Delete Pokémon");
+          deletePokemon(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+    }
+
+    function renderBattles() {
+      const tbody = document.getElementById("battles-table-tbody");
+      tbody.innerHTML = "";
+      battlesDb.forEach(b => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${b.trainer}</td>
+          <td>${b.opponent}</td>
+          <td>${b.winner}</td>
+          <td>${b.arena}</td>
+          <td>${b.duration}</td>
+          <td><b class="${b.status === 'Completed' ? 'online' : 'offline'}">${b.status}</b></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMissions() {
+      const container = document.getElementById("missions-grid-container");
+      container.innerHTML = "";
+      missionsDb.forEach((m, idx) => {
+        const card = document.createElement("div");
+        card.className = "mission-card";
+        card.innerHTML = `
+          <div class="mission-header">
+            <h4 style="margin:0; color:var(--yellow);">${m.name}</h4>
+            <span class="mission-difficulty difficulty-${m.difficulty}">${m.difficulty}</span>
+          </div>
+          <p style="margin:2px 0 8px; font-size:0.85rem; color:var(--text-gray);">Reward: ${m.reward}</p>
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" style="width: ${m.progress}%;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:5px;">
+            <span>Progress: <b>${m.progress}%</b></span>
+            <span class="${m.status === 'Completed' ? 'online' : 'offline'}">${m.status}</span>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn-mission-edit" data-index="${idx}" style="flex:1; padding:4px 8px; font-size:0.8rem;">Edit</button>
+            <button class="btn-mission-delete" data-index="${idx}" style="flex:1; padding:4px 8px; font-size:0.8rem;">Delete</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Bind mission card actions listeners
+      document.querySelectorAll(".btn-mission-edit").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Edit Mission");
+          editMission(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+      document.querySelectorAll(".btn-mission-delete").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Delete Mission");
+          deleteMission(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById("leaderboard-table-tbody");
+      tbody.innerHTML = "";
+      leaderboardDb.forEach(l => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>#${l.rank}</b></td>
+          <td style="color:var(--yellow); font-weight:600;">${l.trainer}</td>
+          <td>${l.xp}</td>
+          <td>${l.wins}</td>
+          <td>${l.rate}</td>
+          <td>${l.tier}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderShop() {
+      const container = document.getElementById("shop-grid-container");
+      container.innerHTML = "";
+      shopDb.forEach((item, idx) => {
+        const card = document.createElement("div");
+        card.className = "shop-card";
+        card.innerHTML = `
+          <h4 style="margin:0 0 4px; color:var(--yellow);">${item.name}</h4>
+          <span style="font-size:0.8rem; text-transform:uppercase; color:var(--text-gray);">${item.category}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:5px;">
+            <span>Price: <b>₹${item.price}</b></span>
+            <span>Stock: <b>${item.stock}</b></span>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn-shop-edit" data-index="${idx}" style="flex:1; padding:6px; font-size:0.85rem;">Edit</button>
+            <button class="btn-shop-delete" data-index="${idx}" style="flex:1; padding:6px; font-size:0.85rem;">Remove</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Bind shop inventory actions listeners
+      document.querySelectorAll(".btn-shop-edit").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Edit Shop Item");
+          editShopItem(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+      document.querySelectorAll(".btn-shop-delete").forEach(btn => {
+        btn.addEventListener("click", () => {
+          console.log("Clicked: Remove Shop Item");
+          deleteShopItem(parseInt(btn.getAttribute("data-index")));
+        });
+      });
+    }
+
+    // ACTIONS & MODALS TRIGGER
+
+    function editTrainer(idx) {
+      const trainer = trainersDb[idx];
+      const html = `
+        <div class="form-group">
+          <label>Trainer Name</label>
+          <input type="text" id="edit-trainer-name" value="${trainer.name}" />
+        </div>
+        <div class="form-group">
+          <label>Trainer Level</label>
+          <input type="number" id="edit-trainer-level" value="${trainer.level}" />
+        </div>
+        <div class="form-group">
+          <label>Region</label>
+          <input type="text" id="edit-trainer-region" value="${trainer.region}" />
+        </div>
+        <div class="form-group">
+          <label>Rank / League</label>
+          <input type="text" id="edit-trainer-rank" value="${trainer.rank}" />
+        </div>
+      `;
+      openCustomModal("👤 Edit Trainer Profile", html, () => {
+        trainersDb[idx].name = document.getElementById("edit-trainer-name").value;
+        trainersDb[idx].level = parseInt(document.getElementById("edit-trainer-level").value);
+        trainersDb[idx].region = document.getElementById("edit-trainer-region").value;
+        trainersDb[idx].rank = document.getElementById("edit-trainer-rank").value;
+        renderTrainers();
+        renderDashboard();
+        showToast("Trainer details updated successfully!");
+      });
+    }
+
+    function toggleTrainerStatus(idx) {
+      const current = trainersDb[idx].status;
+      trainersDb[idx].status = current === "Active" ? "Banned" : "Active";
+      renderTrainers();
+      renderDashboard();
+      showToast(`Trainer ${trainersDb[idx].name} status toggled to ${trainersDb[idx].status}!`);
+    }
+
+    function openAddTrainerModal() {
+      const html = `
+        <div class="form-group">
+          <label>Trainer Name</label>
+          <input type="text" id="add-trainer-name" placeholder="e.g. Gary Oak" />
+        </div>
+        <div class="form-group">
+          <label>Trainer Level</label>
+          <input type="number" id="add-trainer-level" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Region</label>
+          <input type="text" id="add-trainer-region" placeholder="e.g. Johto" />
+        </div>
+        <div class="form-group">
+          <label>Rank / League</label>
+          <input type="text" id="add-trainer-rank" placeholder="e.g. Master" />
+        </div>
+      `;
+      openCustomModal("👥 Register New Trainer", html, () => {
+        const name = document.getElementById("add-trainer-name").value;
+        const level = parseInt(document.getElementById("add-trainer-level").value);
+        const region = document.getElementById("add-trainer-region").value;
+        const rank = document.getElementById("add-trainer-rank").value;
+        
+        if (!name) return showToast("Trainer name cannot be empty!");
+        
+        trainersDb.push({ name, level, region, rank, status: "Active" });
+        renderTrainers();
+        renderDashboard();
+        showToast("New Trainer successfully registered!");
+      });
+    }
+
+    function openAddPokemonModal() {
+      const html = `
+        <div class="form-group">
+          <label>Pokémon Name</label>
+          <input type="text" id="add-pkmn-name" placeholder="e.g. Lucario" />
+        </div>
+        <div class="form-group">
+          <label>Elemental Type</label>
+          <input type="text" id="add-pkmn-type" placeholder="e.g. Fighting" />
+        </div>
+        <div class="form-group">
+          <label>Base Level</label>
+          <input type="number" id="add-pkmn-lvl" value="50" />
+        </div>
+        <div class="form-group">
+          <label>Rarity Tier</label>
+          <select id="add-pkmn-rarity">
+            <option value="Common">Common</option>
+            <option value="Rare">Rare</option>
+            <option value="Epic">Epic</option>
+            <option value="Legendary">Legendary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Max HP</label>
+          <input type="number" id="add-pkmn-hp" value="200" />
+        </div>
+        <div class="form-group">
+          <label>Base Attack</label>
+          <input type="number" id="add-pkmn-atk" value="150" />
+        </div>
+        <div class="form-group">
+          <label>Sprite Art URL</label>
+          <input type="text" id="add-pkmn-sprite" value="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png" />
+        </div>
+      `;
+      openCustomModal("⚡ Register New Pokémon", html, () => {
+        const name = document.getElementById("add-pkmn-name").value;
+        const type = document.getElementById("add-pkmn-type").value;
+        const level = parseInt(document.getElementById("add-pkmn-lvl").value);
+        const rarity = document.getElementById("add-pkmn-rarity").value;
+        const hp = parseInt(document.getElementById("add-pkmn-hp").value);
+        const attack = parseInt(document.getElementById("add-pkmn-atk").value);
+        const sprite = document.getElementById("add-pkmn-sprite").value;
+        
+        if (!name) return showToast("Pokémon name is required!");
+        
+        pokemonDb.push({ name, type, level, rarity, hp, attack, sprite });
+        renderPokemon();
+        showToast("New Pokémon added to database!");
+      });
+    }
+
+    function editPokemon(idx) {
+      const p = pokemonDb[idx];
+      const html = `
+        <div class="form-group">
+          <label>Pokémon Name</label>
+          <input type="text" id="edit-pkmn-name" value="${p.name}" />
+        </div>
+        <div class="form-group">
+          <label>Elemental Type</label>
+          <input type="text" id="edit-pkmn-type" value="${p.type}" />
+        </div>
+        <div class="form-group">
+          <label>Level</label>
+          <input type="number" id="edit-pkmn-lvl" value="${p.level}" />
+        </div>
+        <div class="form-group">
+          <label>Rarity Tier</label>
+          <select id="edit-pkmn-rarity">
+            <option value="Common" ${p.rarity === 'Common' ? 'selected' : ''}>Common</option>
+            <option value="Rare" ${p.rarity === 'Rare' ? 'selected' : ''}>Rare</option>
+            <option value="Epic" ${p.rarity === 'Epic' ? 'selected' : ''}>Epic</option>
+            <option value="Legendary" ${p.rarity === 'Legendary' ? 'selected' : ''}>Legendary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>HP</label>
+          <input type="number" id="edit-pkmn-hp" value="${p.hp}" />
+        </div>
+        <div class="form-group">
+          <label>Attack</label>
+          <input type="number" id="edit-pkmn-atk" value="${p.attack}" />
+        </div>
+      `;
+      openCustomModal("⚡ Edit Pokémon Stats", html, () => {
+        pokemonDb[idx].name = document.getElementById("edit-pkmn-name").value;
+        pokemonDb[idx].type = document.getElementById("edit-pkmn-type").value;
+        pokemonDb[idx].level = parseInt(document.getElementById("edit-pkmn-lvl").value);
+        pokemonDb[idx].rarity = document.getElementById("edit-pkmn-rarity").value;
+        pokemonDb[idx].hp = parseInt(document.getElementById("edit-pkmn-hp").value);
+        pokemonDb[idx].attack = parseInt(document.getElementById("edit-pkmn-atk").value);
+        renderPokemon();
+        showToast("Pokémon stats updated successfully!");
+      });
+    }
+
+    function deletePokemon(idx) {
+      const name = pokemonDb[idx].name;
+      const html = `<p style="color:var(--red)">Are you sure you want to delete <b>${name}</b> from the database?</p>`;
+      openCustomModal("⚠️ Delete Pokémon", html, () => {
+        pokemonDb.splice(idx, 1);
+        renderPokemon();
+        showToast(`${name} deleted successfully!`);
+      });
+    }
+
+    function openAddMissionModal() {
+      const html = `
+        <div class="form-group">
+          <label>Mission Name</label>
+          <input type="text" id="add-mission-name" placeholder="e.g. Master Catcher" />
+        </div>
+        <div class="form-group">
+          <label>Rewards Description</label>
+          <input type="text" id="add-mission-reward" placeholder="e.g. 500 XP, 2 Ultra Balls" />
+        </div>
+        <div class="form-group">
+          <label>Difficulty</label>
+          <select id="add-mission-diff">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="mythic">Mythic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Initial Progress (%)</label>
+          <input type="number" id="add-mission-prog" value="0" />
+        </div>
+      `;
+      openCustomModal("🎯 Add New Quest Mission", html, () => {
+        const name = document.getElementById("add-mission-name").value;
+        const reward = document.getElementById("add-mission-reward").value;
+        const difficulty = document.getElementById("add-mission-diff").value;
+        const progress = parseInt(document.getElementById("add-mission-prog").value);
+
+        if (!name) return showToast("Mission name is required!");
+
+        missionsDb.push({ name, reward, difficulty, progress, status: "Active" });
+        renderMissions();
+        showToast("New Mission created successfully!");
+      });
+    }
+
+    function editMission(idx) {
+      const m = missionsDb[idx];
+      const html = `
+        <div class="form-group">
+          <label>Mission Name</label>
+          <input type="text" id="edit-mission-name" value="${m.name}" />
+        </div>
+        <div class="form-group">
+          <label>Rewards</label>
+          <input type="text" id="edit-mission-reward" value="${m.reward}" />
+        </div>
+        <div class="form-group">
+          <label>Difficulty</label>
+          <select id="edit-mission-diff">
+            <option value="easy" ${m.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
+            <option value="medium" ${m.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
+            <option value="hard" ${m.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
+            <option value="mythic" ${m.difficulty === 'mythic' ? 'selected' : ''}>Mythic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Progress (%)</label>
+          <input type="number" id="edit-mission-prog" value="${m.progress}" />
+        </div>
+      `;
+      openCustomModal("🎯 Edit Quest Mission", html, () => {
+        missionsDb[idx].name = document.getElementById("edit-mission-name").value;
+        missionsDb[idx].reward = document.getElementById("edit-mission-reward").value;
+        missionsDb[idx].difficulty = document.getElementById("edit-mission-diff").value;
+        missionsDb[idx].progress = parseInt(document.getElementById("edit-mission-prog").value);
+        if (missionsDb[idx].progress >= 100) {
+          missionsDb[idx].status = "Completed";
+        }
+        renderMissions();
+        showToast("Quest details successfully updated!");
+      });
+    }
+
+    function deleteMission(idx) {
+      const name = missionsDb[idx].name;
+      const html = `<p style="color:var(--red)">Remove quest <b>${name}</b> from active listings?</p>`;
+      openCustomModal("⚠️ Remove Mission", html, () => {
+        missionsDb.splice(idx, 1);
+        renderMissions();
+        showToast("Quest removed successfully!");
+      });
+    }
+
+    function openAddShopItemModal() {
+      const html = `
+        <div class="form-group">
+          <label>Item Name</label>
+          <input type="text" id="add-item-name" placeholder="e.g. Max Revive" />
+        </div>
+        <div class="form-group">
+          <label>Price (Coins)</label>
+          <input type="number" id="add-item-price" value="500" />
+        </div>
+        <div class="form-group">
+          <label>Available Stock</label>
+          <input type="number" id="add-item-stock" value="100" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" id="add-item-cat" placeholder="e.g. Heals" />
+        </div>
+      `;
+      openCustomModal("🛒 Add Store Item", html, () => {
+        const name = document.getElementById("add-item-name").value;
+        const price = parseInt(document.getElementById("add-item-price").value);
+        const stock = parseInt(document.getElementById("add-item-stock").value);
+        const category = document.getElementById("add-item-cat").value;
+
+        if (!name) return showToast("Item name is required!");
+
+        shopDb.push({ name, price, stock, category });
+        renderShop();
+        showToast("New item added to Poké Shop!");
+      });
+    }
+
+    function editShopItem(idx) {
+      const item = shopDb[idx];
+      const html = `
+        <div class="form-group">
+          <label>Item Name</label>
+          <input type="text" id="edit-item-name" value="${item.name}" />
+        </div>
+        <div class="form-group">
+          <label>Price (Coins)</label>
+          <input type="number" id="edit-item-price" value="${item.price}" />
+        </div>
+        <div class="form-group">
+          <label>Available Stock</label>
+          <input type="number" id="edit-item-stock" value="${item.stock}" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" id="edit-item-cat" value="${item.category}" />
+        </div>
+      `;
+      openCustomModal("🛒 Edit Store Item", html, () => {
+        shopDb[idx].name = document.getElementById("edit-item-name").value;
+        shopDb[idx].price = parseInt(document.getElementById("edit-item-price").value);
+        shopDb[idx].stock = parseInt(document.getElementById("edit-item-stock").value);
+        shopDb[idx].category = document.getElementById("edit-item-cat").value;
+        renderShop();
+        showToast("Store item updated successfully!");
+      });
+    }
+
+    // Modal Delete Shop Item
+    function deleteShopItem(idx) {
+      const name = shopDb[idx].name;
+      const html = `<p style="color:var(--red)">Remove item <b>${name}</b> from store inventory listings?</p>`;
+      openCustomModal("⚠️ Remove Shop Item", html, () => {
+        shopDb.splice(idx, 1);
+        renderShop();
+        showToast("Store item removed successfully!");
+      });
+    }
+
+    // Modal Reset Season
+    function openResetSeasonModal() {
+      const html = `
+        <p style="color:var(--red)"><b>CRITICAL WARNING:</b> You are about to reset the current active competitive season.</p>
+        <p style="font-size:0.85rem; color:var(--text-gray);">This action will archive all leaderboard stats, clear current ranks, and reset win multipliers to default.</p>
+      `;
+      openCustomModal("🏆 Confirm Season Reset", html, () => {
+        leaderboardDb.forEach(l => {
+          l.xp = "0 XP";
+          l.wins = 0;
+          l.rate = "0%";
+          l.tier = "Bronze";
+        });
+        renderLeaderboard();
+        renderDashboard();
+        showToast("Competitive Season has been reset!");
+      });
+    }
+
+    function saveSystemSettings() {
+      const adminUser = document.getElementById("settings-admin-user").value;
+      const adminEmail = document.getElementById("settings-admin-email").value;
+      
+      showToast("System configurations successfully saved!");
+      console.log("Configurations Saved:", {
+        adminUser,
+        adminEmail,
+        siteOnline: document.getElementById("toggle-site-status").checked,
+        maintenanceMode: document.getElementById("toggle-maintenance").checked,
+        doubleXpActive: document.getElementById("toggle-double-xp").checked
+      });
+    }
+
+    // ==========================================
+    // DOMContentLoaded Event Listeners
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Sidebar menu click handlers
+      const menuLinks = document.querySelectorAll("#adminMenu a");
+      menuLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const targetSection = link.getAttribute("data-section");
+          
+          console.log("Clicked sidebar item:", link.textContent.trim().replace(/^[^a-zA-Z]+/g, ''));
+
+          if (link.id === "logoutBtn") {
+            console.log("Clicked:", "Logout");
+            openLogoutModal();
+            return;
+          }
+
+          if (targetSection) {
+            // Hide all .admin-section
+            document.querySelectorAll(".admin-section").forEach(sec => {
+              sec.classList.remove("active-section");
+            });
+
+            // Show selected section
+            const selectedSec = document.getElementById("section-" + targetSection);
+            if (selectedSec) {
+              selectedSec.classList.add("active-section");
+            }
+
+            // Update active sidebar class
+            menuLinks.forEach(a => a.classList.remove("active"));
+            link.classList.add("active");
+
+            // Update topbar headers
+            updateTopbarHeaders(targetSection);
+
+            // Re-render
+            refreshSectionContent(targetSection);
+          }
+        });
+      });
+
+      // Helper function to bind action loggers to buttons
+      function bindButton(id, buttonName, callback) {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            console.log("Clicked:", buttonName);
+            callback();
+          });
+        }
+      }
+
+      // 2. Control & Action Buttons binding
+      bindButton("control-add-pkmn", "Add Pokémon", openAddPokemonModal);
+      bindButton("control-edit-stats", "Edit Stats", () => showToast("Edit Stats tool opened."));
+      bindButton("control-set-legendary", "Set Legendary", () => showToast("Set Legendary config updated."));
+      bindButton("control-remove-pkmn", "Remove Pokémon", () => showToast("Remove Pokémon tool ready."));
+      bindButton("dashboard-export-btn", "Export", () => exportToCSV('battle_analytics.csv', battlesDb));
+      bindButton("dashboard-view-all-btn", "View All", () => {
+        const trainersLink = document.querySelector("#adminMenu a[data-section='trainers']");
+        if (trainersLink) trainersLink.click();
+      });
+      bindButton("dashboard-reset-btn", "Reset Season", openResetSeasonModal);
+
+      // Section specific actions binding
+      bindButton("trainers-add-btn", "Add Trainer", openAddTrainerModal);
+      bindButton("trainers-export-btn", "Export CSV", () => exportToCSV('registered_trainers.csv', trainersDb));
+      bindButton("pokemon-add-btn", "Add Pokémon", openAddPokemonModal);
+      bindButton("battles-export-btn", "Export History", () => exportToCSV('battle_history.csv', battlesDb));
+      bindButton("missions-add-btn", "Add Mission", openAddMissionModal);
+      bindButton("leaderboard-reset-btn", "Reset Season", openResetSeasonModal);
+      bindButton("shop-add-btn", "Add New Item", openAddShopItemModal);
+      bindButton("settings-save-btn", "Save System Configurations", saveSystemSettings);
+
+      // Topbar buttons binding
+      bindButton("btn-topbar-notify", "Notifications", () => showToast("🔔 No new system notifications."));
+      bindButton("btn-topbar-events", "Live Events", () => showToast("🔥 Live events are running normally."));
+      bindButton("btn-topbar-admin", "Admin", () => showToast("👑 Master Admin access granted."));
+
+      // Modal buttons binding
+      bindButton("customModalCloseBtn", "Close Modal", closeCustomModal);
+      bindButton("customModalCancelBtn", "Cancel Modal", closeCustomModal);
+      bindButton("logoutCancelBtn", "Cancel Logout", closeLogoutModal);
+      bindButton("logoutConfirmBtn", "Confirm Logout", confirmLogout);
+
+      // Initial render on load
+      refreshSectionContent("dashboard");
+    });
+  </script>
+</body>
+</html>
