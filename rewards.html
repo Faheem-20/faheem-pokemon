@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Nexus — Rewards Center</title>
+<link rel="stylesheet" href="navbar.css">
+<style>
+/* ============================================================
+   POKÉMON NEXUS REWARDS CENTER — PREMIUM AAA DESIGN SYSTEM
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;900&display=swap');
+
+:root {
+  --radius-card: 20px;
+  --radius-sm: 10px;
+  --yellow: #ffcb05;
+  --gold-glow: rgba(255, 203, 5, 0.45);
+  --red: #ef4444;
+  --blue: #0c70ff;
+  --neon-blue: #00e5ff;
+  --green: #00ff88;
+  --purple: #bf5af2;
+  --border-neon: rgba(12, 112, 255, 0.35);
+  --shadow-glow: 0 0 25px rgba(12, 112, 255, 0.25);
+  --glass-bg: rgba(8, 14, 38, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, rgba(15, 22, 45, 0.88) 0%, rgba(3, 6, 18, 0.95) 100%), url("background.jpg") center/cover no-repeat fixed;
+  color: #fff;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Floating Particles Canvas */
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Ambient glow blobs */
+.ambient-glow {
+  position: fixed;
+  top: 15%;
+  left: 5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(12, 112, 255, 0.08) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+.ambient-glow-2 {
+  position: fixed;
+  bottom: 10%;
+  right: 5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(191, 90, 242, 0.06) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* MAIN LAYOUT */
+.main-wrapper {
+  max-width: 1200px;
+  margin: 120px auto 40px;
+  padding: 0 20px;
+}
+
+/* HEADER BANNER */
+.header-banner {
+  background: linear-gradient(135deg, rgba(8, 14, 38, 0.9), rgba(12, 112, 255, 0.18));
+  border: 1px solid var(--border-neon);
+  border-radius: var(--radius-card);
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-glow);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+
+.header-banner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(12, 112, 255, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.banner-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  background: linear-gradient(95deg, var(--yellow), #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.banner-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* STATS DASHBOARD GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(12, 112, 255, 0.4);
+  box-shadow: 0 8px 25px rgba(12, 112, 255, 0.2);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--blue);
+}
+
+.stat-card.coins::before { background: var(--yellow); }
+.stat-card.xp::before { background: var(--green); }
+.stat-card.bp::before { background: var(--purple); }
+.stat-card.points::before { background: var(--red); }
+
+.stat-icon {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.stat-val {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* GRID LAYOUT PANELS */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.col-span-8 { grid-column: span 8; }
+.col-span-4 { grid-column: span 4; }
+.col-span-12 { grid-column: span 12; }
+
+/* GLASSCARD BASE */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin-bottom: 24px;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s;
+}
+
+.glass-panel:hover {
+  border-color: rgba(12, 112, 255, 0.25);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.panel-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* DAILY LOGIN SECTION */
+.cooldown-badge {
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Outfit', sans-serif;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+.cooldown-badge.ready {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: var(--green);
+  color: var(--green);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+.calendar-grid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 4px 15px;
+  scroll-behavior: smooth;
+  margin-bottom: 20px;
+}
+
+.calendar-grid::-webkit-scrollbar {
+  height: 6px;
+}
+.calendar-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+.calendar-grid::-webkit-scrollbar-thumb {
+  background: rgba(12, 112, 255, 0.3);
+  border-radius: 99px;
+}
+
+.day-card {
+  flex: 0 0 110px;
+  background: rgba(5, 8, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px 8px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.day-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(12, 112, 255, 0.4);
+  box-shadow: 0 5px 15px rgba(12, 112, 255, 0.15);
+}
+
+.day-card.claimed {
+  opacity: 0.65;
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 255, 136, 0.2);
+}
+
+.day-card.claimable {
+  background: linear-gradient(180deg, rgba(255, 203, 5, 0.15), rgba(12, 112, 255, 0.05));
+  border-color: var(--yellow);
+  box-shadow: 0 0 15px rgba(255, 203, 5, 0.25);
+  transform: scale(1.03);
+}
+
+.day-card.locked {
+  background: rgba(0, 0, 0, 0.18);
+  opacity: 0.45;
+}
+
+/* Gold/Shine effect for claimable rewards */
+@keyframes shine {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+.day-card.claimable::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+.day-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 6px;
+}
+
+.day-card.claimable .day-title {
+  color: var(--yellow);
+}
+
+.day-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.day-icon img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
+}
+
+.day-val {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.claimed-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 20, 0.75);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--green);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  font-family: 'Outfit', sans-serif;
+}
+
+.day-card.claimed .claimed-overlay {
+  opacity: 1;
+}
+
+/* BUTTONS */
+.btn-claim {
+  width: 100%;
+  background: linear-gradient(90deg, #ffd700 0%, #ffa500 100%);
+  border: none;
+  border-radius: 14px;
+  color: #030612;
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.btn-claim:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 0 30px rgba(255, 165, 0, 0.55);
+}
+
+.btn-claim:disabled {
+  background: #1c2235;
+  color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* LEVEL MILESTONES (timeline) */
+/* Force display:block for both timeline and missions container */
+#level-milestones-container, #missions-container {
+  display: block !important;
+}
+
+.level-timeline-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.level-card-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: inset 0 0 20px rgba(124, 58, 237, 0.15);
+}
+
+.hexagon-badge {
+  position: relative;
+  width: 90px;
+  height: 100px;
+  background: radial-gradient(circle, #7c3aed 0%, #4c1d95 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+.hexagon-badge::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background: #090c1f;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 1;
+}
+
+.hexagon-badge-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hex-lvl-lbl {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hex-lvl-val {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.lvl-xp-bar-container {
+  width: 100%;
+}
+.lvl-xp-bar-lbl {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+}
+.lvl-xp-bar-fill-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.lvl-xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--green));
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.6s ease;
+}
+
+.level-timeline-container {
+  position: relative;
+  padding-left: 28px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.level-timeline-container::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 9px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue) 0%, var(--purple) 100%);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+.level-timeline-container::-webkit-scrollbar {
+  width: 5px;
+}
+.level-timeline-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+.level-timeline-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+.milestone-item {
+  position: relative;
+  background: rgba(13, 22, 54, 0.5);
+  border: 1px solid rgba(12, 112, 255, 0.15);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s;
+}
+
+.milestone-item:hover {
+  border-color: rgba(12, 112, 255, 0.35);
+  transform: translateX(2px);
+}
+
+.milestone-item::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #090c1f;
+  border: 2px solid var(--neon-blue);
+  box-shadow: 0 0 8px var(--neon-blue);
+  z-index: 2;
+  transition: all 0.25s;
+}
+
+.milestone-item.claimable {
+  border-color: rgba(0, 255, 136, 0.25);
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.05) 0%, transparent 100%);
+}
+
+.milestone-item.claimable::before {
+  border-color: var(--yellow);
+  background: var(--yellow);
+  box-shadow: 0 0 10px var(--yellow);
+}
+
+.milestone-item.claimed {
+  opacity: 0.65;
+  border-color: rgba(255,255,255,0.04);
+}
+
+.milestone-item.claimed::before {
+  border-color: var(--green);
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.milestone-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-badge {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: 900;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.level-badge span {
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.level-badge val {
+  font-size: 1rem;
+  color: var(--yellow);
+}
+
+.milestone-reward-desc {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  font-family: 'Outfit', sans-serif;
+  text-transform: uppercase;
+}
+
+.milestone-reward-sub {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.milestone-reward-sub img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.btn-milestone-claim {
+  background: var(--blue);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  text-transform: uppercase;
+}
+
+.btn-milestone-claim:hover:not(:disabled) {
+  background: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.btn-milestone-claim.claimable {
+  background: var(--green);
+  color: #061225;
+}
+
+.btn-milestone-claim.claimable:hover {
+  background: #39ff9c;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.btn-milestone-claim:disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.15);
+  cursor: not-allowed;
+}
+
+/* MISSIONS LIST CONTAINER */
+.missions-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.missions-list-container::-webkit-scrollbar {
+  width: 5px;
+}
+.missions-list-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+.missions-list-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+/* Difficulty tag styling */
+.diff-tag {
+  font-size: 0.52rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  font-family: 'Outfit', sans-serif;
+  display: inline-block;
+}
+.diff-tag.easy {
+  background: rgba(0, 255, 136, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+.diff-tag.medium {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--neon-blue);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+.diff-tag.hard {
+  background: rgba(255, 165, 0, 0.15);
+  color: #ffa500;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+}
+.diff-tag.legendary {
+  background: rgba(191, 90, 242, 0.15);
+  color: var(--purple);
+  border: 1px solid rgba(191, 90, 242, 0.3);
+}
+
+/* ACHIEVEMENTS LIST CONTAINER */
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.achievements-list::-webkit-scrollbar {
+  width: 5px;
+}
+.achievements-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+.achievements-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+.ach-card {
+  background: rgba(10, 18, 48, 0.5);
+  border: 1px solid rgba(255, 203, 5, 0.12);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s;
+}
+.ach-card:hover {
+  border-color: rgba(255, 203, 5, 0.35);
+  box-shadow: 0 0 12px rgba(255, 203, 5, 0.1);
+}
+.ach-badge-wrapper {
+  flex-shrink: 0;
+}
+.ach-badge-svg {
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 0 5px rgba(255, 203, 5, 0.4));
+}
+.ach-info {
+  flex: 1;
+  text-align: left;
+}
+.ach-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--yellow);
+  text-transform: uppercase;
+}
+.ach-desc {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.ach-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ach-progress-bg {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.ach-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffcc00, #ffa500);
+  border-radius: 99px;
+  width: 0%;
+}
+.ach-progress-text {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.45);
+}
+.ach-rewards-sub {
+  font-size: 0.62rem;
+  color: var(--green);
+  font-weight: 700;
+}
+.btn-ach-claim {
+  background: var(--blue);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 55px;
+  font-family: 'Outfit', sans-serif;
+}
+.btn-ach-claim:hover:not(:disabled) {
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+.btn-ach-claim.claimable {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+  color: #030612;
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+}
+.btn-ach-claim.claimable:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+}
+.btn-ach-claim.claimed {
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.05);
+  cursor: not-allowed;
+}
+
+/* MILESTONE CHESTS LIST */
+.chests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.chests-list::-webkit-scrollbar {
+  width: 5px;
+}
+.chests-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+.chests-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+.chest-card {
+  background: rgba(10, 18, 48, 0.5);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s;
+}
+.chest-card:hover {
+  border-color: rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
+}
+.chest-img-wrapper {
+  flex-shrink: 0;
+}
+.chest-svg {
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.3));
+}
+.chest-info {
+  flex: 1;
+  text-align: left;
+}
+.chest-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--neon-blue);
+  text-transform: uppercase;
+}
+.chest-desc {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.chest-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.chest-progress-bg {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.chest-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d2ff, #00f2ff);
+  border-radius: 99px;
+  width: 0%;
+}
+.chest-progress-text {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.45);
+}
+.chest-rewards-sub {
+  font-size: 0.62rem;
+  color: var(--green);
+  font-weight: 700;
+}
+.btn-chest-claim {
+  background: var(--blue);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 55px;
+  font-family: 'Outfit', sans-serif;
+}
+.btn-chest-claim:hover:not(:disabled) {
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+.btn-chest-claim.claimable {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+  color: #030612;
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+}
+.btn-chest-claim.claimable:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+}
+.btn-chest-claim.claimed {
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.05);
+  cursor: not-allowed;
+}
+
+/* Bottom Event Banner */
+.event-banner-panel {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(191, 90, 242, 0.3) !important;
+  box-shadow: 0 0 30px rgba(191, 90, 242, 0.15) !important;
+}
+.event-banner-panel:hover {
+  border-color: rgba(191, 90, 242, 0.5) !important;
+  box-shadow: 0 0 40px rgba(191, 90, 242, 0.25) !important;
+}
+.event-banner-gengar-svg {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 0 8px rgba(191, 90, 242, 0.5));
+  animation: float-gengar 3s ease-in-out infinite;
+}
+@keyframes float-gengar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.event-card {
+  background: rgba(15, 8, 38, 0.6);
+  border: 1px solid rgba(191, 90, 242, 0.3);
+  border-radius: 16px;
+  padding: 16px;
+  flex: 1;
+  min-width: 250px;
+  transition: all 0.3s;
+  text-align: left;
+}
+.event-card:hover {
+  border-color: rgba(191, 90, 242, 0.5);
+  box-shadow: 0 0 20px rgba(191, 90, 242, 0.2);
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.event-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-img img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+}
+
+.event-meta {
+  text-align: left;
+}
+
+.event-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+}
+
+.event-type {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--purple);
+  letter-spacing: 0.5px;
+}
+
+.event-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.event-timer {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ff5252;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.btn-event-claim {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+  border: none;
+  border-radius: 6px;
+  color: #030612;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  text-transform: uppercase;
+}
+
+.btn-event-claim:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+}
+
+.btn-event-claim:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* HISTORY SECTION */
+.history-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: white;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 10px rgba(12, 112, 255, 0.2);
+}
+
+.category-select {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: white;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.category-select option {
+  background: #0c1225;
+  color: white;
+}
+
+.history-scroll-container {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.history-table th {
+  background: rgba(12, 112, 255, 0.08);
+  border-bottom: 2px solid rgba(12, 112, 255, 0.25);
+  padding: 12px 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.65);
+  font-family: 'Outfit', sans-serif;
+}
+
+.history-table td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.history-table tr:hover {
+  background: rgba(12, 112, 255, 0.03);
+}
+
+/* History Source Badge */
+.hist-source-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.5px;
+}
+.hist-source-badge.daily { background: rgba(0, 229, 255, 0.15); color: var(--neon-blue); border: 1px solid rgba(0, 229, 255, 0.25); }
+.hist-source-badge.mission { background: rgba(191, 90, 242, 0.15); color: var(--purple); border: 1px solid rgba(191, 90, 242, 0.25); }
+.hist-source-badge.level { background: rgba(255, 203, 5, 0.15); color: var(--yellow); border: 1px solid rgba(255, 203, 5, 0.25); }
+.hist-source-badge.event { background: rgba(0, 255, 136, 0.15); color: var(--green); border: 1px solid rgba(0, 255, 136, 0.25); }
+.hist-source-badge.battle { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.25); }
+
+.pagination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Outfit', sans-serif;
+}
+
+.pagination-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-page {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  background: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 0 8px rgba(12, 112, 255, 0.4);
+}
+
+.btn-page:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* TOAST NOTIFICATION */
+.toast {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  color: #061225;
+  font-weight: 800;
+  padding: 13px 28px;
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1000000;
+  font-family: 'Outfit', sans-serif;
+  text-transform: uppercase;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* HIGH-TECH CHEST OPENING MODAL */
+.chest-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 18, 0.95);
+  z-index: 9999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(15px);
+  animation: modal-fade-in 0.3s ease forwards;
+}
+.chest-modal-content {
+  text-align: center;
+  background: rgba(10, 18, 48, 0.85);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: 24px;
+  padding: 40px 60px;
+  box-shadow: 0 0 50px rgba(0, 229, 255, 0.2);
+  animation: chest-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.chest-modal-glow {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.chest-modal-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2.2rem;
+  color: var(--yellow);
+  text-shadow: 0 0 15px rgba(255, 203, 5, 0.5);
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+}
+.chest-modal-subtitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes chest-pop {
+  from { transform: scale(0.8) translateY(20px); }
+  to { transform: scale(1) translateY(0); }
+}
+
+@keyframes chest-unlock-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20%, 60% { transform: rotate(-5deg) scale(1.1); }
+  40%, 80% { transform: rotate(5deg) scale(1.1); }
+}
+@keyframes lid-open-rotate {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-12px) rotate(-10deg); opacity: 0.7; }
+}
+.chest-svg.unlock-open {
+  animation: chest-unlock-shake 0.8s ease;
+}
+.chest-svg.unlock-open .chest-lid {
+  animation: lid-open-rotate 0.6s 0.8s forwards;
+  transform-origin: top;
+}
+
+/* ============================================================
+   FINAL REWARDS UI POLISH — added by ChatGPT
+   UI-only overrides. Existing IDs, APIs and event listeners preserved.
+   ============================================================ */
+:root {
+  --reward-gold: #ffd86b;
+  --reward-blue: #23d5ff;
+  --reward-violet: #9b5cff;
+  --reward-green: #35ff9d;
+  --reward-panel: rgba(6, 12, 32, 0.74);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(35,213,255,.11), transparent 32%),
+    radial-gradient(circle at 76% 34%, rgba(155,92,255,.10), transparent 35%),
+    linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.28));
+}
+
+.navbar {
+  position: fixed;
+  height: 70px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(6,10,24,.82), rgba(11,19,50,.74));
+  border-color: rgba(35,213,255,.22);
+  box-shadow: 0 16px 42px rgba(0,0,0,.36), 0 0 30px rgba(35,213,255,.13);
+}
+.nav-links { gap: 6px; flex-wrap: nowrap; }
+.nav-links a { padding: 8px 12px; font-size: 12px; }
+.nav-links a.active {
+  background: linear-gradient(135deg, rgba(255,216,107,.24), rgba(255,180,0,.10));
+  box-shadow: 0 0 22px rgba(255,216,107,.30), inset 0 0 12px rgba(255,216,107,.08);
+}
+
+.main-wrapper { max-width: 1240px; margin-top: 108px; }
+.header-banner {
+  min-height: 138px;
+  background:
+    linear-gradient(135deg, rgba(7,12,35,.92), rgba(12,112,255,.16)),
+    radial-gradient(circle at 88% 18%, rgba(255,216,107,.18), transparent 28%);
+  border-color: rgba(255,216,107,.20);
+  box-shadow: 0 18px 48px rgba(0,0,0,.38), 0 0 34px rgba(12,112,255,.16);
+}
+.header-banner::after {
+  content: "🎁";
+  position: absolute;
+  right: 34px;
+  top: 18px;
+  font-size: 84px;
+  opacity: .12;
+  filter: drop-shadow(0 0 18px var(--reward-gold));
+}
+.banner-title { font-size: clamp(1.75rem, 3vw, 2.65rem); }
+.banner-subtitle { max-width: 780px; }
+
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 14px;
+}
+.stat-card {
+  min-height: 118px;
+  background: linear-gradient(160deg, rgba(10,18,48,.82), rgba(8,13,32,.66));
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 12px 30px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.stat-card::before {
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--reward-blue), var(--reward-gold));
+  box-shadow: 0 0 14px rgba(35,213,255,.35);
+}
+.stat-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  border-color: rgba(255,216,107,.35);
+  box-shadow: 0 18px 44px rgba(0,0,0,.35), 0 0 24px rgba(255,216,107,.18);
+}
+.stat-icon { font-size: 1.9rem; margin-bottom: 9px; }
+.stat-val { font-size: 1.55rem; background: linear-gradient(90deg,#fff,var(--reward-gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+.glass-panel {
+  background: linear-gradient(155deg, rgba(9,16,42,.84), rgba(6,10,26,.72));
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 16px 42px rgba(0,0,0,.33), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.glass-panel:hover { border-color: rgba(35,213,255,.30); }
+.panel-title { letter-spacing: .75px; }
+.panel-header { border-bottom-color: rgba(35,213,255,.14); }
+
+.calendar-grid { gap: 14px; padding: 12px 6px 18px; }
+.day-card {
+  flex-basis: 118px;
+  min-height: 138px;
+  background: linear-gradient(180deg, rgba(13,23,57,.88), rgba(5,9,23,.72));
+  border-color: rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.day-card:hover { transform: translateY(-6px); }
+.day-card.claimable {
+  border-color: var(--reward-gold);
+  background: linear-gradient(180deg, rgba(255,216,107,.20), rgba(12,112,255,.08));
+  animation: rewardPulse 1.8s ease-in-out infinite;
+}
+.day-card.chest-day-card,
+.day-card:nth-child(7), .day-card:nth-child(14), .day-card:nth-child(21), .day-card:nth-child(30) {
+  border-color: rgba(255,216,107,.32);
+  background: radial-gradient(circle at 50% 18%, rgba(255,216,107,.20), transparent 30%), rgba(8,14,35,.80);
+}
+.day-icon { width: 58px; height: 58px; font-size: 31px; }
+.claimed-overlay { background: rgba(4,13,21,.82); }
+.day-card.claimed .claimed-overlay::before { content: "✓"; font-size: 26px; line-height: 1; margin-bottom: 2px; }
+.cooldown-badge { box-shadow: 0 0 18px rgba(35,213,255,.24); }
+
+.btn-claim, .btn-ach-claim, .btn-chest-claim, .btn-milestone-claim.claimable {
+  background: linear-gradient(135deg, #ffe58a, #ffb422 52%, #ff8a00) !important;
+  color: #061225 !important;
+  border: 0 !important;
+  box-shadow: 0 0 22px rgba(255,180,34,.28), inset 0 1px 0 rgba(255,255,255,.30) !important;
+  position: relative;
+  overflow: hidden;
+}
+.btn-claim::after, .btn-ach-claim::after, .btn-chest-claim::after, .btn-milestone-claim.claimable::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -65%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.42), transparent);
+  transform: skewX(-18deg);
+  animation: shine 3.2s infinite;
+}
+
+.level-card-left, .ach-card, .chest-card, .event-card,
+#missions-container > *, .history-table tbody tr {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease;
+}
+.level-card-left {
+  background: radial-gradient(circle at 50% 0%, rgba(155,92,255,.22), transparent 35%), rgba(10,18,48,.62);
+}
+.hexagon-badge { filter: drop-shadow(0 0 20px rgba(155,92,255,.40)); }
+.level-timeline-container::before {
+  background: linear-gradient(180deg, var(--reward-gold), var(--reward-violet), var(--reward-blue));
+  box-shadow: 0 0 14px rgba(35,213,255,.28);
+}
+
+#missions-container > * {
+  background: linear-gradient(145deg, rgba(12,21,54,.78), rgba(5,10,27,.70)) !important;
+  border: 1px solid rgba(35,213,255,.16) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+#missions-container > *:hover,
+.ach-card:hover, .chest-card:hover, .event-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,216,107,.32) !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,.30), 0 0 22px rgba(255,216,107,.12) !important;
+}
+
+.ach-card {
+  background: linear-gradient(140deg, rgba(13,23,57,.78), rgba(6,11,28,.72));
+  border-color: rgba(255,216,107,.16);
+}
+.ach-progress-fill, .chest-progress-fill, .lvl-xp-bar-fill {
+  background: linear-gradient(90deg, var(--reward-green), var(--reward-blue), var(--reward-gold)) !important;
+  box-shadow: 0 0 14px rgba(35,213,255,.35);
+}
+.ach-badge-svg { width: 50px; height: 50px; }
+
+.chests-list { gap: 14px; }
+.chest-card {
+  border-radius: 18px;
+  background: radial-gradient(circle at 18% 20%, rgba(255,216,107,.14), transparent 30%), rgba(9,16,42,.78);
+  border: 1px solid rgba(255,216,107,.18);
+}
+.chest-img-wrapper { filter: drop-shadow(0 0 16px rgba(255,216,107,.32)); }
+.event-banner-panel {
+  border-color: rgba(155,92,255,.30) !important;
+  box-shadow: 0 0 34px rgba(155,92,255,.15), 0 18px 44px rgba(0,0,0,.32) !important;
+}
+.event-card.seasonal { border-color: rgba(255,216,107,.42) !important; }
+
+.history-controls { gap: 12px; }
+.search-input, .category-select {
+  background: rgba(4,8,22,.70) !important;
+  border-color: rgba(35,213,255,.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+.history-table { border-collapse: separate; border-spacing: 0 8px; }
+.history-table tbody tr {
+  background: rgba(9,16,42,.62);
+}
+.history-table tbody tr:hover {
+  transform: translateX(3px);
+  background: rgba(12,112,255,.10);
+}
+.history-table tbody td:first-child { border-radius: 12px 0 0 12px; }
+.history-table tbody td:last-child { border-radius: 0 12px 12px 0; }
+.hist-source-badge { text-transform: uppercase; letter-spacing: .55px; }
+
+.toast {
+  border: 1px solid rgba(255,216,107,.35);
+  background: linear-gradient(135deg, rgba(7,12,31,.94), rgba(18,28,69,.92));
+  box-shadow: 0 0 26px rgba(255,216,107,.24);
+}
+
+@keyframes rewardPulse {
+  0%,100% { box-shadow: 0 0 15px rgba(255,216,107,.26); }
+  50% { box-shadow: 0 0 30px rgba(255,216,107,.52); }
+}
+
+@media (max-width: 1100px) {
+  .navbar { width: 96vw; padding: 0 14px; }
+  .nav-brand { font-size: 20px; }
+  .nav-links a { font-size: 10px; padding: 7px 8px; }
+  .trainer-profile-card-nav { padding: 5px 8px; }
+  .col-span-8, .col-span-4 { grid-column: span 12; }
+}
+@media (max-width: 760px) {
+  .navbar { position: static; transform: none; width: calc(100% - 24px); margin: 12px auto; height: auto; flex-wrap: wrap; padding: 12px; }
+  .nav-links { order: 3; width: 100%; overflow-x: auto; justify-content: flex-start; padding-top: 8px; }
+  .main-wrapper { margin-top: 24px; padding: 0 14px; }
+  .header-banner { padding: 22px; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glass-panel { padding: 18px; }
+  .day-card { flex-basis: 104px; }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Background canvas for floating stars -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pokedex.html">Pokédex</a>
+      <a href="battle.html">Battle</a>
+      <a href="kingdom-map.html">Kingdom Map</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="rewards.html" class="active">Rewards</a>
+      <a href="achievements.html">Achievements</a>
+      <a href="events.html">Events</a>
+      <a href="admin/admin.html" id="adminLink" style="display:none">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <main class="main-wrapper">
+    <!-- HERO SECTION WRAPPER WITH CINEMATIC BACKGROUND -->
+    <div class="rewards-hero-wrapper">
+      <div class="hero-fire-bg">
+        <div class="lava-glow"></div>
+        <div class="smoke-layer"></div>
+        <div class="heat-wave"></div>
+        <div class="embers-layer">
+          <span class="ember" style="--left: 5%; --size: 3px; --duration: 6s; --delay: 0.5s; --drift: 30px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 15%; --size: 5px; --duration: 8s; --delay: 1.2s; --drift: -40px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 28%; --size: 2px; --duration: 5s; --delay: 0.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 38%; --size: 6px; --duration: 7s; --delay: 2.5s; --drift: -30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 48%; --size: 3px; --duration: 9s; --delay: 1.8s; --drift: 45px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 58%; --size: 2px; --duration: 6s; --delay: 0.8s; --drift: -15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 68%; --size: 5px; --duration: 8s; --delay: 3.0s; --drift: 35px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 78%; --size: 3px; --duration: 7s; --delay: 1.5s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 88%; --size: 6px; --duration: 5s; --delay: 0.4s; --drift: 30px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 95%; --size: 2px; --duration: 9s; --delay: 2.1s; --drift: -40px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 12%; --size: 4px; --duration: 7.5s; --delay: 3.5s; --drift: 15px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 32%; --size: 3px; --duration: 6.5s; --delay: 4.2s; --drift: -25px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 52%; --size: 6px; --duration: 8.5s; --delay: 2.8s; --drift: 40px; --color: #ff4500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 72%; --size: 2px; --duration: 5.5s; --delay: 1.9s; --drift: -20px; --color: #ffa500; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 90%; --size: 5px; --duration: 6.8s; --delay: 4.8s; --drift: 35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 20%; --size: 3px; --duration: 6.2s; --delay: 2.2s; --drift: 20px; --color: #ffd700; --glow-color: #ff8c00;"></span>
+          <span class="ember" style="--left: 42%; --size: 4px; --duration: 7.8s; --delay: 1.1s; --drift: -30px; --color: #ffa500; --glow-color: #ff0000;"></span>
+          <span class="ember" style="--left: 62%; --size: 2px; --duration: 5.8s; --delay: 3.7s; --drift: 25px; --color: #ff8c00; --glow-color: #ff3c00;"></span>
+          <span class="ember" style="--left: 82%; --size: 5px; --duration: 8.2s; --delay: 0.9s; --drift: -35px; --color: #ffcc00; --glow-color: #ff3c00;"></span>
+        </div>
+      </div>
+      <section class="header-banner">
+        <h1 class="banner-title">⚡ PREMIUM REWARDS CENTER</h1>
+        <p class="banner-subtitle">Claim your consecutive login streaks, clear level milestones, and participate in active events to earn XP, Poké Coins, and Crystals.</p>
+      </section>
+    </div>
+
+    <!-- Stats Dashboard Grid -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <span class="stat-label">Rewards Claimed</span>
+        <div class="stat-val" id="stat-rewards-claimed">0</div>
+      </div>
+      <div class="stat-card coins">
+        <div class="stat-icon">🪙</div>
+        <span class="stat-label">Coins Earned</span>
+        <div class="stat-val" id="stat-coins-earned">0</div>
+      </div>
+      <div class="stat-card xp">
+        <div class="stat-icon">🎫</div>
+        <span class="stat-label">XP Earned</span>
+        <div class="stat-val" id="stat-xp-earned">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💎</div>
+        <span class="stat-label">Crystals</span>
+        <div class="stat-val" id="stat-crystals">0</div>
+      </div>
+      <div class="stat-card bp">
+        <div class="stat-icon">🔥</div>
+        <span class="stat-label">Login Streak</span>
+        <div class="stat-val" id="stat-streak">0 / 30</div>
+      </div>
+      <div class="stat-card bp">
+        <div class="stat-icon">🛡️</div>
+        <span class="stat-label">Battle Pass</span>
+        <div class="stat-val" id="stat-bp-level">LV 1</div>
+      </div>
+      <div class="stat-card points">
+        <div class="stat-icon">⭐</div>
+        <span class="stat-label">Reward Points</span>
+        <div class="stat-val" id="stat-reward-points">0</div>
+      </div>
+    </section>
+
+    <div class="grid-layout">
+      <!-- Daily Login Calendar Panel -->
+      <div class="glass-panel col-span-8">
+        <div class="panel-header">
+          <h2 class="panel-title">📅 Daily Check-In Calendar</h2>
+          <div class="cooldown-badge" id="daily-cooldown-badge">Checking...</div>
+        </div>
+        <div class="calendar-grid" id="daily-calendar-grid">
+          <!-- Rendered via JS -->
+        </div>
+        <button class="btn-claim" id="btn-claim-daily" disabled>Claim Daily Reward</button>
+      </div>
+
+      <!-- Quest Missions Panel -->
+      <div class="glass-panel col-span-4">
+        <div class="panel-header">
+          <h2 class="panel-title">🎯 Quest Missions</h2>
+        </div>
+        <!-- Hidden tab elements to satisfy game-sync.js bindings -->
+        <button id="tab-milestones" style="display: none;"></button>
+        <button id="tab-missions" style="display: none;"></button>
+        <h2 id="panel-rewards-title" style="display: none;"></h2>
+        <div id="mission-type-filters" style="display: none;"></div>
+        
+        <div class="missions-list-container" id="missions-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Level Up Timeline Panel -->
+      <div class="glass-panel col-span-4">
+        <div class="panel-header">
+          <h2 class="panel-title">🏆 Level Milestones</h2>
+        </div>
+        <div class="level-timeline-wrapper">
+           <div class="level-card-left">
+              <div class="hexagon-badge">
+                 <div class="hexagon-badge-content">
+                    <span class="hex-lvl-lbl">LEVEL</span>
+                    <span class="hex-lvl-val" id="timeline-level-val">1</span>
+                 </div>
+              </div>
+              <div class="lvl-xp-bar-container">
+                 <div class="lvl-xp-bar-lbl">
+                    <span>XP PROGRESS</span>
+                    <span id="timeline-xp-text">0 / 0 XP</span>
+                 </div>
+                 <div class="lvl-xp-bar-fill-bg">
+                    <div class="lvl-xp-bar-fill" id="timeline-xp-bar-fill" style="width: 0%;"></div>
+                 </div>
+              </div>
+           </div>
+           
+           <div class="level-timeline-container" id="level-milestones-container">
+             <!-- Rendered via JS -->
+           </div>
+        </div>
+      </div>
+
+      <!-- Achievement Rewards Panel -->
+      <div class="glass-panel col-span-4">
+        <div class="panel-header">
+          <h2 class="panel-title">⭐ Achievement Rewards</h2>
+        </div>
+        <div class="achievements-list" id="achievements-container">
+          <!-- Loaded via JS -->
+          <div class="ach-card" id="ach-pokemon-master">
+             <div class="ach-badge-wrapper">
+                <svg viewBox="0 0 100 100" class="ach-badge-svg">
+                   <circle cx="50" cy="50" r="42" fill="#ffd700" stroke="#b8860b" stroke-width="4"/>
+                   <circle cx="50" cy="50" r="32" fill="#ffffff" stroke="#b8860b" stroke-width="2"/>
+                   <circle cx="50" cy="50" r="22" fill="#ef4444"/>
+                   <circle cx="50" cy="50" r="10" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+                </svg>
+             </div>
+             <div class="ach-info">
+                <div class="ach-title">POKÉMON MASTER</div>
+                <div class="ach-desc">Catch 50 Pokémon in your collection.</div>
+                <div class="ach-progress-wrapper">
+                   <div class="ach-progress-bg"><div class="ach-progress-fill" style="width: 0%;"></div></div>
+                   <span class="ach-progress-text">0/50</span>
+                </div>
+                <div class="ach-rewards-sub">🎁 XP: 1000, Crystals: 10</div>
+             </div>
+             <button class="btn-ach-claim" id="btn-claim-ach-pokemon-master" disabled>0%</button>
+          </div>
+
+          <div class="ach-card" id="ach-battle-legend">
+             <div class="ach-badge-wrapper">
+                <svg viewBox="0 0 100 100" class="ach-badge-svg">
+                   <polygon points="50,10 90,30 90,70 50,90 10,70 10,30" fill="#c0c0c0" stroke="#708090" stroke-width="4"/>
+                   <path d="M30,35 L50,55 L70,35 L50,80 Z" fill="#ffd700"/>
+                </svg>
+             </div>
+             <div class="ach-info">
+                <div class="ach-title">BATTLE LEGEND</div>
+                <div class="ach-desc">Win 100 arena battle victories.</div>
+                <div class="ach-progress-wrapper">
+                   <div class="ach-progress-bg"><div class="ach-progress-fill" style="width: 0%;"></div></div>
+                   <span class="ach-progress-text">0/100</span>
+                </div>
+                <div class="ach-rewards-sub">🎁 XP: 1500, Coins: 2000</div>
+             </div>
+             <button class="btn-ach-claim" id="btn-claim-ach-battle-legend" disabled>0%</button>
+          </div>
+
+          <div class="ach-card" id="ach-collector">
+             <div class="ach-badge-wrapper">
+                <svg viewBox="0 0 100 100" class="ach-badge-svg">
+                   <circle cx="50" cy="50" r="40" fill="#cd7f32" stroke="#8b4513" stroke-width="4"/>
+                   <rect x="35" y="30" width="30" height="40" rx="3" fill="#ffffff" stroke="#8b4513" stroke-width="2"/>
+                   <line x1="42" y1="40" x2="58" y2="40" stroke="#cd7f32" stroke-width="2"/>
+                   <line x1="42" y1="50" x2="58" y2="50" stroke="#cd7f32" stroke-width="2"/>
+                </svg>
+             </div>
+             <div class="ach-info">
+                <div class="ach-title">COLLECTOR</div>
+                <div class="ach-desc">Collect 100 different Pokémon.</div>
+                <div class="ach-progress-wrapper">
+                   <div class="ach-progress-bg"><div class="ach-progress-fill" style="width: 0%;"></div></div>
+                   <span class="ach-progress-text">0/100</span>
+                </div>
+                <div class="ach-rewards-sub">🎁 XP: 2000, Crystals: 1</div>
+             </div>
+             <button class="btn-ach-claim" id="btn-claim-ach-collector" disabled>0%</button>
+          </div>
+
+          <div class="ach-card" id="ach-gym-champion">
+             <div class="ach-badge-wrapper">
+                <svg viewBox="0 0 100 100" class="ach-badge-svg">
+                   <polygon points="50,5 95,35 78,90 22,90 5,35" fill="#ffd700" stroke="#ff8c00" stroke-width="4"/>
+                   <circle cx="50" cy="50" r="18" fill="#ffcb05" stroke="#ff8c00" stroke-width="2"/>
+                </svg>
+             </div>
+             <div class="ach-info">
+                <div class="ach-title">GYM CHAMPION</div>
+                <div class="ach-desc">Defeat 8 Gym Leaders across maps.</div>
+                <div class="ach-progress-wrapper">
+                   <div class="ach-progress-bg"><div class="ach-progress-fill" style="width: 0%;"></div></div>
+                   <span class="ach-progress-text">0/8</span>
+                </div>
+                <div class="ach-rewards-sub">🎁 XP: 1000, Star Shard: 5</div>
+             </div>
+             <button class="btn-ach-claim" id="btn-claim-ach-gym-champion" disabled>0%</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestone Chests Panel -->
+      <div class="glass-panel col-span-4">
+        <div class="panel-header">
+          <h2 class="panel-title">📦 Milestone Chests</h2>
+        </div>
+        <div class="chests-list">
+          <div class="chest-card" id="chest-card-battles-100">
+             <div class="chest-img-wrapper" id="chest-svg-battles-100"></div>
+             <div class="chest-info">
+                <div class="chest-title">100 BATTLES</div>
+                <div class="chest-desc">Battle Milestone</div>
+                <div class="chest-progress-wrapper">
+                   <div class="chest-progress-bg"><div class="chest-progress-fill" style="width: 0%;"></div></div>
+                   <span class="chest-progress-text">0/100</span>
+                </div>
+                <div class="chest-rewards-sub">🎁 XP: 2000, Rare Candy x3</div>
+             </div>
+             <button class="btn-chest-claim" id="btn-claim-chest-battles-100" disabled>0%</button>
+          </div>
+
+          <div class="chest-card" id="chest-card-captured-250">
+             <div class="chest-img-wrapper" id="chest-svg-captured-250"></div>
+             <div class="chest-info">
+                <div class="chest-title">250 CAUGHT</div>
+                <div class="chest-desc">Collection Milestone</div>
+                <div class="chest-progress-wrapper">
+                   <div class="chest-progress-bg"><div class="chest-progress-fill" style="width: 0%;"></div></div>
+                   <span class="chest-progress-text">0/250</span>
+                </div>
+                <div class="chest-rewards-sub">🎁 XP: 5000, Ultra Ball x10</div>
+             </div>
+             <button class="btn-chest-claim" id="btn-claim-chest-captured-250" disabled>0%</button>
+          </div>
+
+          <div class="chest-card" id="chest-card-logins-500">
+             <div class="chest-img-wrapper" id="chest-svg-logins-500"></div>
+             <div class="chest-info">
+                <div class="chest-title">500 LOGINS</div>
+                <div class="chest-desc">Login Milestone</div>
+                <div class="chest-progress-wrapper">
+                   <div class="chest-progress-bg"><div class="chest-progress-fill" style="width: 0%;"></div></div>
+                   <span class="chest-progress-text">0/500</span>
+                </div>
+                <div class="chest-rewards-sub">🎁 XP: 3000, Master Ball x2</div>
+             </div>
+             <button class="btn-chest-claim" id="btn-claim-chest-logins-500" disabled>0%</button>
+          </div>
+
+          <div class="chest-card" id="chest-card-battles-1000">
+             <div class="chest-img-wrapper" id="chest-svg-battles-1000"></div>
+             <div class="chest-info">
+                <div class="chest-title">1000 BATTLES</div>
+                <div class="chest-desc">Ultimate Milestone</div>
+                <div class="chest-progress-wrapper">
+                   <div class="chest-progress-bg"><div class="chest-progress-fill" style="width: 0%;"></div></div>
+                   <span class="chest-progress-text">0/1000</span>
+                </div>
+                <div class="chest-rewards-sub">🎁 XP: 10000, Fire Stone x5</div>
+             </div>
+             <button class="btn-chest-claim" id="btn-claim-chest-battles-1000" disabled>0%</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Special Event Banner -->
+      <div class="glass-panel col-span-12 event-banner-panel" style="background: linear-gradient(90deg, rgba(88, 28, 135, 0.3) 0%, rgba(12, 112, 255, 0.15) 100%);">
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+           <div class="event-banner-gengar">
+              <svg viewBox="0 0 100 100" class="event-banner-gengar-svg">
+                 <!-- Stylized Gengar graphic -->
+                 <path d="M30,30 L50,15 L70,30 L80,50 L75,80 L25,80 L20,50 Z" fill="#4a157d" stroke="#bf5af2" stroke-width="3"/>
+                 <polygon points="35,45 42,48 40,43" fill="#ff3d00"/>
+                 <polygon points="65,45 58,48 60,43" fill="#ff3d00"/>
+                 <circle cx="38" cy="46" r="1.5" fill="#ffffff"/>
+                 <circle cx="62" cy="46" r="1.5" fill="#ffffff"/>
+                 <path d="M40,65 Q50,75 60,65" stroke="#ffffff" stroke-width="2" fill="none"/>
+                 <polygon points="45,67 47,70 49,67" fill="#ffffff"/>
+                 <polygon points="55,67 53,70 51,67" fill="#ffffff"/>
+              </svg>
+           </div>
+           <div style="flex: 1; text-align: left;">
+              <h2 class="banner-title" style="font-size: 1.4rem; margin-bottom: 4px;">🔥 SPECIAL EVENT REWARDS</h2>
+              <p class="banner-subtitle" style="margin-bottom: 12px; font-size: 0.88rem;">Participate in events and earn exclusive limited-time rewards!</p>
+              <div id="active-events-container" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                 <!-- Rendered via JS -->
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- Reward History Panel -->
+      <div class="glass-panel col-span-12">
+        <div class="panel-header">
+          <h2 class="panel-title">📜 Reward History</h2>
+        </div>
+        <div class="history-controls">
+          <div class="search-wrapper">
+            <input type="text" class="search-input" id="history-search" placeholder="Search rewards..." />
+          </div>
+          <select class="category-select" id="history-category-filter">
+            <option value="">All Source</option>
+            <option value="Daily">Daily Login</option>
+            <option value="Level">Level Milestone</option>
+            <option value="Event">Event</option>
+            <option value="Battle">Battle</option>
+          </select>
+        </div>
+        <div class="history-scroll-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Reward</th>
+                <th>Amount</th>
+                <th>Earned From</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-footer">
+          <span id="history-pagination-info">Showing 0 to 0 of 0 logs</span>
+          <div class="pagination-btns">
+            <button class="btn-page" id="btn-history-prev" disabled>Prev</button>
+            <button class="btn-page" id="btn-history-next" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div class="toast" id="toast">Daily Reward Claimed!</div>
+
+  <!-- High-tech Chest Claim Modal -->
+  <div id="chest-claim-modal" class="chest-modal" style="display: none;">
+    <div class="chest-modal-content">
+      <div class="chest-modal-glow">
+        <div id="chest-modal-svg-container"></div>
+      </div>
+      <h3 id="chest-modal-title" class="chest-modal-title">UNLOCKING CHEST...</h3>
+      <p id="chest-modal-subtitle" class="chest-modal-subtitle">Rare Candy x3</p>
+    </div>
+  </div>
+
+  <!-- Client-side Sync Scripts -->
+  <script src="game-sync.js"></script>
+  <script>
+    // Placeholder stats and states
+    let localProfile = {
+      level: 1,
+      xp: 0,
+      coins: 100,
+      crystals: 0,
+      login_streak: 0,
+      reward_points: 0
+    };
+
+    // Initialize Page
+    function initRewardsPage() {
+      console.log("Loading Rewards center widgets...");
+      loadLocalState();
+      
+      // Hook up UI listeners
+      document.getElementById("btn-claim-daily").addEventListener("click", () => {
+        showToast("🎁 Daily login claims will be activated in Phase 3!");
+      });
+
+      document.getElementById("history-search").addEventListener("input", filterHistoryLogs);
+      document.getElementById("history-category-filter").addEventListener("change", filterHistoryLogs);
+      
+      document.getElementById("btn-history-prev").addEventListener("click", () => {
+        showToast("Pagination functionality will be activated in Phase 3!");
+      });
+      document.getElementById("btn-history-next").addEventListener("click", () => {
+        showToast("Pagination functionality will be activated in Phase 3!");
+      });
+
+      // Load Achievements and Chest Milestones dynamically
+      loadAchievementsAndMilestones();
+    }
+
+    // Load user/trainer credentials from Cache
+    function loadLocalState() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          document.getElementById("nav-trainer-name").textContent = user.trainerName || "Trainer";
+          document.getElementById("nav-trainer-level").textContent = "Level " + (user.level || 1);
+          document.getElementById("trainerWelcome").textContent = "Welcome, " + (user.trainerName || "Trainer") + "!";
+          
+          // Set assets in nav card
+          const navCoins = document.getElementById("nav-trainer-coins");
+          const navCrystals = document.getElementById("nav-trainer-crystals");
+          if (navCoins) navCoins.textContent = (user.coins || 0).toLocaleString();
+          if (navCrystals) navCrystals.textContent = (user.crystals || 0).toLocaleString();
+
+          // Set level card stats
+          const timelineLevel = document.getElementById("timeline-level-val");
+          const timelineXpText = document.getElementById("timeline-xp-text");
+          const timelineBar = document.getElementById("timeline-xp-bar-fill");
+          
+          if (timelineLevel) timelineLevel.textContent = user.level || 1;
+          
+          // Calculate level milestone progress (assuming 5600 xp threshold like the reference)
+          const threshold = (user.level || 1) * 1000; 
+          const currentXp = user.xp || 0;
+          if (timelineXpText) timelineXpText.textContent = `${currentXp.toLocaleString()} / ${threshold.toLocaleString()} XP`;
+          if (timelineBar) {
+              const pct = Math.min(100, Math.round((currentXp / threshold) * 100));
+              timelineBar.style.width = `${pct}%`;
+          }
+        } catch (e) {}
+      }
+    }
+
+    // UI Helpers
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      return `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+    }
+
+    // Search and filtering log placeholders
+    function filterHistoryLogs() {
+      console.log("Filtering history logs...");
+    }
+
+    // dynamic achievements and chests logic
+    async function loadAchievementsAndMilestones() {
+        const userStr = localStorage.getItem("pokemonNexusUser");
+        if (!userStr) return;
+        const user = JSON.parse(userStr);
+        
+        let capturedCount = 0;
+        try {
+            const pokemon = await syncApiRequest("/pokemon/") || [];
+            capturedCount = pokemon.length;
+        } catch (e) {
+            console.warn("Failed to fetch pokemon collection count:", e);
+        }
+        
+        const wins = user.wins || 0;
+        const streak = user.login_streak || 0;
+        const badgesCount = (user.badges || []).length;
+        const battlesPlayed = user.battles_played || 0;
+
+        // 1. Achievements
+        updateAchievementCard("pokemon-master", "POKÉMON MASTER", capturedCount, 50, 1000, 0, "Crystal", 10);
+        updateAchievementCard("battle-legend", "BATTLE LEGEND", wins, 100, 1500, 2000, "", 0);
+        updateAchievementCard("collector", "COLLECTOR", capturedCount, 100, 2000, 0, "Crystal", 1);
+        updateAchievementCard("gym-champion", "GYM CHAMPION", badgesCount, 8, 1000, 0, "Star Shard", 5);
+
+        // 2. Chest Milestones
+        updateMilestoneChest("battles-100", "100 BATTLES", battlesPlayed, 100, 2000, 500, "Rare Candy", 3);
+        updateMilestoneChest("captured-250", "250 CAUGHT", capturedCount, 250, 5000, 1000, "Ultra Ball", 10);
+        updateMilestoneChest("logins-500", "500 LOGINS", streak, 500, 3000, 800, "Master Ball", 2);
+        updateMilestoneChest("battles-1000", "1000 BATTLES", battlesPlayed, 1000, 10000, 2000, "Fire Stone", 5);
+    }
+
+    function updateAchievementCard(id, name, current, target, rewardXp, rewardCoins, rewardItem, rewardItemQty) {
+        const card = document.getElementById(`ach-${id}`);
+        if (!card) return;
+        
+        const progressPct = Math.min(100, Math.round((current / target) * 100));
+        const progressBar = card.querySelector(".ach-progress-fill");
+        const progressText = card.querySelector(".ach-progress-text");
+        const btn = card.querySelector(".btn-ach-claim");
+        
+        if (progressBar) progressBar.style.width = `${progressPct}%`;
+        if (progressText) progressText.textContent = `${current}/${target}`;
+        
+        const user = JSON.parse(localStorage.getItem("pokemonNexusUser"));
+        const claimedKey = `nexus_ach_claimed_${user.trainerName}_${id}`;
+        const isClaimed = localStorage.getItem(claimedKey) === "true";
+        
+        if (isClaimed) {
+            btn.textContent = "CLAIMED";
+            btn.disabled = true;
+            btn.className = "btn-ach-claim claimed";
+        } else if (progressPct >= 100) {
+            btn.textContent = "CLAIM";
+            btn.disabled = false;
+            btn.className = "btn-ach-claim claimable";
+            btn.onclick = () => claimAchievementReward(id, name, rewardCoins, rewardXp, rewardItem, rewardItemQty);
+        } else {
+            btn.textContent = `${progressPct}%`;
+            btn.disabled = true;
+            btn.className = "btn-ach-claim";
+        }
+    }
+
+    window.claimAchievementReward = async function(id, name, coins, xp, item, qty) {
+        const user = JSON.parse(localStorage.getItem("pokemonNexusUser"));
+        const claimedKey = `nexus_ach_claimed_${user.trainerName}_${id}`;
+        localStorage.setItem(claimedKey, "true");
+        
+        showToast(`🏆 Claimed Achievement: ${name}!`);
+        
+        try {
+            // Post battle log to reward coins and XP dynamically
+            await syncApiRequest("/battles/", "POST", {
+              opponent: `Achievement: ${name}`,
+              winner: user.trainerName,
+              log: `Claimed achievement reward for ${name}.`,
+              xp_gained: xp || 0,
+              coins_gained: coins || 0,
+              started_at: new Date().toISOString()
+            });
+            
+            // Sync item reward if exists
+            if (item) {
+              await syncApiRequest("/inventory/sync/", "POST", { items: [{ name: item, qty: qty, category: "General", id: 99 }] });
+            }
+            
+            explodeRewardParticles();
+            
+            setTimeout(async () => {
+              await syncRewardsDataFromBackend();
+              await loadAchievementsAndMilestones();
+              
+              const profileData = await syncApiRequest("/auth/profile/");
+              if (profileData && profileData.user) {
+                localStorage.setItem("pokemonNexusUser", JSON.stringify(profileData.user));
+                loadLocalState();
+              }
+            }, 1500);
+        } catch (e) {
+            console.error("Failed to claim achievement:", e);
+        }
+    };
+
+    function updateMilestoneChest(id, name, current, target, rewardXp, rewardCoins, rewardItem, rewardItemQty) {
+        const card = document.getElementById(`chest-card-${id}`);
+        const svgContainer = document.getElementById(`chest-svg-${id}`);
+        if (!card) return;
+        
+        if (svgContainer && !svgContainer.innerHTML) {
+            svgContainer.innerHTML = getChestSvgForId(id);
+        }
+
+        const progressPct = Math.min(100, Math.round((current / target) * 100));
+        const progressBar = card.querySelector(".chest-progress-fill");
+        const progressText = card.querySelector(".chest-progress-text");
+        const btn = card.querySelector(".btn-chest-claim");
+        
+        if (progressBar) progressBar.style.width = `${progressPct}%`;
+        if (progressText) progressText.textContent = `${current}/${target}`;
+        
+        const user = JSON.parse(localStorage.getItem("pokemonNexusUser"));
+        const claimedKey = `nexus_milestone_claimed_${user.trainerName}_${id}`;
+        const isClaimed = localStorage.getItem(claimedKey) === "true";
+        
+        if (isClaimed) {
+            btn.textContent = "CLAIMED";
+            btn.disabled = true;
+            btn.className = "btn-chest-claim claimed";
+            const chestLid = card.querySelector(".chest-lid");
+            if (chestLid) {
+                chestLid.style.transform = "translateY(-12px) rotate(-10deg)";
+                chestLid.style.opacity = "0.7";
+            }
+        } else if (progressPct >= 100) {
+            btn.textContent = "CLAIM";
+            btn.disabled = false;
+            btn.className = "btn-chest-claim claimable";
+            btn.onclick = () => claimMilestoneChest(id, name, rewardCoins, rewardXp, rewardItem, rewardItemQty);
+        } else {
+            btn.textContent = `${progressPct}%`;
+            btn.disabled = true;
+            btn.className = "btn-chest-claim";
+        }
+    }
+
+    function getChestSvgForId(id) {
+        let strokeColor = "#00d2ff";
+        let fillLid = "#19376d";
+        let fillBase = "#0b2447";
+        if (id.includes("250")) { strokeColor = "#ffcb05"; fillLid = "#5c4817"; fillBase = "#3b2f0f"; }
+        else if (id.includes("500")) { strokeColor = "#d946ef"; fillLid = "#4a157d"; fillBase = "#2d0b47"; }
+        else if (id.includes("1000")) { strokeColor = "#ef4444"; fillLid = "#290707"; fillBase = "#110505"; }
+        
+        return `
+        <svg width="50" height="50" viewBox="0 0 100 100" class="chest-svg animated-chest">
+          <path d="M15,45 L85,45 L75,85 L25,85 Z" fill="${fillBase}" stroke="${strokeColor}" stroke-width="4"/>
+          <path class="chest-lid" d="M15,45 L85,45 L75,15 L25,15 Z" fill="${fillLid}" stroke="${strokeColor}" stroke-width="4"/>
+          <rect x="42" y="37" width="16" height="16" rx="4" fill="${strokeColor}" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="50" cy="45" r="3" fill="#ffffff"/>
+          <line x1="15" y1="45" x2="85" y2="45" stroke="${strokeColor}" stroke-width="2"/>
+        </svg>
+        `;
+    }
+
+    window.claimMilestoneChest = async function(id, name, coins, xp, item, qty) {
+        const user = JSON.parse(localStorage.getItem("pokemonNexusUser"));
+        const claimedKey = `nexus_milestone_claimed_${user.trainerName}_${id}`;
+        localStorage.setItem(claimedKey, "true");
+        
+        // Show chest unlock modal
+        const modal = document.getElementById("chest-claim-modal");
+        const container = document.getElementById("chest-modal-svg-container");
+        const title = document.getElementById("chest-modal-title");
+        const subtitle = document.getElementById("chest-modal-subtitle");
+        
+        if (modal && container && title && subtitle) {
+            container.innerHTML = getChestSvgForId(id);
+            title.textContent = "UNLOCKING CHEST...";
+            subtitle.textContent = `${item} x${qty}`;
+            modal.style.display = "flex";
+            
+            setTimeout(() => {
+                const chestSvg = container.querySelector(".chest-svg");
+                if (chestSvg) chestSvg.classList.add("unlock-open");
+                title.textContent = "CHEST UNLOCKED!";
+                playRewardChimeSound();
+                explodeRewardParticles();
+            }, 800);
+            
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 3200);
+        }
+        
+        try {
+            await syncApiRequest("/battles/", "POST", {
+              opponent: `Milestone: ${name}`,
+              winner: user.trainerName,
+              log: `Claimed milestone chest reward for ${name}.`,
+              xp_gained: xp || 0,
+              coins_gained: coins || 0,
+              started_at: new Date().toISOString()
+            });
+            
+            if (item) {
+              await syncApiRequest("/inventory/sync/", "POST", { items: [{ name: item, qty: qty, category: "General", id: 99 }] });
+            }
+            
+            setTimeout(async () => {
+              await syncRewardsDataFromBackend();
+              await loadAchievementsAndMilestones();
+              
+              const profileData = await syncApiRequest("/auth/profile/");
+              if (profileData && profileData.user) {
+                localStorage.setItem("pokemonNexusUser", JSON.stringify(profileData.user));
+                loadLocalState();
+              }
+            }, 1500);
+        } catch (e) {
+            console.error("Failed to claim milestone chest:", e);
+        }
+    };
+
+    // Particles Canvas background
+    const canvas = document.getElementById('particles-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = -Math.random() * 0.3 - 0.05;
+                this.color = Math.random() > 0.5 ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255, 203, 5, 0.08)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        for (let i = 0; i < 35; i++) {
+            particles.push(new Particle());
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Intercept stats value updates to animate count-ups dynamically
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          obj.innerHTML = end.toLocaleString();
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    // Chest helper for day cells
+    function getChestSvgForDay(dayNum, isClaimed) {
+        let strokeColor = "#00d2ff"; // Day 7: Blue chest
+        let fillLid = "#19376d";
+        let fillBase = "#0b2447";
+        if (dayNum === 14) { strokeColor = "#ffcb05"; fillLid = "#5c4817"; fillBase = "#3b2f0f"; } // Gold
+        else if (dayNum === 21) { strokeColor = "#d946ef"; fillLid = "#4a157d"; fillBase = "#2d0b47"; } // Purple
+        else if (dayNum === 30) { strokeColor = "#ef4444"; fillLid = "#290707"; fillBase = "#110505"; } // Red/Black
+        
+        let lidTransform = isClaimed ? "transform: translateY(-8px) rotate(-10deg); opacity: 0.7;" : "";
+        
+        return `
+        <svg width="40" height="40" viewBox="0 0 100 100" class="chest-svg">
+          <path d="M15,45 L85,45 L75,85 L25,85 Z" fill="${fillBase}" stroke="${strokeColor}" stroke-width="4"/>
+          <path class="chest-lid" style="${lidTransform}" d="M15,45 L85,45 L75,15 L25,15 Z" fill="${fillLid}" stroke="${strokeColor}" stroke-width="4"/>
+          <rect x="42" y="37" width="16" height="16" rx="4" fill="${strokeColor}" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="50" cy="45" r="3" fill="#ffffff"/>
+        </svg>
+        `;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const ids = [
+            "stat-rewards-claimed",
+            "stat-coins-earned",
+            "stat-xp-earned",
+            "stat-crystals",
+            "stat-reward-points"
+        ];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === "childList") {
+                        const valStr = el.textContent.replace(/,/g, "");
+                        const val = parseInt(valStr);
+                        if (!isNaN(val) && val !== el.lastAnimatedVal) {
+                            el.lastAnimatedVal = val;
+                            observer.disconnect();
+                            animateValue(el, 0, val, 900);
+                            setTimeout(() => observer.observe(el, { childList: true }), 1000);
+                        }
+                    }
+                });
+            });
+            observer.observe(el, { childList: true });
+        });
+
+        // Setup MutationObserver on Quest Missions container to insert Difficulty Badges dynamically
+        const missionsObserver = new MutationObserver(() => {
+            const badgeVals = document.querySelectorAll("#missions-container val");
+            badgeVals.forEach(val => {
+                if (val.dataset.formatted) return;
+                val.dataset.formatted = "true";
+                const text = val.textContent.trim();
+                let tagHtml = "";
+                if (text === "🎯") tagHtml = `<span class="diff-tag easy">EASY</span>`;
+                else if (text === "📅") tagHtml = `<span class="diff-tag medium">MEDIUM</span>`;
+                else if (text === "🏆") tagHtml = `<span class="diff-tag hard">HARD</span>`;
+                else if (text === "🔥") tagHtml = `<span class="diff-tag legendary">LEGENDARY</span>`;
+                
+                if (tagHtml) {
+                    val.innerHTML = tagHtml;
+                    const badgeParent = val.closest(".level-badge");
+                    if (badgeParent) {
+                        badgeParent.style.background = "transparent";
+                        badgeParent.style.border = "none";
+                    }
+                }
+            });
+        });
+        const target = document.getElementById("missions-container");
+        if (target) missionsObserver.observe(target, { childList: true, subtree: true });
+
+        // Setup MutationObserver on Daily Calendar grid to swap Days 7, 14, 21, 30 with chest SVGs
+        const dailyObserver = new MutationObserver(() => {
+            const cards = document.querySelectorAll("#daily-calendar-grid .day-card");
+            cards.forEach(card => {
+                const titleEl = card.querySelector(".day-title");
+                if (!titleEl) return;
+                const dayNum = parseInt(titleEl.textContent.replace("DAY", "").trim());
+                if ([7, 14, 21, 30].includes(dayNum)) {
+                    if (card.dataset.chestFormatted) return;
+                    card.dataset.chestFormatted = "true";
+                    
+                    card.classList.add("chest-day-card");
+                    const iconEl = card.querySelector(".day-icon");
+                    if (iconEl) {
+                        iconEl.innerHTML = getChestSvgForDay(dayNum, card.classList.contains("claimed"));
+                    }
+                }
+            });
+        });
+        const dailyGrid = document.getElementById("daily-calendar-grid");
+        if (dailyGrid) dailyObserver.observe(dailyGrid, { childList: true, subtree: true });
+
+        // Setup MutationObserver on Active Events to style seasonal events with glowing borders
+        const eventsObserver = new MutationObserver(() => {
+            const cards = document.querySelectorAll("#active-events-container .event-card");
+            cards.forEach(card => {
+                if (card.dataset.formatted) return;
+                card.dataset.formatted = "true";
+                const typeEl = card.querySelector(".event-type");
+                if (typeEl) {
+                    const txt = typeEl.textContent.toLowerCase();
+                    if (txt.includes("seasonal") || txt.includes("limited")) {
+                        card.classList.add("seasonal");
+                    }
+                }
+            });
+        });
+        const eventsContainer = document.getElementById("active-events-container");
+        if (eventsContainer) eventsObserver.observe(eventsContainer, { childList: true, subtree: true });
+
+        // Setup MutationObserver on History Logs to style badges dynamically and handle empty state
+        const historyObserver = new MutationObserver(() => {
+            const rows = document.querySelectorAll("#history-table-tbody tr");
+            rows.forEach(row => {
+                if (row.dataset.formatted) return;
+                row.dataset.formatted = "true";
+                const tds = row.querySelectorAll("td");
+                if (tds.length < 3) return;
+                const sourceTd = tds[2];
+                const text = sourceTd.textContent.trim().toLowerCase();
+                let badgeClass = "";
+                let badgeText = "General";
+                
+                if (text.includes("daily")) { badgeClass = "daily"; badgeText = "Daily Login"; }
+                else if (text.includes("mission")) { badgeClass = "mission"; badgeText = "Mission"; }
+                else if (text.includes("level") || text.includes("milestone")) { badgeClass = "level"; badgeText = "Levelup"; }
+                else if (text.includes("event")) { badgeClass = "event"; badgeText = "Event"; }
+                else if (text.includes("battle")) { badgeClass = "battle"; badgeText = "Battle"; }
+                
+                if (badgeClass) {
+                    sourceTd.innerHTML = `<span class="hist-source-badge ${badgeClass}">${badgeText}</span>`;
+                }
+            });
+        });
+        const historyTbody = document.getElementById("history-table-tbody");
+        if (historyTbody) historyObserver.observe(historyTbody, { childList: true });
+
+        const emptyObserver = new MutationObserver(() => {
+            const text = historyTbody.textContent.trim();
+            if (text === "No rewards claimed yet.") {
+                historyTbody.innerHTML = `
+                    <tr>
+                      <td colspan="4" style="text-align:center;padding:40px 0;color:rgba(255,255,255,0.25)">
+                        <svg width="60" height="60" viewBox="0 0 100 100" style="margin-bottom:12px;opacity:0.35;">
+                          <circle cx="50" cy="50" r="40" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6"/>
+                          <circle cx="50" cy="50" r="12" fill="none" stroke="#ffffff" stroke-width="4"/>
+                        </svg>
+                        <div style="font-size:0.85rem;font-weight:700;">No Reward History Records Found</div>
+                        <div style="font-size:0.75rem;opacity:0.6;margin-top:4px;">Start claiming daily login checks and battle payouts.</div>
+                      </td>
+                    </tr>
+                `;
+            }
+        });
+        if (historyTbody) emptyObserver.observe(historyTbody, { childList: true });
+    });
+
+    // Auto-initialize fallback if game-sync hook doesn't override
+    window.addEventListener("load", () => {
+      if (!window.rewardsSynced) {
+        initRewardsPage();
+      }
+    });
+  </script>
+
+<script>
+/* Final rewards UI polish script: visual-only count-up for stat cards. */
+(function(){
+  function animateNumber(el){
+    if(!el || el.dataset.counted === 'true') return;
+    const raw=(el.textContent||'').trim();
+    const match=raw.match(/(\d+[\d,]*)/);
+    if(!match) return;
+    const target=parseInt(match[1].replace(/,/g,''),10);
+    if(!Number.isFinite(target) || target<=0) return;
+    el.dataset.counted='true';
+    const suffix=raw.replace(match[1],'');
+    const start=performance.now();
+    const duration=850;
+    function step(now){
+      const t=Math.min(1,(now-start)/duration);
+      const eased=1-Math.pow(1-t,3);
+      el.textContent=Math.round(target*eased).toLocaleString()+suffix;
+      if(t<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function run(){ document.querySelectorAll('.stat-val').forEach(animateNumber); }
+  window.addEventListener('load', run);
+  const obs=new MutationObserver(run);
+  window.addEventListener('DOMContentLoaded',()=>obs.observe(document.body,{subtree:true,childList:true,characterData:true}));
+})();
+</script>
+</body>
+</html>

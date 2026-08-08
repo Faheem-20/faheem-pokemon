@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Nexus — Trainer Profile</title>
+  <link rel="stylesheet" href="navbar.css">
+  <style>
+    /* ============================================================
+       POKÉMON NEXUS — TRAINER PROFILE (EXACT MATCH REFERENCE UI)
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --bg-dark: #020612;
+      --panel-bg: rgba(14, 15, 20, 0.94) !important;
+      --border-blue: rgba(12, 112, 255, 0.28);
+      --yellow: #ffcb05;
+      --red: #ff3d00;
+      --blue: #0c70ff;
+      --green: #10b981;
+      --purple: #a855f7;
+      --orange: #f97316;
+      --silver: #cbd5e1;
+      --bronze: #b45309;
+      --text-gray: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden; /* Force single screen layout */
+      font-family: 'Poppins', sans-serif;
+      background: #020612 url("background.jpg") center/cover no-repeat fixed;
+      color: #fff;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(6, 12, 28, 0.45) 0%, rgba(2, 6, 18, 0.85) 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Ambient Sparks & Volumetric Light */
+    #sparks-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      width: 4.5px;
+      height: 4.5px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.7;
+      animation: floatSpark 9s linear infinite;
+    }
+
+    .spark.orange {
+      background: #ff5500;
+      box-shadow: 0 0 10px #ff5500, 0 0 20px #ff7b00;
+    }
+
+    .spark.blue {
+      background: #00a2ff;
+      box-shadow: 0 0 10px #00a2ff, 0 0 20px #00d0ff;
+    }
+
+    @keyframes floatSpark {
+      0% { transform: translateY(105vh) scale(0.8); opacity: 0; }
+      10% { opacity: 0.75; }
+      90% { opacity: 0.75; }
+      100% { transform: translateY(-5vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Shared navbar styling is linked in navbar.css */
+
+    /* MAIN CONTAINER SETUP */
+    main.page {
+      max-width: 1220px;
+      width: 92vw;
+      height: calc(100vh - 95px);
+      margin: 80px auto 15px;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* TOP ROW LAYOUT */
+    .top-row {
+      height: 60%;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Wider Left profile card */
+    .left-col {
+      width: 32%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .center-col {
+      width: 33%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Right column: My Team at top, Gym Badges directly below it */
+    .right-col {
+      width: 35%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* PREMIUM GLASS PANELS WITH BLUR */
+    .glass-panel {
+      background: var(--panel-bg);
+      border: 1.2px solid var(--border-blue);
+      border-radius: var(--radius-card);
+      padding: 12px 14px;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 18px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s;
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(12, 112, 255, 0.35);
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #ffd86b;
+      letter-spacing: 0.08em;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-link {
+      margin-left: auto;
+      font-size: 0.62rem;
+      color: var(--text-gray);
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0px;
+      text-transform: none;
+    }
+
+    .title-link:hover {
+      color: var(--yellow);
+    }
+
+    /* SECTION 1 — LEFT PROFILE CARD */
+    .profile-card {
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .large-profile-avatar-container {
+      position: relative;
+    }
+
+    .large-profile-avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      border: 3px solid var(--yellow);
+      background: rgba(255, 203, 5, 0.1) url("trainer_character.png?v=12") no-repeat center 15%/210%;
+      box-shadow: 0 0 20px rgba(255, 203, 5, 0.35);
+    }
+
+    .avatar-edit-icon {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 22px;
+      height: 22px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #060c1c;
+      cursor: pointer;
+    }
+
+    .avatar-edit-icon svg {
+      width: 10px;
+      height: 10px;
+      fill: #000;
+    }
+
+    .profile-identity {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.45rem;
+      color: #fff;
+      margin: 0;
+    }
+
+    .profile-id {
+      font-size: 0.68rem;
+      color: var(--text-gray);
+      margin-top: 1px;
+    }
+
+    .profile-league-rank {
+      font-size: 0.72rem;
+      color: #b07dff;
+      font-weight: 800;
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-league-rank-sub {
+      font-size: 0.58rem;
+      color: var(--text-gray);
+      font-weight: 500;
+    }
+
+    .location-region-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: var(--text-gray);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 6px;
+    }
+
+    .location-pin {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #fff;
+    }
+
+    .profile-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    .status-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: 0.05em;
+    }
+
+    .profile-xp-bar-container {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 6px;
+    }
+
+    .level-block {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .level-label {
+      font-size: 0.65rem;
+      color: var(--text-gray);
+    }
+
+    .level-number {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--yellow);
+      line-height: 1;
+    }
+
+    .xp-details-block {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .xp-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--text-gray);
+    }
+
+    .profile-xp-progress {
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .profile-xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), #3b82f6, #60a5fa, var(--blue));
+      background-size: 200% 100%;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 1.2s cubic-bezier(0.25, 1, 0.2, 1);
+      animation: xpFlow 2s linear infinite;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+    }
+
+    @keyframes xpFlow {
+      0% { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* SECTION 2 — 3D TRAINER SHOWCASE (Centered, original male character PNG graphic cutout) */
+    .trainer-showcase-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 5px;
+    }
+
+    .trainer-rim-light {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(12, 112, 255, 0.12) 0%, rgba(255, 203, 5, 0.04) 60%, transparent 80%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translateY(-80px);
+    }
+
+    /* Pedestal Platform */
+    .showcase-pedestal {
+      width: 310px; /* Scaled up by 40% */
+      height: 58px; /* Scaled up by 40% */
+      background: radial-gradient(ellipse at center, rgba(12, 112, 255, 0.65) 0%, rgba(12, 112, 255, 0.1) 60%, transparent 100%);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(12, 112, 255, 0.4);
+      z-index: 2;
+      border: 1px solid rgba(12, 112, 255, 0.35);
+    }
+
+    .showcase-pedestal {
+      position: absolute;
+      bottom: -45px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(60deg);
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(12, 112, 255, 0.6) 0%, rgba(5, 8, 18, 0.9) 70%);
+      border-radius: 50%;
+      box-shadow: 0 8px 24px rgba(12, 112, 255, 0.4);
+      z-index: 2;
+      border: 1px solid rgba(12, 112, 255, 0.35);
+    }
+
+    /* Volumetric blue energy aura under pedestal */
+    .showcase-pedestal::before {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, rgba(0, 162, 255, 0.6) 0%, rgba(0, 80, 255, 0.25) 50%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+      filter: blur(10px);
+      animation: blueEnergyPulse 3s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes blueEnergyPulse {
+      0% { transform: scale(0.9) opacity: 0.6; filter: blur(8px); }
+      100% { transform: scale(1.15) opacity: 1; filter: blur(15px); }
+    }
+
+    .showcase-pedestal-rim {
+      position: absolute;
+      inset: -4px;
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      opacity: 0.6;
+      box-shadow: 0 0 15px var(--blue);
+      animation: rotateRim 15s linear infinite;
+    }
+
+    /* Standalone character illustration graphic cutout - NOT a framed screenshot/rectangular card */
+    .trainer-showcase-graphic {
+      width: 320px;
+      height: 500px;
+      background: url("trainer_character.png?v=12") no-repeat center/contain;
+      position: absolute;
+      bottom: -75px;
+      left: 50%;
+      transform: translateX(-50%); /* Pulled down so character's feet sit on the platform pedestal */
+      z-index: 3;
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,0.5));
+      animation: trainerBreathe 4s ease-in-out infinite alternate;
+    }
+
+    /* Floating Poké Ball with orbit */
+    .floating-pokeball {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      right: 6%; /* Pushed further right for wider orbit around larger trainer */
+      bottom: 210px; /* Elevated to float naturally around chest height of scaled trainer */
+      z-index: 4;
+      animation: pokeballFloat 5s ease-in-out infinite alternate;
+    }
+
+    /* SECTION 3 — MY TEAM (2 rows x 3 columns on top right) */
+    .team-card {
+      height: calc(100% - 92px);
+    }
+
+    .team-grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 8px;
+      flex: 1;
+    }
+
+    .team-pkmn-slot {
+      background: rgba(5, 8, 18, 0.45);
+      border: 1.5px solid var(--pkmn-border, rgba(255,255,255,0.08));
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    .team-pkmn-slot:hover {
+      transform: translateY(-6px) scale(1.04) !important;
+      border-color: var(--pkmn-border) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 
+                  0 0 20px var(--pkmn-border),
+                  inset 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .team-pkmn-lvl-tag {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.58rem;
+      color: var(--text-gray);
+      font-weight: 700;
+    }
+
+    .team-pkmn-sprite-hd {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      margin-top: 4px;
+    }
+
+    .team-pkmn-name {
+      font-weight: 800;
+      font-size: 0.7rem;
+      color: #fff;
+      margin-top: 1px;
+    }
+
+    .team-hp-container {
+      width: 100%;
+      margin-top: 1px;
+    }
+
+    .team-hp-text-row {
+      display: flex;
+      justify-content: center;
+      font-size: 0.55rem;
+      color: var(--text-gray);
+      margin-bottom: 2px;
+    }
+
+    .team-hp-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .team-hp-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+    }
+
+    .team-type-row {
+      display: flex;
+      gap: 3px;
+      margin-top: 2px;
+    }
+
+    .team-type-pill {
+      font-size: 0.5rem;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* SECTION 4 — GYM BADGES (Directly below team cards card) */
+    .badges-card {
+      height: 80px;
+    }
+
+    .badges-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .badge-icon {
+      width: 24px;
+      height: 24px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .badge-icon.locked {
+      filter: grayscale(1) opacity(0.2);
+    }
+
+    .badge-icon.unlocked {
+      filter: drop-shadow(0 0 8px var(--glow-color, var(--yellow)));
+    }
+
+    .badge-icon:hover {
+      transform: scale(1.2);
+    }
+
+    .badge-label {
+      font-size: 0.55rem;
+      color: var(--text-gray);
+    }
+
+    /* SECTION 5 — BOTTOM ROW (Recent Battles, Achievements, Explored Regions, Settings) */
+    .bottom-row {
+      height: 38%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .bottom-card {
+      justify-content: flex-start;
+    }
+
+    /* Recent Battles panel (Strictly 4 rows) */
+    .battle-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .battle-history-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.02);
+      border: 1.2px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.65rem;
+    }
+
+    .battle-history-opponent {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .battle-history-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .battle-history-mvp-block {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-gray);
+      font-size: 0.58rem;
+    }
+
+    .battle-history-mvp {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    .battle-outcome {
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .battle-outcome.win { color: var(--green); }
+    .battle-outcome.loss { color: var(--red); }
+
+    .trophy-mini-svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--yellow);
+    }
+
+    /* Achievements list */
+    .achievement-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .achievement-item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .achievement-badge-shield {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.62rem;
+      border: 1px solid var(--shield-color);
+      box-shadow: 0 0 8px var(--shield-color);
+      color: var(--shield-color);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .achievement-details-block {
+      flex: 1;
+      text-align: left;
+    }
+
+    .achievement-title-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .achievement-desc {
+      font-size: 0.58rem;
+      color: var(--text-gray);
+    }
+
+    .achievement-progress-bar-outer {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .achievement-progress-bar-inner {
+      height: 100%;
+      background: var(--bar-color, var(--yellow));
+      border-radius: 99px;
+    }
+
+    /* Explored Regions Grid (Compact, no empty space) */
+    .explored-regions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 4px;
+      flex: 1;
+    }
+
+    .region-tile {
+      background: rgba(5, 8, 18, 0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 3px 5px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .region-tile:hover {
+      background: rgba(255, 203, 5, 0.08);
+      border-color: var(--yellow);
+    }
+
+    .region-name {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .region-progress {
+      font-size: 0.55rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* Settings list button layout */
+    .settings-button-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .settings-action-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      height: 26px;
+      transition: all 0.25s;
+    }
+
+    .settings-action-btn:hover {
+      background: rgba(255, 203, 5, 0.08);
+      border-color: var(--yellow);
+    }
+
+    .settings-action-btn.logout-btn {
+      background: rgba(255, 61, 0, 0.08);
+      border-color: rgba(255, 61, 0, 0.3);
+      color: #ffd0d0;
+      margin-top: auto;
+    }
+
+    .settings-action-btn.logout-btn:hover {
+      background: rgba(255, 61, 0, 0.15);
+      border-color: var(--red);
+      box-shadow: 0 0 12px rgba(255, 61, 0, 0.3);
+    }
+
+    .settings-icon-svg {
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      fill: currentColor;
+    }
+
+    .settings-chevron-svg {
+      width: 10px;
+      height: 10px;
+      margin-left: auto;
+      fill: rgba(255,255,255,0.4);
+    }
+
+    /* CUSTOM TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid var(--yellow);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 203, 5, 0.25);
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    /* Volumetric animated flames near the right edge only (Charizard area) */
+    .charizard-flame-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32%;
+      height: 100%;
+      background: linear-gradient(270deg, rgba(255, 68, 0, 0.25) 0%, rgba(255, 20, 0, 0.05) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: screen;
+      overflow: hidden;
+    }
+
+    .charizard-flame-flicker {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 150px;
+      height: 100%;
+      background: radial-gradient(ellipse at right bottom, rgba(255, 100, 0, 0.35) 0%, transparent 75%);
+      animation: flamePulse 4s ease-in-out infinite alternate, fireFlicker 0.12s ease-in-out infinite;
+    }
+
+    /* Volumetric Stadium Light Glow from top corners */
+    .stadium-light-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 300px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                  linear-gradient(225deg, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Localized heat wave behind the character illustration */
+    .center-heat-wave {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 15%;
+      bottom: 5%;
+      background: radial-gradient(circle at 50% 60%, rgba(255, 74, 0, 0.08) 0%, transparent 75%);
+      backdrop-filter: blur(1.2px);
+      -webkit-backdrop-filter: blur(1.2px);
+      z-index: 1;
+      pointer-events: none;
+      animation: heatRising 4s ease-in-out infinite;
+    }
+
+    /* Completed golden achievement shine */
+    .badge-item, .achievement-badge-shield {
+      position: relative;
+      overflow: hidden;
+    }
+    .badge-item::after, .achievement-badge-shield::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 215, 0, 0.4) 48%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 215, 0, 0.4) 52%,
+        transparent 55%
+      );
+      transform: rotate(-15deg);
+      pointer-events: none;
+      z-index: 5;
+      animation: goldShimmer 4s ease-in-out infinite;
+    }
+
+    /* Glowing Reward Center button style */
+    .glowing-reward-btn {
+      animation: blueBtnPulse 2s infinite alternate;
+      box-shadow: 0 0 10px rgba(12, 112, 255, 0.4);
+      border-color: rgba(12, 112, 255, 0.8) !important;
+    }
+    .glowing-reward-btn:hover {
+      box-shadow: 0 0 20px rgba(12, 112, 255, 0.8), 0 0 35px rgba(0, 162, 255, 0.4);
+      background: rgba(12, 112, 255, 0.4) !important;
+      transform: scale(1.02);
+    }
+
+    @keyframes blueBtnPulse {
+      0% { box-shadow: 0 0 8px rgba(12, 112, 255, 0.4); }
+      100% { box-shadow: 0 0 18px rgba(12, 112, 255, 0.8), 0 0 5px rgba(0, 162, 255, 0.3); }
+    }
+
+    @keyframes goldShimmer {
+      0% { transform: translate(-30%, -30%) rotate(-15deg); }
+      30%, 100% { transform: translate(30%, 30%) rotate(-15deg); }
+    }
+
+    @keyframes flamePulse {
+      0% { transform: scale(1); opacity: 0.75; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+
+    @keyframes fireFlicker {
+      0% { opacity: 0.85; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.9; }
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+
+    @keyframes smokeDrift {
+      0% { transform: translate(-30px, -20px) scale(1); }
+      100% { transform: translate(30px, 20px) scale(1.08); }
+    }
+
+    @keyframes heatRising {
+      0% { transform: scaleY(1) skewX(0deg); }
+      50% { transform: scaleY(1.03) skewX(1deg); }
+      100% { transform: scaleY(1) skewX(0deg); }
+    }
+  
+    @keyframes trainerBreathe {
+      0% {
+        transform: translate(-50%, 0) scale(1);
+        filter: drop-shadow(0 12px 20px rgba(0,0,0,0.5)) brightness(1);
+      }
+      100% {
+        transform: translate(-50%, -8px) scale(1.015);
+        filter: drop-shadow(0 16px 25px rgba(0,0,0,0.4)) brightness(1.03);
+      }
+    }
+
+    @keyframes pokeballFloat {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+      }
+      100% {
+        transform: translateY(-16px) rotate(180deg);
+        filter: drop-shadow(0 18px 10px rgba(0,0,0,0.3));
+      }
+    @keyframes rotateLegendary {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .rotating-badge {
+      animation: rotateLegendary 15s linear infinite;
+    }
+    :root {
+      --color-common: #00e5ff;
+      --color-rare: #00ff88;
+      --color-epic: #bf5af2;
+      --color-legendary: #ffcb05;
+      --color-mythic: #ef4444;
+    }
+  </style>
+
+  <script src="game-sync.js"></script>
+</head>
+<body>
+  <!-- Sparks Container -->
+  <div id="sparks-container"></div>
+
+  <!-- Cinematic Volcanic Fire & Stadium Light Theme Overlays -->
+  <div class="charizard-flame-bg">
+    <div class="charizard-flame-flicker"></div>
+  </div>
+  <div class="stadium-light-glow"></div>
+
+
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pokedex.html">Pokédex</a>
+      <a href="battle.html">Battle</a>
+      <a href="kingdom-map.html">Kingdom Map</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html" class="active">Profile</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="achievements.html">Achievements</a>
+      <a href="events.html">Events</a>
+      <a href="admin/admin.html" id="adminLink" style="display:none">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <main class="page">
+    
+    <!-- TOP ROW -->
+    <div class="top-row">
+      <!-- Left Column: Wider Profile Card -->
+      <div class="left-col">
+        
+        <!-- Section 1: Left Profile Card -->
+        <article class="glass-panel profile-card">
+          <div class="profile-header">
+            <div class="large-profile-avatar-container">
+              <div class="large-profile-avatar" id="profile-avatar-render"></div>
+              <div class="avatar-edit-icon" onclick="triggerChangeAvatar()" title="Change Avatar">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </div>
+            </div>
+            <div class="profile-identity">
+              <h2 class="profile-name" id="profile-display-name">Shashank</h2>
+              <span class="profile-id">TRAINER ID : #NX-784512</span>
+              <div class="profile-league-rank">
+                Master Champion
+                <span class="profile-league-rank-sub">Top 0.8% of Trainers</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="location-region-row">
+            <div class="location-pin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="var(--text-gray)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              Kanto Region
+            </div>
+            <div class="profile-status-bar">
+              <div class="status-dot"></div>
+              <span class="status-label">Online</span>
+            </div>
+          </div>
+
+          <div class="profile-xp-bar-container">
+            <div class="level-block">
+              <span class="level-label">Level</span>
+              <span class="level-number">80</span>
+            </div>
+            <div class="xp-details-block">
+              <div class="xp-label-row">
+                <span>XP Progress</span>
+                <span>58,420 / 75,000</span>
+              </div>
+              <div class="profile-xp-progress">
+                <div class="profile-xp-fill" id="profile-xp-progress-bar"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Section 1.5: Rewards Summary Card -->
+        <article class="glass-panel profile-card" style="margin-top: 15px; padding: 16px;">
+          <h3 style="margin: 0 0 12px 0; font-size: 0.95rem; color: var(--yellow); letter-spacing: 0.5px; text-transform: uppercase;">💎 Rewards Summary</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; text-align: left;">
+            <div>Crystals: <b id="profile-crystals" style="color: var(--blue);">0</b></div>
+            <div>Reward Points: <b id="profile-points" style="color: var(--red);">0</b></div>
+            <div style="grid-column: span 2;">Daily Streak: <b id="profile-streak" style="color: var(--green);">0 / 30</b></div>
+          </div>
+          <button onclick="location.href='rewards.html'" class="glowing-reward-btn" style="width: 100%; margin-top: 12px; background: rgba(12, 112, 255, 0.2); border: 1px solid var(--blue); color: white; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">Go to Rewards Center</button>
+        </article>
+
+      </div>
+
+      <!-- Center Column: 3D Trainer Platform Showcase (Visual Focus) -->
+      <div class="center-col">
+        <div class="trainer-showcase-container">
+          <div class="center-heat-wave"></div>
+          <div class="trainer-rim-light"></div>
+          <!-- standing illustration graphic of the original male trainer character -->
+          <div class="trainer-showcase-graphic" id="trainer-showcase-img"></div>
+          
+          <!-- pedestal circular base -->
+          <div class="showcase-pedestal">
+            <div class="showcase-pedestal-rim"></div>
+          </div>
+
+          <!-- Floating Poké Ball beside character -->
+          <svg class="floating-pokeball" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="46" fill="#fff" stroke="#000" stroke-width="6" />
+            <path d="M 50,50 M 4,50 A 46,46 0 0,1 96,50 Z" fill="#ff2222" stroke="#000" stroke-width="6" />
+            <line x1="4" y1="50" x2="96" y2="50" stroke="#000" stroke-width="6" />
+            <circle cx="50" cy="50" r="16" fill="#fff" stroke="#000" stroke-width="6" />
+            <circle cx="50" cy="50" r="6" fill="#fff" stroke="#000" stroke-width="2" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right Column: My Team & Gym Badges directly below it -->
+      <div class="right-col">
+        <!-- Section 3: My active 6-Pokémon team cards in 2 rows x 3 columns -->
+        <section class="glass-panel team-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            MY TEAM
+            <a href="pokedex.html" class="title-link">View All Pokémon ></a>
+          </h3>
+          <div class="team-grid-container" id="team-roster-grid">
+            <!-- Populated dynamically below -->
+          </div>
+        </section>
+
+        <!-- Section 4: Gym Badges Row (Directly below team cards) -->
+        <section class="glass-panel badges-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            GYM BADGES
+          </h3>
+          <div class="badges-row" id="gym-badges-container">
+            <!-- Populated dynamically below -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW GRID (Four Equal Panels) -->
+    <div class="bottom-row">
+      
+      <!-- Panel 1: Recent Battles -->
+      <section class="glass-panel bottom-card">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          RECENT BATTLES
+          <a href="battle.html" class="title-link">View All ></a>
+        </h3>
+        <div class="battle-history-list">
+          <div class="battle-history-row">
+            <div class="battle-history-opponent">
+              <div class="battle-history-avatar" style="background-image:url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png')"></div>
+              <span>vs Cynthia</span>
+            </div>
+            <span class="battle-outcome win">
+              WIN
+              <svg class="trophy-mini-svg" viewBox="0 0 24 24"><path d="M19 2h-4v2h4v3c0 2.21-1.79 4-4 4h-2v2h2c1.75 0 3.29-.98 4.07-2.42C19.78 9.94 20 9 20 8V4c0-1.1-.9-2-2-2z"/></svg>
+            </span>
+            <div class="battle-history-mvp-block">
+              <img class="battle-history-mvp" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png">
+              MVP 15m ago
+            </div>
+          </div>
+          <div class="battle-history-row">
+            <div class="battle-history-opponent">
+              <div class="battle-history-avatar" style="background-image:url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png')"></div>
+              <span>vs Lance</span>
+            </div>
+            <span class="battle-outcome win">
+              WIN
+              <svg class="trophy-mini-svg" viewBox="0 0 24 24"><path d="M19 2h-4v2h4v3c0 2.21-1.79 4-4 4h-2v2h2c1.75 0 3.29-.98 4.07-2.42C19.78 9.94 20 9 20 8V4c0-1.1-.9-2-2-2z"/></svg>
+            </span>
+            <div class="battle-history-mvp-block">
+              <img class="battle-history-mvp" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png">
+              MVP 32m ago
+            </div>
+          </div>
+          <div class="battle-history-row">
+            <div class="battle-history-opponent">
+              <div class="battle-history-avatar" style="background-image:url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/376.png')"></div>
+              <span>vs Steven</span>
+            </div>
+            <span class="battle-outcome loss">
+              LOSE
+              <span style="font-size: 10px;">✖</span>
+            </span>
+            <div class="battle-history-mvp-block">
+              <img class="battle-history-mvp" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/376.png">
+              1h ago
+            </div>
+          </div>
+          <div class="battle-history-row">
+            <div class="battle-history-opponent">
+              <div class="battle-history-avatar" style="background-image:url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png')"></div>
+              <span>vs Red</span>
+            </div>
+            <span class="battle-outcome win">
+              WIN
+              <svg class="trophy-mini-svg" viewBox="0 0 24 24"><path d="M19 2h-4v2h4v3c0 2.21-1.79 4-4 4h-2v2h2c1.75 0 3.29-.98 4.07-2.42C19.78 9.94 20 9 20 8V4c0-1.1-.9-2-2-2z"/></svg>
+            </span>
+            <div class="battle-history-mvp-block">
+              <img class="battle-history-mvp" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png">
+              MVP 2h ago
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Achievements -->
+      <section class="glass-panel bottom-card">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          ACHIEVEMENTS
+          <a href="#" class="title-link">View All ></a>
+        </h3>
+        <div class="achievement-history-list">
+          <div class="achievement-item-row">
+            <div class="achievement-badge-shield" style="--shield-color: var(--yellow);">★</div>
+            <div class="achievement-details-block">
+              <div class="achievement-title-row">
+                <span>Pokémon Champion</span>
+                <span>100%</span>
+              </div>
+              <div class="achievement-desc">Win Pokémon League</div>
+              <div class="achievement-progress-bar-outer"><div class="achievement-progress-bar-inner" style="width: 100%; --bar-color: var(--yellow);"></div></div>
+            </div>
+          </div>
+          <div class="achievement-item-row">
+            <div class="achievement-badge-shield" style="--shield-color: var(--blue);">★</div>
+            <div class="achievement-details-block">
+              <div class="achievement-title-row">
+                <span>Elite Trainer</span>
+                <span>75%</span>
+              </div>
+              <div class="achievement-desc">Win 100 Trainer Battles</div>
+              <div class="achievement-progress-bar-outer"><div class="achievement-progress-bar-inner" style="width: 75%; --bar-color: var(--blue);"></div></div>
+            </div>
+          </div>
+          <div class="achievement-item-row">
+            <div class="achievement-badge-shield" style="--shield-color: var(--orange);">★</div>
+            <div class="achievement-details-block">
+              <div class="achievement-title-row">
+                <span>Battle Master</span>
+                <span>60%</span>
+              </div>
+              <div class="achievement-desc">Win 20 Online Battles</div>
+              <div class="achievement-progress-bar-outer"><div class="achievement-progress-bar-inner" style="width: 60%; --bar-color: var(--orange);"></div></div>
+            </div>
+          </div>
+          <div class="achievement-item-row">
+            <div class="achievement-badge-shield" style="--shield-color: var(--green);">★</div>
+            <div class="achievement-details-block">
+              <div class="achievement-title-row">
+                <span>Gym Master</span>
+                <span>87%</span>
+              </div>
+              <div class="achievement-desc">Collect 8 Gym Badges</div>
+              <div class="achievement-progress-bar-outer"><div class="achievement-progress-bar-inner" style="width: 87%; --bar-color: var(--green);"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: Explored Regions -->
+      <section class="glass-panel bottom-card">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          EXPLORED REGIONS
+          <a href="kingdom-map.html" class="title-link">View Map ></a>
+        </h3>
+        <div class="explored-regions-grid" id="regions-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- Panel 4: Settings -->
+      <section class="glass-panel bottom-card">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          SETTINGS
+        </h3>
+        <div class="settings-button-grid">
+          <button class="settings-action-btn" onclick="triggerEditName()">
+            <svg class="settings-icon-svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Edit Profile
+            <svg class="settings-chevron-svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </button>
+          <button class="settings-action-btn" onclick="triggerChangeAvatar()">
+            <svg class="settings-icon-svg" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            Change Avatar
+            <svg class="settings-chevron-svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </button>
+          <button class="settings-action-btn" onclick="triggerEditName()">
+            <svg class="settings-icon-svg" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            Change Name
+            <svg class="settings-chevron-svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </button>
+          <button class="settings-action-btn" onclick="triggerSystemSettings()">
+            <svg class="settings-icon-svg" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Game Settings
+            <svg class="settings-chevron-svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </button>
+          <button class="settings-action-btn logout-btn" onclick="triggerLogout()">
+            <svg class="settings-icon-svg" viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+            Logout
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <div id="toast">Message</div>
+
+  <script>
+    // Web Audio Sound Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'hover') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(820, now);
+          osc.frequency.exponentialRampToValueAtTime(1050, now + 0.08);
+          gain.gain.setValueAtTime(0.015, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(580, now);
+          osc.frequency.setValueAtTime(320, now + 0.06);
+          gain.gain.setValueAtTime(0.03, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'success') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      } catch (err) {
+        console.warn("Audio Context blocked:", err);
+      }
+    }
+
+    // Interactive button audio attachments
+    document.querySelectorAll("button, a, .region-tile, .team-pkmn-slot").forEach(elem => {
+      elem.addEventListener("mouseenter", () => playSound("hover"));
+      elem.addEventListener("click", () => playSound("click"));
+    });
+
+    // Exact reference Pokemon Team dataset
+    let pokemonTeamData = [];
+
+    function loadLocalStorageTeam() {
+      pokemonTeamData = [];
+      const cachedTeamStr = localStorage.getItem("pokemonNexusTeam");
+      if (cachedTeamStr) {
+        try {
+          const teamObj = JSON.parse(cachedTeamStr);
+          if (Array.isArray(teamObj) && teamObj.length > 0) {
+            const borderColors = {
+              electric: "#ffcb05", fire: "#f97316", water: "#3b82f6", grass: "#10b981",
+              psychic: "#ec4899", fighting: "#0ea5e9", dragon: "#a855f7", ice: "#67e8f9",
+              steel: "#94a3b8", ground: "#b45309", rock: "#78350f", ghost: "#6366f1", poison: "#a855f7", bug: "#84cc16",
+              fairy: "#ec4899", normal: "#9ca3af", flying: "#a78bfa", dark: "#4b5563"
+            };
+            pokemonTeamData = teamObj.slice(0, 6).map(p => {
+              if (!p) return null;
+              const pkmnLvl = p.level || p.lvl || 50;
+              const pkmnHp = p.hp || p.maxHp || p.max_hp || (100 + pkmnLvl * 2);
+              
+              let rawTypes = [];
+              if (Array.isArray(p.types)) {
+                rawTypes = p.types;
+              } else if (p.types && typeof p.types === 'string') {
+                rawTypes = [p.types];
+              } else {
+                rawTypes = [p.type || p.type1 || "Normal"];
+              }
+              
+              const pkmnTypes = rawTypes.map(t => {
+                if (!t) return "Normal";
+                return String(t).charAt(0).toUpperCase() + String(t).slice(1).toLowerCase();
+              });
+              
+              const pkmnType = pkmnTypes[0] || "Normal";
+              const pkmnBorder = p.border || borderColors[pkmnType.toLowerCase()] || "#9ca3af";
+              const pkmnImage = p.image || p.artwork || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id || p.pokedex_number || 1}.png`;
+              
+              return {
+                name: p.name || "Unknown",
+                lvl: pkmnLvl,
+                id: p.id || p.pokedex_number || 1,
+                types: pkmnTypes,
+                hp: pkmnHp,
+                maxHp: pkmnHp,
+                border: pkmnBorder,
+                image: pkmnImage
+              };
+            }).filter(Boolean);
+          }
+        } catch (err) {
+          console.error("Failed to parse pokemonNexusTeam in profile.html:", err);
+        }
+      }
+    }
+
+    const exploredRegionsData = [
+      { name: "Kanto", progress: 100 },
+      { name: "Johto", progress: 95 },
+      { name: "Hoenn", progress: 88 },
+      { name: "Sinnoh", progress: 80 },
+      { name: "Unova", progress: 75 },
+      { name: "Kalos", progress: 60 },
+      { name: "Alola", progress: 55 },
+      { name: "Galar", progress: 40 },
+      { name: "Paldea", progress: 25 }
+    ];
+
+    function renderActiveTeam() {
+      const grid = document.getElementById("team-roster-grid");
+      if (!grid) return;
+      if (!pokemonTeamData || pokemonTeamData.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; color: var(--text-gray); font-size: 13px; font-weight: 500; text-align: center; padding: 40px 10px; width: 100%;">
+            No Pokémon added yet. Add Pokémon from Pokédex.
+          </div>`;
+        return;
+      }
+      grid.innerHTML = pokemonTeamData.map(pkmn => {
+        const typeBadges = pkmn.types.map(t => `<span class="team-type-pill type-${t.toLowerCase()}">${t}</span>`).join('');
+        const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pkmn.id}.png`;
+        return `
+          <div class="team-pkmn-slot" style="--pkmn-border: ${pkmn.border};">
+            <span class="team-pkmn-lvl-tag">Lv. ${pkmn.lvl}</span>
+            <img class="team-pkmn-sprite-hd" src="${pkmn.image}" alt="PKMN" onerror="this.onerror=null; this.src='${spriteUrl}';">
+            <div class="team-pkmn-name">${pkmn.name}</div>
+            
+            <div class="team-hp-container">
+              <div class="team-hp-text-row">${pkmn.hp} / ${pkmn.maxHp}</div>
+              <div class="team-hp-bar"><div class="team-hp-fill" style="width: 100%"></div></div>
+            </div>
+            <div class="team-type-row">${typeBadges}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderExploredRegions() {
+      const grid = document.getElementById("regions-grid");
+      grid.innerHTML = exploredRegionsData.map(r => {
+        return `
+          <div class="region-tile" onclick="location.href='kingdom-map.html'">
+            <span class="region-name">${r.name}</span>
+            <span class="region-progress">${r.progress}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Change avatar visual cycle
+    let currentAvatarIndex = 0;
+    const mascotIds = [25, 6, 9, 3, 448]; // Pikachu, Charizard, Blastoise, Venusaur, Lucario
+
+    async function triggerChangeAvatar() {
+      currentAvatarIndex = (currentAvatarIndex + 1) % mascotIds.length;
+      const newId = mascotIds[currentAvatarIndex];
+      const avatarUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${newId}.png`;
+      
+      playSound("success");
+      showToast("Updating avatar...");
+      
+      if (typeof syncApiRequest === "function") {
+          try {
+              await syncApiRequest("/auth/profile/", "PUT", { avatar: avatarUrl });
+              if (typeof syncProfileFromBackend === "function") {
+                await syncProfileFromBackend();
+              }
+              if (typeof window.renderTrainerCard === "function") {
+                window.renderTrainerCard();
+              }
+              showToast("Avatar successfully updated!");
+          } catch (err) {
+              console.error("Failed to update avatar on backend:", err);
+              showToast("Failed to sync avatar with server.");
+          }
+      }
+    }
+
+    async function triggerEditName() {
+      const currentName = document.getElementById("profile-display-name").textContent || "Shashank";
+      const newName = prompt("Enter your new Trainer Name:", currentName);
+      if (newName && newName.trim().length > 0) {
+        playSound("success");
+        showToast("Updating Trainer Name...");
+        
+        if (typeof syncApiRequest === "function") {
+            try {
+                await syncApiRequest("/auth/profile/", "PUT", { trainerName: newName.trim() });
+                if (typeof syncProfileFromBackend === "function") {
+                  await syncProfileFromBackend();
+                }
+                if (typeof window.renderTrainerCard === "function") {
+                  window.renderTrainerCard();
+                }
+                showToast(`Trainer Name successfully updated to: ${newName.trim()}`);
+            } catch (err) {
+                console.error("Failed to update name on backend:", err);
+                showToast("Failed to sync name with server.");
+            }
+        }
+      }
+    }
+
+    function triggerSystemSettings() {
+      alert("Nexus Settings Interface: Sound FX volume set to 100%. Single Screen scaling: ENABLED.");
+      playSound("success");
+    }
+
+    function triggerLogout() {
+      const proceed = confirm("Are you sure you want to log out of Pokémon Nexus?");
+      if (proceed) {
+        location.href = "index.html";
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    window.renderTrainerCard = function() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (!userStr) return;
+      try {
+        const user = JSON.parse(userStr);
+        if (!user) return;
+        
+        const nameEl = document.getElementById("profile-display-name");
+        if (nameEl && user.trainerName) {
+          nameEl.textContent = user.trainerName;
+        }
+        
+        const lvlEl = document.querySelector(".level-number");
+        if (lvlEl && user.level) {
+          lvlEl.textContent = user.level;
+        }
+        
+        const avatarEl = document.getElementById("profile-avatar-render");
+        if (avatarEl && user.avatar) {
+          avatarEl.style.backgroundImage = `url('${user.avatar}')`;
+          avatarEl.style.backgroundSize = "cover";
+          avatarEl.style.backgroundPosition = "center";
+        }
+        
+        const navName = document.getElementById("nav-trainer-name");
+        if (navName && user.trainerName) {
+          navName.textContent = user.trainerName;
+        }
+        
+        const navLvl = document.getElementById("nav-trainer-level");
+        if (navLvl && user.level) {
+          navLvl.textContent = `Level ${user.level}`;
+        }
+        
+        const navAvatar = document.getElementById("nav-trainer-avatar");
+        if (navAvatar && user.avatar) {
+          navAvatar.style.backgroundImage = `url('${user.avatar}')`;
+          navAvatar.style.backgroundSize = "cover";
+          navAvatar.style.backgroundPosition = "center";
+        }
+      } catch (e) {
+        console.error("Failed to render trainer card:", e);
+      }
+    };
+
+    function renderGymBadges() {
+      const container = document.getElementById("gym-badges-container");
+      if (!container) return;
+      
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      let userBadges = [];
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userBadges = user.badges || [];
+        } catch(e) {}
+      }
+      
+      const unlockedSet = new Set(userBadges.map(b => String(b).toLowerCase().trim()));
+      
+      const kantoBadges = [
+        { name: "Boulder", gym: "Pewter", type: "Rock", img: "boulder-badge.png", color: "#94a3b8" },
+        { name: "Cascade", gym: "Cerulean", type: "Water", img: "cascade-badge.png", color: "#38bdf8" },
+        { name: "Thunder", gym: "Vermilion", type: "Electric", img: "thunder-badge.png", color: "#facc15" },
+        { name: "Rainbow", gym: "Celadon", type: "Grass", img: "rainbow-badge.png", color: "#4ade80" },
+        { name: "Soul", gym: "Fuchsia", type: "Poison", img: "soul-badge.png", color: "#c084fc" },
+        { name: "Marsh", gym: "Saffron", type: "Psychic", img: "marsh-badge.png", color: "#f472b6" },
+        { name: "Volcano", gym: "Cinnabar", type: "Fire", img: "volcano-badge.png", color: "#fb923c" },
+        { name: "Earth", gym: "Viridian", type: "Ground", img: "earth-badge.png", color: "#a16207" }
+      ];
+      
+      container.innerHTML = kantoBadges.map(badge => {
+        const isUnlocked = unlockedSet.has(badge.name.toLowerCase()) || 
+                           unlockedSet.has(`${badge.name.toLowerCase()} badge`) || 
+                           unlockedSet.has(`${badge.name.toLowerCase()}_badge`);
+                           
+        const statusClass = isUnlocked ? "unlocked" : "locked";
+        const titleStr = `${badge.name} Badge (${badge.gym} Gym - ${badge.type} Type) ${isUnlocked ? "[Unlocked]" : "[Locked]"}`;
+        const glowStyle = isUnlocked ? `filter: drop-shadow(0 0 10px ${badge.color});` : "filter: grayscale(1) opacity(0.35);";
+        
+        return `
+          <div class="badge-item" style="cursor: pointer;" title="${titleStr}">
+            <div class="badge-icon ${statusClass}" style="background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${badge.img}'); --glow-color: ${badge.color}; ${glowStyle}"></div>
+            <span class="badge-label">${badge.name}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Initializers
+    checkUserWelcome();
+    loadLocalStorageTeam();
+    renderActiveTeam();
+    renderExploredRegions();
+    renderGymBadges();
+    if (typeof window.renderTrainerCard === "function") {
+      window.renderTrainerCard();
+    }
+
+    // Re-sync team and profile from backend on load
+    window.addEventListener("DOMContentLoaded", async () => {
+      if (typeof syncPokedexFromBackend === "function") {
+        try {
+          await syncPokedexFromBackend();
+          loadLocalStorageTeam();
+          renderActiveTeam();
+        } catch (e) {
+          console.error("Failed to sync team on DOMContentLoaded:", e);
+        }
+      }
+      renderGymBadges();
+      if (typeof window.renderTrainerCard === "function") {
+        window.renderTrainerCard();
+      }
+    });
+
+    
+
+    
+    
+    // Animate progress bar on load
+    setTimeout(() => {
+      document.getElementById("profile-xp-progress-bar").style.width = "78%";
+    }, 150);
+
+     // Floating Sparks
+     const sparksContainer = document.getElementById("sparks-container");
+     for (let i = 0; i < 30; i++) {
+       const spark = document.createElement("div");
+       spark.className = `spark ${Math.random() > 0.5 ? 'orange' : 'blue'}`;
+       spark.style.left = Math.random() * 100 + "vw";
+       spark.style.animationDuration = (7 + Math.random() * 8) + "s";
+       spark.style.animationDelay = Math.random() * 5 + "s";
+       sparksContainer.appendChild(spark);
+     }
+
+    function checkUserWelcome() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user) {
+            if (user.role === 'admin' || user.isAdmin) {
+              const adminLink = document.getElementById("adminLink") || document.getElementById("adminNavLink");
+              if (adminLink) {
+                adminLink.style.display = "inline-flex";
+                adminLink.style.visibility = "visible";
+                adminLink.style.opacity = "1";
+              }
+            }
+            if (user.trainerName) {
+              document.getElementById("trainerWelcome").textContent = "Welcome, " + user.trainerName;
+              document.getElementById("profile-display-name").textContent = user.trainerName;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    // Page load console print
+    console.log("userRole =", localStorage.getItem("userRole"));
+
+    // Admin visibility logic
+    let parsedIsAdmin = false;
+    const userStr = localStorage.getItem("pokemonNexusUser");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && (user.role === "admin" || user.isAdmin)) {
+          parsedIsAdmin = true;
+        }
+      } catch (e) {}
+    }
+
+    const role =
+      localStorage.getItem("userRole") ||
+      localStorage.getItem("currentUserRole") ||
+      localStorage.getItem("role");
+
+    const isAdmin =
+      role === "admin" ||
+      localStorage.getItem("isAdmin") === "true" ||
+      parsedIsAdmin;
+
+    const adminNavLink = document.getElementById("adminNavLink") || document.getElementById("adminLink");
+    if (adminNavLink) {
+      if (isAdmin) {
+        adminNavLink.style.display = "inline-flex";
+        adminNavLink.style.visibility = "visible";
+        adminNavLink.style.opacity = "1";
+      } else {
+        adminNavLink.style.display = "none";
+      }
+    }
+
+    // Inline SVG Badge templates for showcase
+    function getBadgeSVG(key, rarity) {
+      let color = "var(--color-common)";
+      if (rarity === "Rare") color = "var(--color-rare)";
+      else if (rarity === "Epic") color = "var(--color-epic)";
+      else if (rarity === "Legendary") color = "var(--color-legendary)";
+      else if (rarity === "Mythic") color = "var(--color-mythic)";
+
+      const templates = {
+        first_victory: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="4 2" /><polygon points="50,15 85,80 15,80" fill="rgba(255,255,255,0.05)" stroke="${color}" stroke-width="3" /><circle cx="50" cy="50" r="18" fill="rgba(255,255,255,0.2)" stroke="#000" stroke-width="3" /><line x1="32" y1="50" x2="68" y2="50" stroke="#000" stroke-width="3" /><circle cx="50" cy="50" r="6" fill="#fff" stroke="#000" stroke-width="2" /></svg>`,
+        pokemon_collector: `<svg viewBox="0 0 100 100"><polygon points="50,8 90,38 75,85 25,85 10,38" fill="rgba(255,255,255,0.03)" stroke="${color}" stroke-width="4" /><circle cx="50" cy="48" r="22" fill="rgba(0,0,0,0.5)" stroke="${color}" stroke-width="2" /><circle cx="50" cy="48" r="14" fill="${color}" stroke="#000" stroke-width="2" /><line x1="36" y1="48" x2="64" y2="48" stroke="#000" stroke-width="3" /><circle cx="50" cy="48" r="5" fill="#fff" stroke="#000" stroke-width="2" /></svg>`,
+        gym_challenger: `<svg viewBox="0 0 100 100"><path d="M15,15 L85,15 L80,55 C80,72 50,88 50,88 C50,88 20,72 20,55 Z" fill="rgba(0,0,0,0.4)" stroke="${color}" stroke-width="4" /><path d="M35,28 L65,28 L50,58 Z" fill="${color}" opacity="0.8" /><circle cx="50" cy="42" r="8" fill="#fff" stroke="#000" stroke-width="2" /></svg>`,
+        explorer: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(0,0,0,0.4)" stroke="${color}" stroke-width="4" /><circle cx="50" cy="50" r="32" fill="none" stroke="${color}" stroke-width="1.5" stroke-dasharray="5 5" /><polygon points="50,22 58,42 50,50" fill="${color}" stroke="#000" stroke-width="1" /><polygon points="50,78 42,58 50,50" fill="#fff" stroke="#000" stroke-width="1" /></svg>`,
+        battle_master: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="rgba(0,0,0,0.5)" stroke="${color}" stroke-width="3" /><path d="M 25,75 L 75,25 M 75,75 L 25,25" stroke="${color}" stroke-width="6" stroke-linecap="round" /><circle cx="50" cy="50" r="16" fill="rgba(6,12,38,0.9)" stroke="#fff" stroke-width="2" /><polygon points="50,38 54,46 62,46 56,51 58,59 50,54 42,59 44,51 38,46 46,46" fill="${color}" /></svg>`,
+        legendary_hunter: `<svg viewBox="0 0 100 100"><path d="M 50,5 Q 95,50 50,95 Q 5,50 50,5" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="10 4" /><circle cx="50" cy="50" r="24" fill="rgba(0,0,0,0.6)" stroke="${color}" stroke-width="3" /><circle cx="50" cy="50" r="15" fill="${color}" stroke="#000" stroke-width="3" /><line x1="35" y1="50" x2="65" y2="50" stroke="#000" stroke-width="3" /><circle cx="50" cy="50" r="5" fill="#fff" stroke="#000" stroke-width="2" /></svg>`,
+        daily_login_streak: `<svg viewBox="0 0 100 100"><rect x="20" y="25" width="60" height="55" rx="8" fill="rgba(0,0,0,0.5)" stroke="${color}" stroke-width="4" /><line x1="20" y1="42" x2="80" y2="42" stroke="${color}" stroke-width="3" /><text x="50" y="68" fill="#fff" font-size="20" font-family="'Outfit', sans-serif" font-weight="900" text-anchor="middle">30</text></svg>`,
+        ultimate_champion: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.7)" stroke="${color}" stroke-width="4" /><path d="M 50,50 M 6,50 A 44,44 0 0,1 94,50 Z" fill="rgba(255,0,85,0.7)" stroke="#000" stroke-width="3" /><line x1="6" y1="50" x2="94" y2="50" stroke="#000" stroke-width="4" /><circle cx="50" cy="50" r="16" fill="#fff" stroke="#000" stroke-width="4" /><polygon points="50,15 62,32 78,22 70,42 30,42 22,22 38,32" fill="#fff" stroke="#000" stroke-width="2" /></svg>`,
+        default_badge: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="${color}" stroke-width="4" /><polygon points="50,20 59,38 78,38 62,49 68,68 50,56 32,68 38,49 22,38 41,38" fill="${color}" /></svg>`
+      };
+      return templates[key] || templates.default_badge;
+    }
+
+    // Removed Achievements Showcase functions
+  </script>
+</body>
+</html>
