@@ -1,0 +1,306 @@
+{
+    "daily_rewards": [
+        {
+            "day": 1,
+            "type": "Coins",
+            "amount": 100,
+            "item_name": null
+        },
+        {
+            "day": 2,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Potion"
+        },
+        {
+            "day": 3,
+            "type": "Item",
+            "amount": 2,
+            "item_name": "Great Ball"
+        },
+        {
+            "day": 4,
+            "type": "XP",
+            "amount": 200,
+            "item_name": null
+        },
+        {
+            "day": 5,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Rare Candy"
+        },
+        {
+            "day": 6,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Ultra Ball"
+        },
+        {
+            "day": 7,
+            "type": "Crystals",
+            "amount": 50,
+            "item_name": null
+        },
+        {
+            "day": 8,
+            "type": "Coins",
+            "amount": 200,
+            "item_name": null
+        },
+        {
+            "day": 9,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Super Potion"
+        },
+        {
+            "day": 10,
+            "type": "Item",
+            "amount": 3,
+            "item_name": "Great Ball"
+        },
+        {
+            "day": 11,
+            "type": "XP",
+            "amount": 300,
+            "item_name": null
+        },
+        {
+            "day": 12,
+            "type": "Item",
+            "amount": 2,
+            "item_name": "Rare Candy"
+        },
+        {
+            "day": 13,
+            "type": "Item",
+            "amount": 2,
+            "item_name": "Ultra Ball"
+        },
+        {
+            "day": 14,
+            "type": "Crystals",
+            "amount": 100,
+            "item_name": null
+        },
+        {
+            "day": 15,
+            "type": "Coins",
+            "amount": 300,
+            "item_name": null
+        },
+        {
+            "day": 16,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Hyper Potion"
+        },
+        {
+            "day": 17,
+            "type": "Item",
+            "amount": 5,
+            "item_name": "Great Ball"
+        },
+        {
+            "day": 18,
+            "type": "XP",
+            "amount": 400,
+            "item_name": null
+        },
+        {
+            "day": 19,
+            "type": "Item",
+            "amount": 3,
+            "item_name": "Rare Candy"
+        },
+        {
+            "day": 20,
+            "type": "Item",
+            "amount": 3,
+            "item_name": "Ultra Ball"
+        },
+        {
+            "day": 21,
+            "type": "Crystals",
+            "amount": 150,
+            "item_name": null
+        },
+        {
+            "day": 22,
+            "type": "Coins",
+            "amount": 500,
+            "item_name": null
+        },
+        {
+            "day": 23,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Max Potion"
+        },
+        {
+            "day": 24,
+            "type": "Item",
+            "amount": 5,
+            "item_name": "Ultra Ball"
+        },
+        {
+            "day": 25,
+            "type": "XP",
+            "amount": 500,
+            "item_name": null
+        },
+        {
+            "day": 26,
+            "type": "Item",
+            "amount": 5,
+            "item_name": "Rare Candy"
+        },
+        {
+            "day": 27,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Master Ball"
+        },
+        {
+            "day": 28,
+            "type": "Crystals",
+            "amount": 250,
+            "item_name": null
+        },
+        {
+            "day": 29,
+            "type": "Coins",
+            "amount": 1000,
+            "item_name": null
+        },
+        {
+            "day": 30,
+            "type": "Crystals",
+            "amount": 500,
+            "item_name": null
+        }
+    ],
+    "level_rewards": [
+        {
+            "level": 5,
+            "type": "Item",
+            "amount": 5,
+            "item_name": "Potion"
+        },
+        {
+            "level": 10,
+            "type": "Item",
+            "amount": 10,
+            "item_name": "Great Ball"
+        },
+        {
+            "level": 15,
+            "type": "Item",
+            "amount": 3,
+            "item_name": "Rare Candy"
+        },
+        {
+            "level": 20,
+            "type": "Crystals",
+            "amount": 100,
+            "item_name": null
+        },
+        {
+            "level": 25,
+            "type": "Item",
+            "amount": 10,
+            "item_name": "Ultra Ball"
+        },
+        {
+            "level": 30,
+            "type": "Item",
+            "amount": 5,
+            "item_name": "Rare Candy"
+        },
+        {
+            "level": 35,
+            "type": "Crystals",
+            "amount": 200,
+            "item_name": null
+        },
+        {
+            "level": 40,
+            "type": "Item",
+            "amount": 1,
+            "item_name": "Master Ball"
+        },
+        {
+            "level": 50,
+            "type": "Crystals",
+            "amount": 500,
+            "item_name": null
+        },
+        {
+            "level": 60,
+            "type": "Item",
+            "amount": 10,
+            "item_name": "Rare Candy"
+        },
+        {
+            "level": 70,
+            "type": "Crystals",
+            "amount": 1000,
+            "item_name": null
+        },
+        {
+            "level": 80,
+            "type": "Item",
+            "amount": 3,
+            "item_name": "Master Ball"
+        },
+        {
+            "level": 90,
+            "type": "Crystals",
+            "amount": 2000,
+            "item_name": null
+        },
+        {
+            "level": 100,
+            "type": "Crystals",
+            "amount": 5000,
+            "item_name": null
+        }
+    ],
+    "battle_rewards": {
+        "win_xp": 450,
+        "win_coins": 150,
+        "win_points": 30,
+        "item_chance": 0.6,
+        "item_weights": [
+            {
+                "name": "Poke Ball",
+                "weight": 35
+            },
+            {
+                "name": "Great Ball",
+                "weight": 25
+            },
+            {
+                "name": "Ultra Ball",
+                "weight": 15
+            },
+            {
+                "name": "Potion",
+                "weight": 15
+            },
+            {
+                "name": "Rare Candy",
+                "weight": 8
+            },
+            {
+                "name": "Fire Stone",
+                "weight": 2
+            }
+        ]
+    },
+    "settings": {
+        "streak_multiplier_enabled": true,
+        "weekend_xp_boost_enabled": false
+    }
+}
