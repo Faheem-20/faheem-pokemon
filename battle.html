@@ -1,0 +1,5007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Nexus — Battle Arena</title>
+  <link rel="stylesheet" href="navbar.css">
+  <style>
+    /* ============================================================
+       POKÉMON NEXUS — CINEMATIC BATTLE ARENA (PHASE 2 ENVIRONMENT)
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --bg-dark: #010309;
+      --panel-bg: rgba(6, 11, 28, 0.85);
+      --border-blue: rgba(12, 112, 255, 0.42);
+      --border-gold: rgba(255, 203, 5, 0.38);
+      --yellow: #ffcb05;
+      --red: #ff3d00;
+      --blue: #0c70ff;
+      --green: #10b981;
+      --purple: #a855f7;
+      --orange: #f97316;
+      --silver: #cbd5e1;
+      --text-gray: #94a3b8;
+      
+      /* Arena dynamic variables */
+      --arena-glow: rgba(255, 61, 0, 0.56);
+      --arena-glow-secondary: rgba(255, 203, 5, 0.32);
+      --arena-border: rgba(255, 61, 0, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden; /* Force single screen layout */
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-dark);
+      color: #fff;
+    }
+
+    /* Environmental backdrop layer with depth blur */
+    #arena-backdrop {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -2;
+      transition: background-image 0.8s ease-in-out;
+      filter: blur(3px) brightness(0.45) contrast(1.2); /* Cinematic depth blur */
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(6, 12, 28, 0.15) 0%, rgba(2, 6, 18, 0.85) 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Volcano Ambient Heat Glow & Lava Reflections */
+    .volcano-glow-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 90%, rgba(255, 61, 0, 0.22) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .lava-reflection-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 60, 0, 0.02);
+      pointer-events: none;
+      z-index: 2;
+      animation: lavaFlicker 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes lavaFlicker {
+      0% { opacity: 0.3; filter: brightness(0.95); }
+      50% { opacity: 0.7; filter: brightness(1.1); }
+      100% { opacity: 0.4; filter: brightness(1.0); }
+    }
+
+    /* Cinematic Volumetric Spotlights (Moving beams) */
+    .spotlight-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .light-beam-left {
+      position: absolute;
+      top: -150px;
+      left: 8%;
+      width: 260px;
+      height: 150%;
+      background: linear-gradient(40deg, rgba(255, 90, 0, 0.12) 0%, rgba(255, 90, 0, 0.02) 40%, transparent 70%);
+      transform-origin: top left;
+      filter: blur(20px);
+      animation: panSpotlightLeft 9s ease-in-out infinite alternate;
+    }
+
+    .light-beam-right {
+      position: absolute;
+      top: -150px;
+      right: 8%;
+      width: 260px;
+      height: 150%;
+      background: linear-gradient(-40deg, rgba(255, 60, 0, 0.1) 0%, rgba(255, 60, 0, 0.01) 40%, transparent 70%);
+      transform-origin: top right;
+      filter: blur(20px);
+      animation: panSpotlightRight 11s ease-in-out infinite alternate;
+    }
+
+    @keyframes panSpotlightLeft {
+      0% { transform: rotate(23deg) scaleX(0.95); opacity: 0.6; }
+      100% { transform: rotate(33deg) scaleX(1.05); opacity: 1; }
+    }
+
+    @keyframes panSpotlightRight {
+      0% { transform: rotate(-33deg) scaleX(1.05); opacity: 0.5; }
+      100% { transform: rotate(-23deg) scaleX(0.95); opacity: 0.9; }
+    }
+
+    /* Atmospheric Fog Overlay */
+    .arena-fog-layer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 110px;
+      height: 280px;
+      background: linear-gradient(to top, rgba(6, 12, 28, 0.5) 0%, rgba(6, 12, 28, 0.15) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+      filter: blur(35px);
+      animation: fogDrift 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes fogDrift {
+      0% { opacity: 0.3; transform: translateX(-40px) scaleY(0.95); }
+      100% { opacity: 0.75; transform: translateX(40px) scaleY(1.1); }
+    }
+
+    /* Floating Fire Embers */
+    #sparks-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 90, 0, 0.55);
+      box-shadow: 0 0 10px rgba(255, 90, 0, 0.9), 0 0 20px rgba(255, 50, 0, 0.6);
+      pointer-events: none;
+      animation: floatSpark 9s linear infinite;
+    }
+
+    @keyframes floatSpark {
+      0% { transform: translateY(105vh) translateX(0) scale(0.7); opacity: 0; }
+      15% { opacity: 0.9; }
+      85% { opacity: 0.9; }
+      100% { transform: translateY(-5vh) translateX(45px) scale(1.3); opacity: 0; }
+    }
+
+    /* Heat Distortion Wave Effect */
+    .heat-distortion {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      backdrop-filter: blur(0.5px);
+      animation: heatWave 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes heatWave {
+      0% { filter: contrast(1) brightness(1); }
+      50% { filter: contrast(1.04) brightness(1.03); }
+      100% { filter: contrast(1) brightness(1); }
+    }
+
+    /* Giant Stadium LED Battle Screens */
+    .stadium-led-screen {
+      position: absolute;
+      top: 65px;
+      width: 140px;
+      height: 80px;
+      background: rgba(10, 20, 45, 0.85);
+      border: 1.5px solid var(--border-blue);
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(12, 112, 255, 0.25), inset 0 0 10px rgba(0,0,0,0.8);
+      z-index: 0;
+      opacity: 0.65;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .stadium-led-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 4px);
+      pointer-events: none;
+    }
+
+    .stadium-led-logo {
+      width: 40px;
+      height: 40px;
+      opacity: 0.25;
+      animation: logoPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoPulse {
+      0% { opacity: 0.15; transform: scale(0.9); }
+      100% { opacity: 0.35; transform: scale(1.1); }
+    }
+
+    .stadium-led-screen.left-screen {
+      left: 14%;
+    }
+
+    .stadium-led-screen.right-screen {
+      right: 14%;
+      border-color: var(--border-gold);
+      box-shadow: 0 0 15px rgba(255, 203, 5, 0.15), inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    /* Fire Geysers / Smoke Columns in distance */
+    .fire-geyser {
+      position: absolute;
+      width: 8px;
+      height: 120px;
+      background: linear-gradient(to top, #ff3d00, #ffb300, transparent);
+      bottom: 220px;
+      z-index: 0;
+      filter: blur(4px);
+      opacity: 0.4;
+      animation: geyserSpurt 5s ease-in-out infinite alternate;
+    }
+
+    .fire-geyser.left-geyser { left: 32%; animation-delay: 1.5s; }
+    .fire-geyser.right-geyser { right: 32%; }
+
+    @keyframes geyserSpurt {
+      0% { height: 60px; opacity: 0.2; }
+      100% { height: 160px; opacity: 0.55; }
+    }
+
+    /* Shared navbar styling is linked in navbar.css */
+
+    /* MAIN CONTAINER SETUP */
+    main.page {
+      max-width: 1220px;
+      width: 94vw;
+      height: calc(100vh - 90px);
+      margin: 80px auto 10px;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 250px 1fr 290px; /* Reference Spacing Layout */
+      grid-template-rows: 1fr 140px; /* Viewport + bottom controls */
+      gap: 14px;
+    }
+
+    /* SIDE PANEL GLASSMORPHISM & NEON BORDERS */
+    .glass-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-blue);
+      border-radius: 18px;
+      padding: 10px 12px;
+      backdrop-filter: blur(16px);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), 
+                  0 10px 30px rgba(0, 0, 0, 0.6),
+                  0 0 20px rgba(12, 112, 255, 0.16);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .glass-panel.gold-themed {
+      border-color: var(--border-gold);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), 
+                  0 10px 30px rgba(0, 0, 0, 0.6),
+                  0 0 20px rgba(255, 203, 5, 0.12);
+    }
+
+    .panel-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--yellow);
+      letter-spacing: 0.08em;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 6px;
+    }
+
+    /* LEFT SIDEBAR: MY TEAM LIST */
+    .left-sidebar {
+      grid-row: 1 / 2;
+    }
+
+    .team-list-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .team-member-card {
+      background: rgba(5, 8, 18, 0.55);
+      border: 1.2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s;
+      height: 100px;
+    }
+
+    .team-member-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .team-member-avatar {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+
+    .team-member-name {
+      font-weight: 800;
+      font-size: 0.65rem;
+      color: #fff;
+      margin-top: 1px;
+    }
+
+    .team-member-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      font-size: 0.55rem;
+      color: var(--text-gray);
+    }
+
+    .team-member-lvl {
+      font-weight: 700;
+    }
+
+    .team-member-hp-bar {
+      width: 90%;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 3px;
+      margin-bottom: 2px;
+    }
+
+    .team-member-hp-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+      transition: width 0.3s ease-out;
+    }
+
+    /* RIGHT SIDEBAR: BAG ITEMS */
+    .right-sidebar {
+      grid-row: 1 / 2;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bag-container-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .bag-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .bag-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5, 8, 18, 0.45);
+      border: 1.2px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.68rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .bag-item-row:hover, .bag-item-row.selected {
+      border-color: var(--yellow);
+      background: rgba(255, 203, 5, 0.05);
+    }
+
+    .bag-item-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+
+    .bag-item-qty {
+      color: var(--yellow);
+      font-weight: 800;
+    }
+
+    .bag-use-btn {
+      width: 100%;
+      height: 28px;
+      background: linear-gradient(180deg, var(--yellow) 0%, #d49a00 100%);
+      border: none;
+      border-radius: 6px;
+      color: #000;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      margin-top: 6px;
+      box-shadow: 0 4px 10px rgba(255, 203, 5, 0.25);
+      transition: all 0.2s;
+    }
+
+    .bag-use-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(255, 203, 5, 0.4);
+    }
+
+    .weather-panel-card {
+      height: auto;
+      padding: 8px 10px;
+    }
+
+    .weather-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    .weather-item {
+      text-align: left;
+    }
+
+    .weather-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .weather-effect {
+      font-size: 0.58rem;
+      color: var(--text-gray);
+    }
+
+    .weather-icon-indicator {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .weather-icon-indicator svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--yellow);
+    }
+
+    /* CENTER COLUMN: BATTLE VIEWPORT */
+    .center-viewport {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 0;
+      perspective: 1200px; /* Enable realistic 3D perspective rotation */
+    }
+
+    /* TOP HUD: PLAYER & OPPONENT STATUS CARDS */
+    .battle-hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 10px;
+      z-index: 5;
+    }
+
+    .hud-status-card {
+      width: 235px;
+      background: rgba(6, 12, 28, 0.9);
+      border: 1.5px solid var(--border-blue);
+      border-radius: 16px;
+      padding: 8px 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .hud-status-card.player-card {
+      border-left: 3.5px solid var(--yellow);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(12, 112, 255, 0.15);
+    }
+
+    .hud-status-card.opponent-card {
+      border-right: 3.5px solid var(--red);
+      flex-direction: row-reverse;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 61, 0, 0.1);
+    }
+
+    .hud-avatar-frame {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid var(--border-color, var(--yellow));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 0 10px var(--border-color, var(--yellow));
+    }
+
+    .hud-pkmn-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .hud-details-block {
+      flex: 1;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hud-status-card.opponent-card .hud-details-block {
+      text-align: right;
+    }
+
+    .hud-name-row {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 0.72rem;
+      color: #fff;
+    }
+
+    .hud-status-card.opponent-card .hud-name-row {
+      flex-direction: row-reverse;
+    }
+
+    .hud-gender-male { color: #38bdf8; margin-left: 4px; }
+    .hud-gender-female { color: #f472b6; margin-left: 4px; }
+
+    .hud-hp-bar-outer {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .hud-hp-bar-inner {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+      transition: width 0.5s ease-out; /* Smooth HP meter drain */
+    }
+
+    .hud-hp-text {
+      font-size: 0.55rem;
+      color: var(--text-gray);
+      margin-top: 1px;
+    }
+
+    .hud-xp-bar-outer {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .hud-xp-bar-inner {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 99px;
+    }
+
+    .hud-pokeball-row {
+      display: flex;
+      gap: 3px;
+      margin-top: 3px;
+    }
+
+    .hud-status-card.opponent-card .hud-pokeball-row {
+      justify-content: flex-end;
+    }
+
+    .hud-mini-pokeball {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 1px solid #fff;
+      opacity: 0.8;
+    }
+
+    .hud-mini-pokeball.spent {
+      background: #475569;
+      border-color: #64748b;
+    }
+
+    /* TURN INDICATOR (Hexagonal Center Panel) */
+    .hud-turn-indicator {
+      width: 72px;
+      height: 48px;
+      background: rgba(5, 8, 18, 0.85);
+      border: 1.5px solid var(--border-blue);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(12, 112, 255, 0.4);
+      z-index: 5;
+    }
+
+    .turn-label {
+      font-size: 0.5rem;
+      color: var(--text-gray);
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .turn-number {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      color: var(--yellow);
+      line-height: 1;
+    }
+
+    /* CENTER STAGE: BATTLE PEDESTALS & LARGE POKEMON MODELS */
+    .battle-field-stage {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      animation: cameraIdle 16s ease-in-out infinite alternate; /* Live-action sweeping camera simulation */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.8s ease-in-out;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    @keyframes cameraIdle {
+      0% { transform: scale(1.0) rotate(0.08deg) translateY(0); }
+      100% { transform: scale(1.015) rotate(-0.08deg) translateY(-2px); }
+    }
+
+    /* Lava Battlefield Floor with Magma cracks */
+    .lava-battle-floor {
+      position: absolute;
+      left: 2%;
+      right: 2%;
+      bottom: 8%;
+      height: 180px;
+      background: radial-gradient(ellipse at center, rgba(255, 60, 0, 0.45) 0%, rgba(20, 5, 2, 0.95) 80%);
+      border-radius: 50%;
+      border: 2px solid rgba(255, 60, 0, 0.35);
+      box-shadow: 0 0 45px rgba(255, 60, 0, 0.4), inset 0 0 30px rgba(255, 60, 0, 0.25);
+      z-index: 0;
+      overflow: hidden;
+      transform: rotateX(25deg);
+      pointer-events: none;
+    }
+
+    .magma-crack-svg {
+      width: 100%;
+      height: 100%;
+      opacity: 0.85;
+      animation: magmaPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes magmaPulse {
+      0% { filter: drop-shadow(0 0 2px #ff4500) brightness(1); opacity: 0.7; }
+      100% { filter: drop-shadow(0 0 10px #ff0000) brightness(1.3); opacity: 0.95; }
+    }
+
+    /* Embedded 3D Battle Platforms (Merged flush into the lava floor) */
+    .battle-pedestal-3d {
+      position: absolute;
+      background: radial-gradient(ellipse at center, rgba(16, 24, 48, 0.4) 0%, rgba(8, 12, 24, 0.8) 70%, transparent 100%);
+      border: 2.5px solid var(--arena-border); /* Flush glowing border ring */
+      border-radius: 50%;
+      box-shadow: inset 0 0 9px var(--arena-glow),
+                  0 0 15px var(--arena-glow); /* Reduced platform blur and glow opacity by 35% */
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotateX(25deg) translate3d(0, 0, 0); /* Isometric Angle Tilt */
+      will-change: transform, opacity;
+    }
+
+    .pedestal-neon-core {
+      position: absolute;
+      width: 82%;
+      height: 82%;
+      border-radius: 50%;
+      border: 1.5px solid var(--arena-border);
+      box-shadow: inset 0 0 8px var(--arena-glow), 0 0 6px var(--arena-glow);
+      opacity: 0.45; /* Reduced platform core opacity by 25% */
+      animation: corePulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes corePulse {
+      0% { opacity: 0.25; box-shadow: inset 0 0 4px var(--arena-glow); }
+      100% { opacity: 0.5; box-shadow: inset 0 0 12px var(--arena-glow); }
+    }
+
+    /* Platform slots and stable anchoring system */
+    .player-slot {
+      position: absolute;
+      left: 8%;
+      bottom: 20%;
+      width: 220px;
+      height: 280px;
+      z-index: 1;
+      overflow: visible !important;
+    }
+
+    .opponent-slot {
+      position: absolute;
+      right: 10%;
+      top: 36%;
+      width: 250px;
+      height: 280px;
+      z-index: 1;
+      overflow: visible !important;
+    }
+
+    .battle-pedestal-3d.player-pedestal {
+      width: 220px;
+      height: 55px;
+      left: calc(6% - 40px);
+      bottom: 20%;
+      --arena-glow: rgba(0, 229, 255, 0.27);
+      --arena-border: #00bcd4;
+    }
+
+    .battle-pedestal-3d.opponent-pedestal {
+      width: 250px;
+      height: 62px;
+      right: calc(8% - 70px);
+      bottom: 44%;
+      --arena-glow: rgba(239, 68, 68, 0.30);
+      --arena-border: #ef4444;
+    }
+
+    .pedestal-neon-core {
+      position: absolute;
+      width: 82%;
+      height: 82%;
+      border-radius: 50%;
+      border: 1.5px solid var(--arena-border);
+      box-shadow: inset 0 0 8px var(--arena-glow), 0 0 6px var(--arena-glow);
+      opacity: 0.45;
+      animation: corePulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes corePulse {
+      0% { opacity: 0.25; box-shadow: inset 0 0 4px var(--arena-glow); }
+      100% { opacity: 0.5; box-shadow: inset 0 0 12px var(--arena-glow); }
+    }
+
+    /* Realistic Drop Shadows cast onto platforms */
+    .pkmn-shadow {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 50%;
+      z-index: 3;
+      filter: blur(5px);
+      pointer-events: none;
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+    }
+
+    .pkmn-shadow.player-shadow {
+      width: 120px;
+      height: 30px;
+      left: calc(11% - 40px);
+      bottom: 21%;
+      animation: shadowBreath 3.5s ease-in-out infinite alternate;
+    }
+
+    .pkmn-shadow.opponent-shadow {
+      width: 130px;
+      height: 32px;
+      right: calc(14% - 70px);
+      bottom: calc(45.5% - 18px);
+      animation: shadowBreathOpponent 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes shadowBreath {
+      0% { transform: scale(1); opacity: 0.75; }
+      100% { transform: scale(0.85); opacity: 0.45; }
+    }
+
+    @keyframes shadowBreathOpponent {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(0.88); opacity: 0.45; }
+    }
+
+    /* Active Pokémon Sprites (Enlarged by 45%) */
+    .battle-pokemon-sprite {
+      position: absolute;
+      width: 240px; /* Scaled up 45% */
+      height: 240px; /* Scaled up 45% */
+      object-fit: contain;
+      z-index: 3;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65));
+      transform-origin: bottom center;
+      transition: transform 0.3s ease-out, opacity 0.3s;
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+    }
+
+    .battle-pokemon-sprite.player-pkmn {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      left: calc(5% - 40px);
+      bottom: 22%;
+      transform: scaleX(-1); /* Face right */
+      z-index: 3;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 10px rgba(12, 112, 255, 0.15)); /* Dynamic blue player backlight */
+      animation: pikachuIdle 4s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+      transition: transform 0.3s ease-out, opacity 0.3s;
+    }
+
+    .battle-pokemon-sprite.opponent-pkmn {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: calc(8.5% - 70px);
+      bottom: calc(46% - 18px); /* Center and align Charizard feet naturally inside opponent container */
+      z-index: 3;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 12px rgba(255, 60, 0, 0.2)); /* Dynamic orange volcanic backlight */
+      animation: charizardIdle 4.5s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+      transition: transform 0.3s ease-out, opacity 0.3s;
+    }
+
+    @keyframes pikachuIdle {
+      0% { transform: translateY(0) scaleX(-1) rotate(0deg); }
+      50% { transform: translateY(-7px) scaleX(-0.98) scaleY(1.02) rotate(1deg); }
+      100% { transform: translateY(0) scaleX(-1) rotate(0deg); }
+    }
+
+    @keyframes charizardIdle {
+      0% { transform: translateY(0) scale(1) rotate(0deg) skewX(0deg); }
+      50% { transform: translateY(-6px) scale(1.02) rotate(-1.5deg) skewX(1deg); }
+      100% { transform: translateY(0) scale(1) rotate(0deg) skewX(0deg); }
+    }
+
+    /* Target hit red flashing animation */
+    .flash-red {
+      animation: flashRedAnim 0.15s ease-out 3;
+    }
+    @keyframes flashRedAnim {
+      0%, 100% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) brightness(1); }
+      50% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) sepia(1) hue-rotate(-50deg) saturate(8) brightness(1.4); }
+    }
+    .player-pkmn.flash-red {
+      animation: flashRedPlayerAnim 0.15s ease-out 3;
+    }
+    @keyframes flashRedPlayerAnim {
+      0%, 100% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 10px rgba(12, 112, 255, 0.15)) brightness(1); }
+      50% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.65)) sepia(1) hue-rotate(-50deg) saturate(8) brightness(1.4); }
+    }
+
+    /* Screen Flash Effect Class */
+    body.screen-flash::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 9999;
+      opacity: 0.8;
+      pointer-events: none;
+      animation: flashFade 0.2s ease-out forwards;
+    }
+    @keyframes flashFade {
+      0% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+
+    /* Jumps & Shakes animations classes */
+    .animate-jump {
+      animation: jumpAnim 0.5s ease-out;
+    }
+    @keyframes jumpAnim {
+      0% { transform: translateY(0) scaleX(-1); }
+      50% { transform: translateY(-50px) scaleX(-1); }
+      100% { transform: translateY(0) scaleX(-1); }
+    }
+    .battle-pokemon-sprite.opponent-pkmn.animate-jump {
+      animation: jumpAnimOpponent 0.5s ease-out;
+    }
+    @keyframes jumpAnimOpponent {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-50px) scale(1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .shake-stage {
+      animation: shakeStageAnim 0.6s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shakeStageAnim {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
+    /* Faint animations */
+    .animate-faint {
+      animation: faintAnim 0.8s ease-in forwards !important;
+    }
+    @keyframes faintAnim {
+      0% { transform: translateY(0) scaleY(1); opacity: 1; }
+      100% { transform: translateY(180px) scaleY(0.2); opacity: 0; }
+    }
+    .battle-pokemon-sprite.player-pkmn.animate-faint {
+      animation: faintAnimPlayer 0.8s ease-in forwards !important;
+    }
+    @keyframes faintAnimPlayer {
+      0% { transform: translateY(0) scaleX(-1); opacity: 1; }
+      100% { transform: translateY(180px) scaleX(-1) scaleY(0.2); opacity: 0; }
+    }
+
+    /* Floating Damage numbers popup styles */
+    .damage-popup {
+      position: absolute;
+      color: #ff3d00;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      text-shadow: 0 0 10px #000, 0 0 5px #000;
+      pointer-events: none;
+      z-index: 100;
+      animation: floatUpFade 1.2s ease-out forwards;
+    }
+    .damage-popup.super-effective {
+      color: #ffcb05;
+      font-size: 1.6rem;
+    }
+    .damage-popup.player-side {
+      left: 20%;
+      bottom: 35%;
+    }
+    .damage-popup.opponent-side {
+      right: 20%;
+      top: 20%;
+    }
+    @keyframes floatUpFade {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      15% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+      85% { transform: translateY(-40px) scale(1); opacity: 1; }
+      100% { transform: translateY(-55px) scale(0.9); opacity: 0; }
+    }
+
+    /* Victory / Defeat Modal Screen */
+    .battle-result-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 3, 9, 0.85);
+      z-index: 10000;
+      display: none; /* Hidden by default */
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(20px);
+    }
+    .battle-result-modal {
+      width: min(480px, 90vw);
+      background: rgba(6, 12, 28, 0.95);
+      border: 2px solid var(--border-blue);
+      border-radius: 24px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(12, 112, 255, 0.3);
+      transform: scale(0.9);
+      animation: modalEntrance 0.5s cubic-bezier(0.25, 1, 0.2, 1) forwards;
+    }
+    @keyframes modalEntrance {
+      to { transform: scale(1); }
+    }
+    .battle-result-modal.win {
+      border-color: var(--border-gold);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 203, 5, 0.4);
+    }
+    .result-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+    .result-title.win {
+      color: var(--yellow);
+      text-shadow: 0 0 15px rgba(255, 203, 5, 0.6);
+    }
+    .result-title.lose {
+      color: var(--red);
+      text-shadow: 0 0 15px rgba(255, 61, 0, 0.6);
+    }
+    .result-body {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    .result-btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .result-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s;
+    }
+    .result-btn.restart-btn {
+      background: linear-gradient(180deg, var(--yellow) 0%, #d49a00 100%);
+      color: #000;
+      box-shadow: 0 4px 12px rgba(255, 203, 5, 0.3);
+    }
+    .result-btn.restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(255, 203, 5, 0.45);
+    }
+    .result-btn.map-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .result-btn.map-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* BOTTOM ROW: COMBAT CONTROLS & BATTLE LOG */
+    .bottom-row-panel {
+      grid-column: 1 / 4;
+      grid-row: 2 / 3;
+      display: grid;
+      grid-template-columns: 250px 1fr 290px; /* Matched top column widths */
+      gap: 14px;
+      height: 100%;
+    }
+
+    /* Panel A: Battle Log */
+    .battle-log-panel {
+      height: 100%;
+    }
+
+    .battle-log-ticker {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      overflow-y: auto;
+      font-size: 0.65rem;
+      text-align: left;
+    }
+
+    .log-line {
+      border-left: 2.5px solid rgba(255,255,255,0.15);
+      padding-left: 6px;
+      line-height: 1.3;
+    }
+
+    .log-line.system { color: var(--text-gray); }
+    .log-line.player-action { color: var(--yellow); border-left-color: var(--yellow); }
+    .log-line.opponent-action { color: #f87171; border-left-color: #f87171; }
+    .log-line.effect { color: var(--green); border-left-color: var(--green); }
+
+    /* Panel B: Center Fight Controls */
+    .fight-controls-panel {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .moves-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .move-btn-slot {
+      background: rgba(5, 8, 18, 0.45);
+      border: 1.5px solid var(--border-blue);
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .move-btn-slot:hover {
+      transform: translateY(-2px);
+      border-color: var(--yellow);
+      background: rgba(255, 203, 5, 0.05);
+    }
+
+    .move-name-row {
+      font-weight: 800;
+      font-size: 0.72rem;
+      color: #fff;
+    }
+
+    .move-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      width: 100%;
+    }
+
+    .move-type-badge {
+      font-size: 0.5rem;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .move-pp-value {
+      font-size: 0.58rem;
+      color: var(--text-gray);
+      margin-left: auto;
+    }
+
+    /* Hexagonal Fight Controller Row */
+    .fight-action-column {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: space-between;
+    }
+
+    .hex-fight-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #0e56c5 0%, #032b70 100%);
+      border: 1.5px solid var(--blue);
+      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(12, 112, 255, 0.3);
+      transition: all 0.25s;
+    }
+
+    .hex-fight-btn:hover {
+      background: linear-gradient(135deg, #1c72ff 0%, #0d4ab5 100%);
+      box-shadow: 0 0 25px rgba(12, 112, 255, 0.6);
+      transform: scale(1.03);
+    }
+
+    .aux-controls-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      height: 28px;
+    }
+
+    .aux-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.65rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .aux-btn:hover {
+      background: rgba(255, 203, 5, 0.08);
+      border-color: var(--yellow);
+    }
+
+    /* Panel C: Arena Switcher Card */
+    .arena-settings-panel {
+      height: 100%;
+    }
+
+    .arena-select-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 2px;
+      text-align: left;
+    }
+
+    .arena-select-label {
+      font-size: 0.58rem;
+      color: var(--text-gray);
+    }
+
+    .arena-dropdown-control {
+      width: 100%;
+      height: 26px;
+      background: rgba(5, 8, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0 6px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .arena-dropdown-control:hover {
+      border-color: var(--yellow);
+    }
+
+    .arena-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 0.62rem;
+      text-align: left;
+    }
+
+    .arena-stat-label {
+      color: var(--text-gray);
+    }
+
+    .arena-stat-value {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* CUSTOM TYPES STYLING PILLS */
+    .type-electric { background-color: #eab308; color: #000; }
+    .type-fire { background-color: #ef4444; color: #fff; }
+    .type-flying { background-color: #38bdf8; color: #000; }
+    .type-dragon { background-color: #a855f7; color: #fff; }
+    .type-ground { background-color: #b45309; color: #fff; }
+    .type-fighting { background-color: #f97316; color: #fff; }
+    .type-steel { background-color: #94a3b8; color: #000; }
+    .type-psychic { background-color: #ec4899; color: #fff; }
+    .type-fairy { background-color: #f472b6; color: #000; }
+    .type-water { background-color: #3b82f6; color: #fff; }
+    .type-dark { background-color: #1e293b; color: #fff; }
+    .type-normal { background-color: #78716c; color: #fff; }
+
+    /* CUSTOM TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid var(--yellow);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 203, 5, 0.25);
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.2, 1);
+    }
+
+    #toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  
+    /* Lightweight Poké Ball Capture CSS Animation */
+    .capture-ball {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ef4444 40%, #7f1d1d 100%);
+      border: 2px solid #000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(239, 68, 68, 0.4);
+      z-index: 9999;
+      pointer-events: none;
+      animation: ballCaptureAnimation 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    /* The animation does: Move from player to opponent pedestal -> bounce -> shake 3 times */
+    @keyframes ballCaptureAnimation {
+      0% {
+        left: 20%;
+        bottom: 30%;
+        transform: scale(1) rotate(0deg);
+      }
+      25% {
+        left: 78%;
+        top: 32%;
+        transform: scale(1.1) rotate(360deg);
+      }
+      35% {
+        left: 78%;
+        top: 42%; /* land on platform */
+        transform: scale(1) rotate(540deg);
+      }
+      /* Bounce slightly */
+      40% {
+        top: 38%;
+        transform: scale(1) rotate(600deg);
+      }
+      45% {
+        top: 42%;
+        transform: scale(1) rotate(720deg);
+      }
+      /* Shake 1 */
+      55% {
+        transform: translate(-4px, 0) rotate(700deg);
+      }
+      60% {
+        transform: translate(4px, 0) rotate(740deg);
+      }
+      65% {
+        transform: translate(0, 0) rotate(720deg);
+      }
+      /* Shake 2 */
+      75% {
+        transform: translate(-4px, 0) rotate(700deg);
+      }
+      80% {
+        transform: translate(4px, 0) rotate(740deg);
+      }
+      85% {
+        transform: translate(0, 0) rotate(720deg);
+      }
+      /* Shake 3 */
+      90% {
+        transform: translate(-3px, 0) rotate(705deg);
+      }
+      95% {
+        transform: translate(3px, 0) rotate(735deg);
+      }
+      100% {
+        transform: translate(0, 0) rotate(720deg);
+      }
+    }
+</style>
+
+  <script src="game-sync.js"></script>
+</head>
+<body>
+
+  <!-- Arena Backdrop Container -->
+  <div id="arena-backdrop"></div>
+
+  <!-- Volcano Ambient Heat Glow -->
+  <div class="volcano-glow-overlay"></div>
+
+  <!-- Lava flicker reflections -->
+  <div class="lava-reflection-overlay"></div>
+
+  <!-- Volumetric Lighting Cones -->
+  <div class="spotlight-overlay">
+    <div class="light-beam-left"></div>
+    <div class="light-beam-right"></div>
+  </div>
+
+  <!-- Heat Distortion Wave Effect -->
+  <div class="heat-distortion"></div>
+
+  <!-- Atmospheric Fog Layer -->
+  <div class="arena-fog-layer"></div>
+
+  <!-- Sparks & Particles -->
+  <div id="sparks-container"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.href='index.html'">
+      <svg class="pokeball-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:8px;display:inline-block;filter:drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));">
+        <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="8" />
+        <path d="M 50,50 M 2,50 A 48,48 0 0,1 98,50 Z" fill="#ff1c1c" stroke="#000" stroke-width="8" />
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="8" />
+        <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2" />
+      </svg>
+      Pokémon Nexus
+      <span id="trainerWelcome" style="font-size:13px;color:#ffd86b;margin-left:10px"></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pokedex.html">Pokédex</a>
+      <a href="battle.html" class="active">Battle</a>
+      <a href="kingdom-map.html">Kingdom Map</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="achievements.html">Achievements</a>
+      <a href="events.html">Events</a>
+      <a href="admin/admin.html" id="adminLink" style="display:none">Admin</a>
+      <!-- Active Trainer Avatar inside navbar -->
+      <div class="trainer-profile-card-nav" onclick="location.href='profile.html'">
+        <div class="trainer-avatar-nav" id="nav-trainer-avatar"></div>
+        <div class="trainer-info-block-nav">
+          <span class="trainer-info-name-nav" id="nav-trainer-name">Trainer</span>
+          <span class="trainer-info-level-nav" id="nav-trainer-level">Level 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="fire-strip"></div>
+  </nav>
+
+  <main class="page">
+    
+    <!-- LEFT COLUMN: MY TEAM -->
+    <aside class="glass-panel left-sidebar gold-themed">
+      <h3 class="panel-title">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/></svg>
+        MY TEAM
+      </h3>
+      <div class="team-list-container" id="team-sidebar-list">
+        <!-- Populated Dynamically -->
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: BATTLE VIEWPORT -->
+    <div class="center-viewport">
+      
+      <!-- Top HUD Status Cards & Turn Counter -->
+      <div class="battle-hud-header">
+        
+        <!-- Player Pokémon HUD Card -->
+        <div class="hud-status-card player-card">
+          <div class="hud-avatar-frame" style="--border-color: var(--yellow);">
+            <img class="hud-pkmn-thumb" id="player-hud-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="PKMN">
+          </div>
+          <div class="hud-details-block">
+            <div class="hud-name-row">
+              <span id="player-hud-name">Pikachu</span>
+              <span id="player-hud-lvl">Lv. 80</span>
+            </div>
+            <div class="hud-hp-bar-outer">
+              <div class="hud-hp-bar-inner" id="player-hud-hp-fill" style="width: 83%;"></div>
+            </div>
+            <div class="hud-hp-text"><span id="player-hud-hp-val">192</span> / 230 EXP</div>
+            <div class="hud-xp-bar-outer">
+              <div class="hud-xp-bar-inner" style="width: 60%;"></div>
+            </div>
+            <!-- Spent Pokéballs representing roster status -->
+            <div class="hud-pokeball-row" id="player-hud-balls">
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball spent"></div>
+              <div class="hud-mini-pokeball spent"></div>
+              <div class="hud-mini-pokeball spent"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Turn Panel -->
+        <div class="hud-turn-indicator">
+          <span class="turn-label">TURN</span>
+          <span class="turn-number" id="battle-turn-counter">07</span>
+        </div>
+
+        <!-- Opponent Pokémon HUD Card -->
+        <div class="hud-status-card opponent-card">
+          <div class="hud-avatar-frame" style="--border-color: var(--red);">
+            <img class="hud-pkmn-thumb" id="opponent-hud-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" alt="PKMN">
+          </div>
+          <div class="hud-details-block">
+            <div class="hud-name-row">
+              <span id="opponent-hud-name">Charizard</span>
+              <span id="opponent-hud-lvl">Lv. 82</span>
+            </div>
+            <div class="hud-hp-bar-outer">
+              <div class="hud-hp-bar-inner" id="opponent-hud-hp-fill" style="width: 40%;"></div>
+            </div>
+            <div class="hud-hp-text"><span id="opponent-hud-hp-val">98</span> / 240 EXP</div>
+            <div class="hud-xp-bar-outer">
+              <div class="hud-xp-bar-inner" style="width: 45%;"></div>
+            </div>
+            <!-- Opponent Spent Pokéballs -->
+            <div class="hud-pokeball-row" id="opponent-hud-balls">
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball"></div>
+              <div class="hud-mini-pokeball spent"></div>
+              <div class="hud-mini-pokeball spent"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Battle platforms and dynamic character cutout placements -->
+      <div class="battle-field-stage">
+        <!-- Precreated Capture Ball element to prevent DOM recreating overhead -->
+        <div class="capture-ball" id="battle-capture-ball" style="display: none; pointer-events: none; z-index: 9;"></div>
+        
+        <!-- Giant Stadium Background LED screens (Scanlined Stadium Displays) -->
+        <div class="stadium-led-screen left-screen">
+          <svg class="stadium-led-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(12, 112, 255, 0.4)" stroke-width="4" />
+            <path d="M 4,50 A 46,46 0 0,1 96,50 Z" fill="none" stroke="rgba(12, 112, 255, 0.4)" stroke-width="4" />
+            <circle cx="50" cy="50" r="16" fill="none" stroke="rgba(12, 112, 255, 0.4)" stroke-width="4" />
+          </svg>
+        </div>
+        
+        <div class="stadium-led-screen right-screen">
+          <svg class="stadium-led-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255, 203, 5, 0.3)" stroke-width="4" />
+            <path d="M 4,50 A 46,46 0 0,1 96,50 Z" fill="none" stroke="rgba(255, 203, 5, 0.3)" stroke-width="4" />
+            <circle cx="50" cy="50" r="16" fill="none" stroke="rgba(255, 203, 5, 0.3)" stroke-width="4" />
+          </svg>
+        </div>
+
+        <!-- Fire Geysers in Stadium backdrop background -->
+        <div class="fire-geyser left-geyser"></div>
+        <div class="fire-geyser right-geyser"></div>
+
+        <!-- Lava battlefield floor with pulsing magma cracks -->
+        <div class="lava-battle-floor">
+          <svg class="magma-crack-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M10,20 Q35,55 50,15 T95,75" stroke="#ff3000" stroke-width="3.5" fill="none"/>
+            <path d="M5,75 Q45,35 85,55" stroke="#ff6b00" stroke-width="3" fill="none"/>
+            <path d="M30,5 Q55,45 75,95" stroke="#ff8b00" stroke-width="2.5" fill="none"/>
+          </svg>
+        </div>
+        
+        <!-- Player premium 3D platform (Merged flush into the lava floor) -->
+        <div class="battle-pedestal-3d player-pedestal">
+          <div class="pedestal-neon-core"></div>
+        </div>
+        <div class="pkmn-shadow player-shadow"></div>
+        <img class="battle-pokemon-sprite player-pkmn" id="stage-player-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="Player PKMN">
+
+        <!-- Opponent premium 3D platform (Merged flush into the lava floor) -->
+        <div class="battle-pedestal-3d opponent-pedestal">
+          <div class="pedestal-neon-core"></div>
+        </div>
+        <div class="pkmn-shadow opponent-shadow"></div>
+        <img class="battle-pokemon-sprite opponent-pkmn" id="stage-opponent-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" alt="Opponent PKMN">
+
+        <!-- Combat Effect Canvas Overlay for moves particles -->
+        <canvas id="battle-animation-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;"></canvas>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR: BAG ITEMS -->
+    <aside class="glass-panel right-sidebar">
+      
+      <!-- Bag items card -->
+      <div class="bag-container-card glass-panel" style="flex: 1; padding: 0; border: none; box-shadow: none; background: transparent;">
+        <h3 class="panel-title">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="margin-right:2px;"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h2v2h-2V4zm8 15H4V8h16v11z"/></svg>
+          BAG INVENTORY
+        </h3>
+        <div class="bag-items-list" id="bag-sidebar-list">
+          <!-- Populated dynamically -->
+        </div>
+        <button class="bag-use-btn" onclick="useItem()">USE ITEM</button>
+      </div>
+
+      <!-- Current Weather Status card -->
+      <div class="glass-panel weather-panel-card">
+        <h3 class="panel-title" style="margin-bottom: 6px; border-bottom: none; padding-bottom: 0;">WEATHER & FIELD</h3>
+        <div class="weather-info-row">
+          <div class="weather-item">
+            <span class="weather-title" id="weather-title-txt">Sunny</span>
+            <div class="weather-effect" id="weather-desc-txt">Fire attacks boosted by 50%</div>
+          </div>
+          <div class="weather-icon-indicator" id="weather-icon-bubble">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- BOTTOM ROW PANEL GRID -->
+    <div class="bottom-row-panel">
+      
+      <!-- Panel A: Battle Log -->
+      <section class="glass-panel battle-log-panel">
+        <h3 class="panel-title">BATTLE LOG</h3>
+        <div class="battle-log-ticker" id="battle-log-lines">
+          <div class="log-line system">Battle started in Volcano Arena!</div>
+          <div class="log-line player-action">Pikachu used Thunderbolt!</div>
+          <div class="log-line effect">It's super effective!</div>
+          <div class="log-line opponent-action">Charizard took 128 damage!</div>
+        </div>
+      </section>
+
+      <!-- Panel B: Center Fight Controls & Moves -->
+      <section class="glass-panel fight-controls-panel gold-themed">
+        
+        <div class="moves-grid" id="fight-moves-box">
+          <!-- Populated Dynamically -->
+        </div>
+
+        <div class="fight-action-column">
+          <button class="hex-fight-btn" onclick="triggerFightAttack()">FIGHT</button>
+          <div class="aux-controls-row">
+            <button class="aux-btn" onclick="triggerBagTab()">BAG</button>
+            <button class="aux-btn" onclick="triggerRunAway()">RUN</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Panel C: Arena Switcher settings panel -->
+      <section class="glass-panel arena-settings-panel">
+        <h3 class="panel-title">ARENA SETTINGS</h3>
+        
+        <div class="arena-select-row">
+          <span class="arena-select-label">Select Battle Arena</span>
+          <select class="arena-dropdown-control" id="arenaSelect">
+            <option value="Volcano Arena">Volcano Arena</option>
+            <option value="Forest Arena">Forest Arena</option>
+            <option value="Snow Arena">Snow Arena</option>
+            <option value="Beach Arena">Beach Arena</option>
+            <option value="Ancient Temple">Ancient Temple</option>
+            <option value="Night Arena">Night Arena</option>
+          </select>
+        </div>
+
+        <div class="arena-stats-grid">
+          <span class="arena-stat-label">Active Field:</span>
+          <span class="arena-stat-value" id="field-modifier-val">Magma Shield</span>
+          
+          <span class="arena-stat-label">Wind Velocity:</span>
+          <span class="arena-stat-value" id="field-wind-val">12 mph</span>
+          
+          <span class="arena-stat-label">Gravity Scale:</span>
+          <span class="arena-stat-value">1.0x</span>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast">Message</div>
+
+  <!-- Victory / Defeat Modal -->
+  <div class="battle-result-overlay" id="result-modal-overlay">
+    <div class="battle-result-modal" id="result-modal-card">
+      <h2 class="result-title" id="result-modal-title">VICTORY</h2>
+      <p class="result-body" id="result-modal-text">You defeated the opponent trainer!</p>
+      <div id="pokemon-select-container" style="display: none; margin: 15px 0; text-align: left; width: 100%;">
+        <label for="next-pokemon-select" style="display: block; font-size: 0.85rem; color: var(--text-gray); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Choose your next Pokémon:</label>
+        <select id="next-pokemon-select" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white; font-size: 0.95rem; font-weight: bold; cursor: pointer; outline: none; transition: border-color 0.2s;"></select>
+      </div>
+      <div class="result-btn-row">
+        <button class="result-btn restart-btn" onclick="resetBattleGame()">BATTLE AGAIN</button>
+        <button class="result-btn map-btn" onclick="location.href='kingdom-map.html'">GO TO MAP</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exact list of 6 player Pokémon matching profile and reference
+    // Performance Optimization DOM Cache & Preloader
+    const domCache = {
+      playerSprite: null,
+      opponentSprite: null,
+      battleFieldStage: null,
+      playerPedestal: null,
+      opponentPedestal: null,
+      playerHudName: null,
+      playerHudLvl: null,
+      playerHudSprite: null,
+      playerHudHpVal: null,
+      playerHudHpFill: null,
+      opponentHudName: null,
+      opponentHudLvl: null,
+      opponentHudSprite: null,
+      opponentHudHpVal: null,
+      opponentHudHpFill: null,
+      battleTurnCounter: null,
+      battleLogLines: null,
+      resultModalOverlay: null,
+      resultModalCard: null,
+      resultModalTitle: null,
+      resultModalText: null,
+      arenaSelect: null
+    };
+
+    function initDomCache() {
+      domCache.playerSprite = document.getElementById("stage-player-sprite");
+      domCache.opponentSprite = document.getElementById("stage-opponent-sprite");
+      domCache.battleFieldStage = document.querySelector(".battle-field-stage");
+      domCache.playerPedestal = document.querySelector(".player-pedestal");
+      domCache.opponentPedestal = document.querySelector(".opponent-pedestal");
+      domCache.playerHudName = document.getElementById("player-hud-name");
+      domCache.playerHudLvl = document.getElementById("player-hud-lvl");
+      domCache.playerHudSprite = document.getElementById("player-hud-sprite");
+      domCache.playerHudHpVal = document.getElementById("player-hud-hp-val");
+      domCache.playerHudHpFill = document.getElementById("player-hud-hp-fill");
+      domCache.opponentHudName = document.getElementById("opponent-hud-name");
+      domCache.opponentHudLvl = document.getElementById("opponent-hud-lvl");
+      domCache.opponentHudSprite = document.getElementById("opponent-hud-sprite");
+      domCache.opponentHudHpVal = document.getElementById("opponent-hud-hp-val");
+      domCache.opponentHudHpFill = document.getElementById("opponent-hud-hp-fill");
+      domCache.battleTurnCounter = document.getElementById("battle-turn-counter");
+      domCache.battleLogLines = document.getElementById("battle-log-lines");
+      domCache.resultModalOverlay = document.getElementById("result-modal-overlay");
+      domCache.resultModalCard = document.getElementById("result-modal-card");
+      domCache.resultModalTitle = document.getElementById("result-modal-title");
+      domCache.resultModalText = document.getElementById("result-modal-text");
+      domCache.arenaSelect = document.getElementById("arenaSelect");
+    }
+
+    function validateActiveIndices() {
+      if (typeof playerTeamData !== 'undefined' && playerTeamData && playerTeamData.length > 0) {
+        let firstValid = -1;
+        for (let i = 0; i < playerTeamData.length; i++) {
+          if (playerTeamData[i] && playerTeamData[i].name) {
+            firstValid = i;
+            break;
+          }
+        }
+        if (firstValid === -1) firstValid = 0;
+        
+        if (activePlayerPkmnIndex < 0 || activePlayerPkmnIndex >= playerTeamData.length || !playerTeamData[activePlayerPkmnIndex] || !playerTeamData[activePlayerPkmnIndex].name) {
+          activePlayerPkmnIndex = firstValid;
+        }
+      }
+      if (typeof opponentTeamData !== 'undefined' && opponentTeamData && opponentTeamData.length > 0) {
+        let firstValidOpp = -1;
+        for (let i = 0; i < opponentTeamData.length; i++) {
+          if (opponentTeamData[i] && opponentTeamData[i].name) {
+            firstValidOpp = i;
+            break;
+          }
+        }
+        if (firstValidOpp === -1) firstValidOpp = 0;
+
+        if (activeOpponentPkmnIndex < 0 || activeOpponentPkmnIndex >= opponentTeamData.length || !opponentTeamData[activeOpponentPkmnIndex] || !opponentTeamData[activeOpponentPkmnIndex].name) {
+          activeOpponentPkmnIndex = firstValidOpp;
+        }
+      }
+    }
+
+    const bgImagesCache = {};
+    function preloadAssets() {
+      // Preload Pokémon sprites
+      const pkmnList = typeof playerTeamData !== 'undefined' ? playerTeamData : [];
+      pkmnList.forEach(p => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`;
+      });
+      const oppList = typeof opponentTeamData !== 'undefined' ? opponentTeamData : [];
+      oppList.forEach(p => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`;
+      });
+      
+      // Preload backgrounds
+      if (typeof arenaData !== 'undefined') {
+        Object.keys(arenaData).forEach(key => {
+          const url = arenaData[key].bg;
+          const img = new Image();
+          img.src = url;
+          bgImagesCache[url] = img;
+        });
+      }
+      
+      // Preload fallback background
+      const fallback = './assets/arenas/volcano-arena.jpg';
+      const fallbackImg = new Image();
+      fallbackImg.src = fallback;
+      bgImagesCache[fallback] = fallbackImg;
+    }
+
+    // Debounce Click handler
+    let clickTimeout = null;
+    function checkClickDebounce() {
+      if (clickTimeout !== null) return false;
+      clickTimeout = setTimeout(() => { clickTimeout = null; }, 250);
+      return true;
+    }
+
+    // Animation Loop Helper (uses requestAnimationFrame)
+    function runAnimationLoop(duration, interval, onTick, onComplete) {
+      let start = null;
+      let lastTick = 0;
+      let ticks = 0;
+      const totalTicks = Math.floor(duration / interval);
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        if (elapsed >= duration) {
+          if (onComplete) onComplete();
+          return;
+        }
+        const currentTick = Math.floor(elapsed / interval);
+        if (currentTick > lastTick) {
+          const deltaTicks = currentTick - lastTick;
+          for (let i = 0; i < deltaTicks; i++) {
+            if (ticks < totalTicks) {
+              onTick(ticks);
+              ticks++;
+            }
+          }
+          lastTick = currentTick;
+        }
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    let playerTeamData = [
+      { name: "Pikachu", lvl: 80, id: 25, type: "Electric", hp: 192, maxHp: 230, border: "#ffcb05", moves: [
+        { name: "Thunderbolt", type: "Electric", pp: "15/15" },
+        { name: "Quick Attack", type: "Normal", pp: "30/30" },
+        { name: "Iron Tail", type: "Steel", pp: "15/15" },
+        { name: "Electro Ball", type: "Electric", pp: "10/10" }
+      ] },
+      { name: "Charizard", lvl: 82, id: 6, type: "Fire", hp: 240, maxHp: 240, border: "#f97316", moves: [
+        { name: "Flamethrower", type: "Fire", pp: "15/15" },
+        { name: "Air Slash", type: "Flying", pp: "20/20" },
+        { name: "Dragon Claw", type: "Dragon", pp: "15/15" },
+        { name: "Fire Blast", type: "Fire", pp: "5/5" }
+      ] },
+      { name: "Garchomp", lvl: 80, id: 445, type: "Dragon", hp: 280, maxHp: 280, border: "#a855f7", moves: [
+        { name: "Earthquake", type: "Ground", pp: "10/10" },
+        { name: "Dragon Rush", type: "Dragon", pp: "10/10" },
+        { name: "Slash", type: "Normal", pp: "20/20" },
+        { name: "Stone Edge", type: "Ground", pp: "5/5" }
+      ] },
+      { name: "Lucario", lvl: 80, id: 448, type: "Fighting", hp: 210, maxHp: 210, border: "#0ea5e9", moves: [
+        { name: "Aura Sphere", type: "Fighting", pp: "20/20" },
+        { name: "Close Combat", type: "Fighting", pp: "5/5" },
+        { name: "Extreme Speed", type: "Normal", pp: "5/5" },
+        { name: "Metal Claw", type: "Steel", pp: "35/35" }
+      ] },
+      { name: "Gardevoir", lvl: 79, id: 282, type: "Psychic", hp: 220, maxHp: 220, border: "#ec4899", moves: [
+        { name: "Psychic", type: "Psychic", pp: "10/10" },
+        { name: "Moonblast", type: "Fairy", pp: "15/15" },
+        { name: "Shadow Ball", type: "Dark", pp: "15/15" },
+        { name: "Calm Mind", type: "Normal", pp: "20/20" }
+      ] },
+      { name: "Zeraora", lvl: 79, id: 807, type: "Electric", hp: 200, maxHp: 200, border: "#eab308", moves: [
+        { name: "Plasma Fists", type: "Electric", pp: "15/15" },
+        { name: "Close Combat", type: "Fighting", pp: "5/5" },
+        { name: "Thunder Punch", type: "Electric", pp: "15/15" },
+        { name: "Volt Switch", type: "Electric", pp: "20/20" }
+      ] }
+    ];
+
+    let cachedBattleTeamStr = localStorage.getItem("pokemonNexusTeam");
+    if (!cachedBattleTeamStr) {
+      localStorage.setItem("pokemonNexusTeam", JSON.stringify(playerTeamData));
+      cachedBattleTeamStr = localStorage.getItem("pokemonNexusTeam");
+    }
+
+    let hasActiveBattle = false;
+    try {
+      const stateStr = localStorage.getItem("pokemonNexusBattleState");
+      if (stateStr) {
+        const stateObj = JSON.parse(stateStr);
+        if (stateObj && stateObj.turnCount > 7) {
+          hasActiveBattle = true;
+        }
+      }
+    } catch (e) {}
+
+    if (cachedBattleTeamStr && (hasActiveBattle || !localStorage.getItem("pokemonNexusUser"))) {
+      try {
+        const teamObj = JSON.parse(cachedBattleTeamStr);
+        if (Array.isArray(teamObj) && teamObj.length > 0) {
+          const borderColors = {
+            electric: "#ffcb05", fire: "#f97316", water: "#3b82f6", grass: "#10b981",
+            psychic: "#ec4899", fighting: "#0ea5e9", dragon: "#a855f7", ice: "#67e8f9",
+            steel: "#94a3b8", ground: "#b45309", rock: "#78350f", ghost: "#6366f1", poison: "#a855f7", bug: "#84cc16"
+          };
+          const mapped = teamObj.map(p => {
+            const pkmnLvl = p.level || p.lvl || 50;
+            const pkmnHp = p.hp !== undefined ? p.hp : (p.maxHp || p.max_hp || (100 + pkmnLvl * 2));
+            const pkmnMaxHp = p.maxHp || p.max_hp || pkmnHp || (100 + pkmnLvl * 2);
+            const pkmnType = p.type || p.type1 || "Normal";
+            const pkmnBorder = p.border || borderColors[pkmnType.toLowerCase()] || "#9ca3af";
+            const pkmnMoves = p.moves && p.moves.length > 0 ? p.moves : [
+              { name: "Tackle", type: "Normal", pp: "35/35" },
+              { name: "Growl", type: "Normal", pp: "40/40" }
+            ];
+            return {
+              name: p.name,
+              lvl: pkmnLvl,
+              id: p.id || p.pokedex_number || 1,
+              type: pkmnType,
+              hp: pkmnHp,
+              maxHp: pkmnMaxHp,
+              border: pkmnBorder,
+              moves: pkmnMoves
+            };
+          });
+          playerTeamData.length = 0;
+          mapped.forEach(p => playerTeamData.push(p));
+          window.battleSynced = true; // Block async backend sync from overwriting
+        }
+      } catch (err) {
+        console.error("Failed to parse cachedBattleTeamStr in battle.html:", err);
+      }
+    }
+
+    const bagItemsData = [
+      { name: "Potion", qty: 15, desc: "Restores 20 HP" },
+      { name: "Super Potion", qty: 10, desc: "Restores 50 HP" },
+      { name: "Hyper Potion", qty: 7, desc: "Restores 120 HP" },
+      { name: "Revive", qty: 6, desc: "Revives fainted PKMN" },
+      { name: "Full Heal", qty: 4, desc: "Cures all status effects" },
+      { name: "Poké Ball", qty: 25, desc: "Standard Poké Ball" },
+      { name: "Great Ball", qty: 12, desc: "High success catch rate" },
+      { name: "Ultra Ball", qty: 8, desc: "Very high success rate" },
+      { name: "Master Ball", qty: 1, desc: "Guarantees 100% catch" }
+    ];
+
+    let cachedInventoryStr = localStorage.getItem("pokemonNexusInventory");
+    if (!cachedInventoryStr) {
+      localStorage.setItem("pokemonNexusInventory", JSON.stringify(bagItemsData));
+      cachedInventoryStr = localStorage.getItem("pokemonNexusInventory");
+    }
+
+    if (cachedInventoryStr && (hasActiveBattle || !localStorage.getItem("pokemonNexusUser"))) {
+      try {
+        const invObj = JSON.parse(cachedInventoryStr);
+        if (Array.isArray(invObj) && invObj.length > 0) {
+          bagItemsData.length = 0;
+          invObj.forEach(item => bagItemsData.push(item));
+          window.battleSynced = true; // Block async backend sync from overwriting
+        }
+      } catch (err) {
+        console.error("Failed to parse cachedInventoryStr in battle.html:", err);
+      }
+    }
+
+    const arenaData = {
+      volcano: {
+        bg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920", // Volcanic glowing landscape
+        bgColor: "#140502",
+        glow: "rgba(255, 61, 0, 0.6)",
+        border: "rgba(255, 61, 0, 0.4)",
+        weather: "Sunny / Magma Storm",
+        weatherDesc: "Fire attacks boosted by 50%",
+        weatherColor: "#ef4444",
+        field: "Magma Shield",
+        wind: "12 mph"
+      },
+      forest: {
+        bg: "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1920",
+        bgColor: "#03140a",
+        glow: "rgba(16, 185, 129, 0.65)",
+        border: "rgba(16, 185, 129, 0.4)",
+        weather: "Rain / Overcast",
+        weatherDesc: "Water attacks boosted by 50%",
+        weatherColor: "#3b82f6",
+        field: "Grassy Terrain",
+        wind: "6 mph"
+      },
+      snow: {
+        bg: "https://images.unsplash.com/photo-1491002052546-bf38f186af56?q=80&w=1920",
+        bgColor: "#061324",
+        glow: "rgba(56, 189, 248, 0.65)",
+        border: "rgba(56, 189, 248, 0.4)",
+        weather: "Hail / Snowstorm",
+        weatherDesc: "Deals 1/16 HP damage per turn",
+        weatherColor: "#38bdf8",
+        field: "Ice Shield",
+        wind: "28 mph"
+      },
+      beach: {
+        bg: "https://images.unsplash.com/photo-1473116763269-255ea7604ad6?q=80&w=1920",
+        bgColor: "#041424",
+        glow: "rgba(250, 204, 21, 0.65)",
+        border: "rgba(250, 204, 21, 0.4)",
+        weather: "Sunny / Sea Breeze",
+        weatherDesc: "Flying speeds increased",
+        weatherColor: "#eab308",
+        field: "None",
+        wind: "15 mph"
+      },
+      temple: {
+        bg: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1920",
+        bgColor: "#110216",
+        glow: "rgba(168, 85, 247, 0.65)",
+        border: "rgba(168, 85, 247, 0.4)",
+        weather: "Mystic Fog",
+        weatherDesc: "Accuracy reduced by 10%",
+        weatherColor: "#a855f7",
+        field: "Psychic Terrain",
+        wind: "2 mph"
+      },
+      night: {
+        bg: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=1920",
+        bgColor: "#01040a",
+        glow: "rgba(12, 112, 255, 0.65)",
+        border: "rgba(12, 112, 255, 0.4)",
+        weather: "Clear / Midnight",
+        weatherDesc: "Dark type moves boosted 30%",
+        weatherColor: "#3b82f6",
+        field: "Shadow Arena",
+        wind: "4 mph"
+      }
+    };
+
+    // Phase 3.2: Opponent data state
+    const opponentTeamData = [
+      { name: "Charizard", lvl: 82, id: 6, type: "Fire", hp: 98, maxHp: 240, border: "#f97316", moves: [
+        { name: "Flamethrower", type: "Fire", pp: "15/15" },
+        { name: "Air Slash", type: "Flying", pp: "20/20" },
+        { name: "Dragon Claw", type: "Dragon", pp: "15/15" },
+        { name: "Fire Blast", type: "Fire", pp: "5/5" }
+      ] }
+    ];
+
+    let activePlayerPkmnIndex = 0;
+    let activeOpponentPkmnIndex = 0;
+    let selectedBagItemIndex = -1;
+    let selectedMoveIndex = 0; // Tracks selected fight move index
+    let currentArenaKey = "volcano";
+    let turnCount = 7;
+    let battleState = "IDLE"; // IDLE, ANIMATING, FAINTED
+    let playerStatus = "paralysis"; // Initial status condition for testing Full Heal
+
+    // Retrieve active combatants HP
+    let playerActiveHp = playerTeamData[0].hp;
+    let opponentActiveHp = opponentTeamData[0].hp;
+
+    // Safety sync proxies to protect battle state from late backend overwrites (safe from TDZ)
+    let teamSynced = false;
+    let inventorySynced = false;
+
+    const defaultTeamData = [
+      { name: "Pikachu", lvl: 80, id: 25, type: "Electric", hp: 192, maxHp: 230, border: "#ffcb05", moves: [
+        { name: "Thunderbolt", type: "Electric", pp: "15/15" },
+        { name: "Quick Attack", type: "Normal", pp: "30/30" },
+        { name: "Iron Tail", type: "Steel", pp: "15/15" },
+        { name: "Electro Ball", type: "Electric", pp: "10/10" }
+      ] },
+      { name: "Charizard", lvl: 82, id: 6, type: "Fire", hp: 240, maxHp: 240, border: "#f97316", moves: [
+        { name: "Flamethrower", type: "Fire", pp: "15/15" },
+        { name: "Air Slash", type: "Flying", pp: "20/20" },
+        { name: "Dragon Claw", type: "Dragon", pp: "15/15" },
+        { name: "Fire Blast", type: "Fire", pp: "5/5" }
+      ] },
+      { name: "Garchomp", lvl: 80, id: 445, type: "Dragon", hp: 280, maxHp: 280, border: "#a855f7", moves: [
+        { name: "Earthquake", type: "Ground", pp: "10/10" },
+        { name: "Dragon Rush", type: "Dragon", pp: "10/10" },
+        { name: "Slash", type: "Normal", pp: "20/20" },
+        { name: "Stone Edge", type: "Ground", pp: "5/5" }
+      ] },
+      { name: "Lucario", lvl: 80, id: 448, type: "Fighting", hp: 210, maxHp: 210, border: "#0ea5e9", moves: [
+        { name: "Aura Sphere", type: "Fighting", pp: "20/20" },
+        { name: "Close Combat", type: "Fighting", pp: "5/5" },
+        { name: "Extreme Speed", type: "Normal", pp: "5/5" },
+        { name: "Metal Claw", type: "Steel", pp: "35/35" }
+      ] },
+      { name: "Gardevoir", lvl: 79, id: 282, type: "Psychic", hp: 220, maxHp: 220, border: "#ec4899", moves: [
+        { name: "Psychic", type: "Psychic", pp: "10/10" },
+        { name: "Moonblast", type: "Fairy", pp: "15/15" },
+        { name: "Shadow Ball", type: "Dark", pp: "15/15" },
+        { name: "Calm Mind", type: "Normal", pp: "20/20" }
+      ] },
+      { name: "Zeraora", lvl: 79, id: 807, type: "Electric", hp: 200, maxHp: 200, border: "#eab308", moves: [
+        { name: "Plasma Fists", type: "Electric", pp: "15/15" },
+        { name: "Close Combat", type: "Fighting", pp: "5/5" },
+        { name: "Thunder Punch", type: "Electric", pp: "15/15" },
+        { name: "Volt Switch", type: "Electric", pp: "20/20" }
+      ] }
+    ];
+
+    const defaultBagData = [
+      { name: "Potion", qty: 15, desc: "Restores 20 HP" },
+      { name: "Super Potion", qty: 10, desc: "Restores 50 HP" },
+      { name: "Hyper Potion", qty: 7, desc: "Restores 120 HP" },
+      { name: "Revive", qty: 6, desc: "Revives fainted PKMN" },
+      { name: "Full Heal", qty: 4, desc: "Cures all status effects" },
+      { name: "Poké Ball", qty: 25, desc: "Standard Poké Ball" },
+      { name: "Great Ball", qty: 12, desc: "High success catch rate" },
+      { name: "Ultra Ball", qty: 8, desc: "Very high success rate" },
+      { name: "Master Ball", qty: 1, desc: "Guarantees 100% catch" }
+    ];
+
+    const playerTeamProxy = new Proxy(playerTeamData, {
+      get(target, prop) {
+        if (target.length === 0) {
+          defaultTeamData.forEach(p => target.push(p));
+        }
+        if (prop === 'push') {
+          return function(...args) {
+            if (teamSynced || turnCount > 7) {
+              console.log("Blocked duplicate/late backend team sync push to protect active battle.");
+              return target.length;
+            }
+            const cleanArgs = args.filter(x => x && x.name);
+            const res = target.push(...cleanArgs);
+            teamSynced = true;
+            return res;
+          };
+        }
+        return Reflect.get(target, prop);
+      },
+      set(target, prop, value) {
+        if (prop === 'length' && value === 0) {
+          if (teamSynced || turnCount > 7) {
+            console.log("Blocked duplicate/late backend team sync clear to protect active battle.");
+            return true;
+          }
+        }
+        return Reflect.set(target, prop, value);
+      }
+    });
+
+    const bagItemsProxy = new Proxy(bagItemsData, {
+      get(target, prop) {
+        if (target.length === 0) {
+          defaultBagData.forEach(item => target.push(item));
+        }
+        if (prop === 'push') {
+          return function(...args) {
+            if (inventorySynced || turnCount > 7) {
+              console.log("Blocked duplicate/late backend inventory sync push to protect active battle.");
+              return target.length;
+            }
+            const cleanArgs = args.filter(x => x && x.name);
+            const res = target.push(...cleanArgs);
+            inventorySynced = true;
+            return res;
+          };
+        }
+        return Reflect.get(target, prop);
+      },
+      set(target, prop, value) {
+        if (prop === 'length' && value === 0) {
+          if (inventorySynced || turnCount > 7) {
+            console.log("Blocked duplicate/late backend inventory sync clear to protect active battle.");
+            return true;
+          }
+        }
+        return Reflect.set(target, prop, value);
+      }
+    });
+
+    // Premium Web Audio Synthesizer
+    let globalAudioCtx = null;
+    function playSynthSound(type) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!globalAudioCtx) {
+          globalAudioCtx = new AudioContextClass();
+        }
+        const ctx = globalAudioCtx;
+        if (ctx.state === 'suspended') {
+          ctx.resume();
+        }
+        
+        if (type === 'thunderbolt') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(800, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
+          
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.5);
+        } else if (type === 'flamethrower') {
+          let bufferSize = ctx.sampleRate * 0.8;
+          let buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          let data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          let noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+          
+          let filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(300, ctx.currentTime);
+          filter.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.8);
+          
+          let gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+          
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          
+          noise.start();
+          noise.stop(ctx.currentTime + 0.8);
+        } else if (type === 'hydropump') {
+          let bufferSize = ctx.sampleRate * 0.6;
+          let buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          let data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          let noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+          
+          let filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(600, ctx.currentTime);
+          filter.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.6);
+          
+          let gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.28, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+          
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          
+          noise.start();
+          noise.stop(ctx.currentTime + 0.6);
+        } else if (type === 'aurasphere') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(200, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.5);
+          
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.5);
+        } else if (type === 'solarbeam') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(100, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.6);
+          
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.6);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 1.2);
+        } else if (type === 'earthquake') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(65, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(15, ctx.currentTime + 0.7);
+          
+          gain.gain.setValueAtTime(0.45, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.7);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.7);
+        } else if (type === 'hit') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(140, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(10, ctx.currentTime + 0.25);
+          
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        } else if (type === 'faint') {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(380, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(40, ctx.currentTime + 0.8);
+          
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.8);
+        }
+      } catch (e) {
+        console.warn("Synth audio error:", e);
+      }
+    }
+
+    function renderTeamSidebar() {
+      const container = document.getElementById("team-sidebar-list");
+      if (!container) return;
+      if (!Array.isArray(playerTeamData)) {
+        container.innerHTML = "";
+        return;
+      }
+      
+      // Safety bounds check on active Pokémon index (Task 1)
+      validateActiveIndices();
+      
+      // Auto-synchronize HP tracking state on load / update
+      if (playerTeamData[activePlayerPkmnIndex]) {
+        playerActiveHp = playerTeamData[activePlayerPkmnIndex].hp;
+      }
+      if (opponentTeamData[activeOpponentPkmnIndex]) {
+        opponentActiveHp = opponentTeamData[activeOpponentPkmnIndex].hp;
+      }
+      
+      container.innerHTML = playerTeamData.map((pkmn, idx) => {
+        if (!pkmn) return "";
+        const hpPercent = Math.round(((pkmn.hp || 0) / (pkmn.maxHp || 100)) * 100);
+        const isActive = idx === activePlayerPkmnIndex ? "active" : "";
+        const borderStyle = idx === activePlayerPkmnIndex 
+          ? `border-color: ${pkmn.border || '#ffffff'}; box-shadow: 0 0 10px ${pkmn.border || '#ffffff'}; background: rgba(255,255,255,0.08);` 
+          : `border-color: rgba(255,255,255,0.08);`;
+        const pkmnType = pkmn.type || "Normal";
+        return `
+          <div class="team-member-card ${isActive}" style="${borderStyle}" onclick="triggerSwitchPokemon(${idx})">
+            <img class="team-member-avatar" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pkmn.id || 25}.png" alt="${pkmn.name || 'Pikachu'}">
+            <div class="team-member-name">${pkmn.name || 'Pikachu'}</div>
+            <div class="team-member-meta">
+              <span class="team-member-lvl">Lv.${pkmn.lvl || 1}</span>
+              <span class="move-type-badge type-${pkmnType.toLowerCase()}" style="font-size: 0.48rem; padding: 1px 3px;">${pkmnType}</span>
+            </div>
+            <div class="team-member-hp-bar">
+              <div class="team-member-hp-fill" style="width: ${hpPercent}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Keep HUD details up to date with sidebar sync
+      syncBattleHUDs();
+    }
+
+    // RENDER BAG SIDEBAR
+    function renderBagSidebar() {
+      const container = document.getElementById("bag-sidebar-list");
+      if (!container) return;
+      if (!Array.isArray(bagItemsData)) {
+        container.innerHTML = "";
+        return;
+      }
+      container.innerHTML = bagItemsData.map((item, idx) => {
+        if (!item) return "";
+        const isSelected = idx === selectedBagItemIndex ? "selected" : "";
+        return `
+          <div class="bag-item-row ${isSelected}" onclick="triggerSelectBagItem(${idx})">
+            <div class="bag-item-label">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="var(--yellow)"><circle cx="12" cy="12" r="10"/></svg>
+              <span>${item.name || 'Item'}</span>
+            </div>
+            <span class="bag-item-qty">x${item.qty || 0}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // RENDER ACTIVE MOVES IN FIGHT PANEL
+    function renderMovesGrid() {
+      validateActiveIndices();
+      const movesContainer = document.getElementById("fight-moves-box");
+      const pkmn = playerTeamData[activePlayerPkmnIndex];
+      if (!pkmn || !pkmn.moves) return;
+
+      movesContainer.innerHTML = pkmn.moves.map((m, idx) => {
+        let moveObj = typeof m === 'string' ? { name: m } : { ...m };
+        if (!moveObj.name) moveObj.name = "Tackle";
+        if (!moveObj.type) {
+          const nameLower = moveObj.name.toLowerCase();
+          if (nameLower.includes("vine") || nameLower.includes("whip") || nameLower.includes("solar") || nameLower.includes("leaf")) {
+            moveObj.type = "Grass";
+          } else {
+            moveObj.type = "Normal";
+          }
+        }
+        if (!moveObj.pp || typeof moveObj.pp !== 'string' || !moveObj.pp.includes('/')) {
+          moveObj.pp = "15/15";
+        }
+        
+        // Save back normalized move
+        pkmn.moves[idx] = moveObj;
+
+        const isSelected = idx === selectedMoveIndex ? "border-color: var(--yellow); background: rgba(255, 203, 5, 0.15);" : "";
+        const typeLower = moveObj.type.toLowerCase();
+        return `
+          <button class="move-btn-slot" style="${isSelected}" onclick="selectMove(${idx}); triggerFightAttack();">
+            <span class="move-name-row">${moveObj.name}</span>
+            <div class="move-meta-row">
+              <span class="move-type-badge type-${typeLower}">${moveObj.type}</span>
+              <span class="move-pp-value">PP ${moveObj.pp}</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Change selected move index
+    function selectMove(idx) {
+      if (battleState !== "IDLE") return;
+      validateActiveIndices();
+      console.log(`Selecting move index: ${idx} (${playerTeamData[activePlayerPkmnIndex].moves[idx].name})`);
+      selectedMoveIndex = idx;
+      renderMovesGrid();
+    }
+
+    // INTERACTIVE BARS SYNC
+    function syncBattleHUDs() {
+      validateActiveIndices();
+      const pPkmn = playerTeamData[activePlayerPkmnIndex];
+      const oPkmn = opponentTeamData[activeOpponentPkmnIndex];
+
+      // Update Player HUD details
+      document.getElementById("player-hud-name").textContent = pPkmn.name;
+      document.getElementById("player-hud-lvl").textContent = "Lv. " + pPkmn.lvl;
+      document.getElementById("player-hud-sprite").src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pPkmn.id}.png`;
+      document.getElementById("player-hud-hp-val").textContent = playerActiveHp;
+      
+      const pHpPercent = Math.round((playerActiveHp / pPkmn.maxHp) * 100);
+      document.getElementById("player-hud-hp-fill").style.width = pHpPercent + "%";
+      
+      // Update max HP text dynamically to show HP instead of static EXP
+      const pExpLabel = document.querySelector(".player-card .hud-hp-text");
+      if (pExpLabel) {
+        pExpLabel.innerHTML = `<span id="player-hud-hp-val">${playerActiveHp}</span> / ${pPkmn.maxHp} HP`;
+      }
+      
+      const pSprite = document.getElementById("stage-player-sprite");
+      pSprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pPkmn.id}.png`;
+      pSprite.style.filter = `drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 12px ${pPkmn.border})`;
+
+      // Update Opponent HUD details
+      document.getElementById("opponent-hud-name").textContent = oPkmn.name;
+      document.getElementById("opponent-hud-lvl").textContent = "Lv. " + oPkmn.lvl;
+      document.getElementById("opponent-hud-sprite").src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${oPkmn.id}.png`;
+      document.getElementById("opponent-hud-hp-val").textContent = opponentActiveHp;
+
+      const oHpPercent = Math.round((opponentActiveHp / oPkmn.maxHp) * 100);
+      document.getElementById("opponent-hud-hp-fill").style.width = oHpPercent + "%";
+      
+      const oExpLabel = document.querySelector(".opponent-card .hud-hp-text");
+      if (oExpLabel) {
+        oExpLabel.innerHTML = `<span id="opponent-hud-hp-val">${opponentActiveHp}</span> / ${oPkmn.maxHp} HP`;
+      }
+
+      document.getElementById("stage-opponent-sprite").style.opacity = opponentActiveHp > 0 ? "1" : "0";
+      
+      const oSprite = document.getElementById("stage-opponent-sprite");
+      oSprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${oPkmn.id}.png`;
+      oSprite.style.filter = `drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 12px ${oPkmn.border})`;
+    }
+
+    // TRIGGER SWITCH POKEMON
+    function triggerSwitchPokemon(idx) {
+      if (!checkClickDebounce()) return;
+      if (battleState !== "IDLE" && battleState !== "FAINTED") return;
+      if (idx === activePlayerPkmnIndex) return;
+      
+      const targetPkmn = playerTeamData[idx];
+      if (!targetPkmn || targetPkmn.hp <= 0) {
+        showToast((targetPkmn ? targetPkmn.name : "Selected Pokémon") + " is fainted and cannot fight!");
+        return;
+      }
+
+      console.log(`Switching active Pokémon to: ${targetPkmn.name} (index: ${idx})`);
+
+      const wasFainted = battleState === "FAINTED";
+
+      // Hide modal overlay if open
+      document.getElementById("result-modal-overlay").style.display = "none";
+
+      activePlayerPkmnIndex = idx;
+      selectedMoveIndex = 0; // Reset selected move slot
+      playerActiveHp = playerTeamData[idx].hp;
+
+      // Restore sprite opacity and class
+      const pSprite = document.getElementById("stage-player-sprite");
+      if (pSprite) {
+        pSprite.className = "battle-pokemon-sprite player-pkmn";
+        pSprite.style.opacity = "1";
+      }
+
+      // Restore standard restart button callback
+      const restartBtn = document.querySelector(".restart-btn");
+      if (restartBtn) {
+        restartBtn.textContent = "BATTLE AGAIN";
+        restartBtn.setAttribute("onclick", "resetBattleGame()");
+      }
+
+      renderTeamSidebar();
+      syncBattleHUDs();
+      renderMovesGrid();
+      
+      appendLogLine("Shashank sent out " + targetPkmn.name + "!", "player-action");
+      showToast("Swapped active Pokémon to: " + targetPkmn.name);
+      
+      saveBattleStateToLocalStorage();
+
+      if (wasFainted) {
+        battleState = "IDLE";
+        disableMoveButtons(false);
+      } else {
+        // Battle Fix: manual switch consumes turn, opponent attacks
+        battleState = "ANIMATING";
+        disableMoveButtons(true);
+        setTimeout(() => {
+          battleState = "IDLE";
+          disableMoveButtons(false);
+          setTimeout(opponentTurn, 1000);
+        }, 1000);
+      }
+    }
+
+    // Helper to persist battle state (HP & PP) in localStorage
+    function saveBattleStateToLocalStorage() {
+      try {
+        localStorage.setItem("pokemonNexusTeam", JSON.stringify(playerTeamData));
+        
+        const stateObj = {
+          turnCount,
+          battleState,
+          playerActiveHp,
+          opponentActiveHp,
+          activePlayerPkmnIndex,
+          activeOpponentPkmnIndex,
+          selectedMoveIndex,
+          playerStatus
+        };
+        localStorage.setItem("pokemonNexusBattleState", JSON.stringify(stateObj));
+        console.log("Battle state saved to localStorage.");
+      } catch (e) {
+        console.error("Failed to save battle state to localStorage:", e);
+      }
+    }
+
+    // Helper to persist inventory in localStorage and trigger backend sync
+    function saveInventoryToLocalStorage() {
+      try {
+        localStorage.setItem("pokemonNexusInventory", JSON.stringify(bagItemsData));
+        console.log("Inventory saved to localStorage.");
+        
+        if (typeof syncInventoryToBackend === "function") {
+          const backendItems = bagItemsData.map((x, idx) => ({
+            id: idx + 1,
+            name: x.name,
+            qty: x.qty,
+            category: x.name.includes("Potion") ? "Potions" : (x.name.includes("Ball") ? "Poké Balls" : "Battle Items")
+          }));
+          syncInventoryToBackend(backendItems);
+        }
+      } catch (e) {
+        console.error("Failed to save inventory to localStorage:", e);
+      }
+    }
+
+    function saveArenaToLocalStorage(arenaKey) {
+      try {
+        localStorage.setItem("pokemonNexusArena", arenaKey);
+        console.log("Arena saved to localStorage:", arenaKey);
+      } catch (e) {
+        console.error("Failed to save arena to localStorage:", e);
+      }
+    }
+
+    // TRIGGER SELECT BAG ITEM
+    function triggerSelectBagItem(idx) {
+      selectedBagItemIndex = idx;
+      renderBagSidebar();
+    }
+
+    // Required normalize function
+    function normalizeItemName(name) {
+      if (!name) return "";
+      return name.toLowerCase()
+        .replace(/é/g, 'e')
+        .replace(/[^a-z0-9]/g, '');
+    }
+
+    // TRIGGER USE BAG ITEM (try/catch wrapped, safe state recovery, zero freeze)
+    function useItem() {
+      if (!checkClickDebounce()) return;
+      if (battleState !== "IDLE") return;
+
+      try {
+        if (selectedBagItemIndex === -1) {
+          appendLogLine("Select an item first.", "system");
+          showToast("Select an item first.");
+          return;
+        }
+
+        const item = bagItemsData[selectedBagItemIndex];
+        console.log(`Using bag item: ${item.name}`);
+
+        if (item.qty <= 0) {
+          appendLogLine("This item is out of stock!", "system");
+          showToast("Out of stock!");
+          return;
+        }
+
+        validateActiveIndices();
+        const key = normalizeItemName(item.name);
+
+        // Poké Ball class check (does not require player Pokémon target)
+        if (key === "pokeball" || key === "greatball" || key === "ultraball" || key === "masterball") {
+          let catchRate = 0.25; // 25% chance
+          if (key === "greatball") catchRate = 0.45; // 45% chance
+          if (key === "ultraball") catchRate = 0.65; // 65% chance
+          if (key === "masterball") catchRate = 1.0; // 100% chance
+
+          item.qty = Math.max(0, item.qty - 1);
+          renderBagSidebar();
+          saveInventoryToLocalStorage();
+          
+          playCaptureAnimation(item.name, catchRate);
+          return;
+        }
+
+        // Ask player to select target Pokémon (Task 2)
+        let promptText = "Choose Target:\n";
+        playerTeamData.forEach((p, i) => {
+          if (!p || !p.name) return;
+          const statusText = p.hp <= 0 ? "Fainted" : `HP ${p.hp}/${p.maxHp}`;
+          promptText += `${i + 1}. ${p.name} (${statusText})\n`;
+        });
+        const choice = prompt(promptText, String(activePlayerPkmnIndex + 1));
+        if (choice === null) return;
+        const targetIdx = parseInt(choice) - 1;
+        if (isNaN(targetIdx) || targetIdx < 0 || targetIdx >= playerTeamData.length) {
+          showToast("Invalid choice!");
+          return;
+        }
+        const targetPkmn = playerTeamData[targetIdx];
+        if (!targetPkmn || !targetPkmn.name) {
+          showToast("Invalid choice!");
+          return;
+        }
+
+        // Potion / Super Potion / Hyper Potion healing
+        if (key === "potion" || key === "superpotion" || key === "hyperpotion") {
+          if (targetPkmn.hp <= 0) {
+            appendLogLine(`Cannot use ${item.name} on fainted Pokémon ${targetPkmn.name}.`, "system");
+            showToast("Cannot heal fainted Pokémon!");
+            return;
+          }
+          if (targetPkmn.hp >= targetPkmn.maxHp) {
+            appendLogLine(`${targetPkmn.name} is already at full health!`, "system");
+            showToast("Already at full HP!");
+            return;
+          }
+
+          let healAmount = 20;
+          if (key === "superpotion") healAmount = 50;
+          if (key === "hyperpotion") healAmount = 120;
+
+          item.qty = Math.max(0, item.qty - 1);
+          renderBagSidebar();
+          saveInventoryToLocalStorage();
+
+          targetPkmn.hp = Math.min(targetPkmn.maxHp, targetPkmn.hp + healAmount);
+          if (targetIdx === activePlayerPkmnIndex) {
+            playerActiveHp = targetPkmn.hp;
+            syncBattleHUDs();
+          }
+          
+          renderTeamSidebar();
+          playSynthSound("aurasphere");
+
+          spawnGreenHealPopup(healAmount, targetIdx === activePlayerPkmnIndex);
+          appendLogLine("Shashank used " + item.name + "! Restored " + healAmount + " HP to " + targetPkmn.name + ".", "player-action");
+          
+          saveBattleStateToLocalStorage();
+
+          // Opponent turn
+          battleState = "ANIMATING";
+          disableMoveButtons(true);
+          setTimeout(() => {
+            battleState = "IDLE";
+            disableMoveButtons(false);
+            setTimeout(opponentTurn, 1000);
+          }, 1000);
+          return;
+        }
+
+        // Revive fainted Pokemon
+        if (key === "revive") {
+          if (targetPkmn.hp > 0) {
+            appendLogLine(`Cannot use Revive on healthy Pokémon ${targetPkmn.name}.`, "system");
+            showToast("Cannot revive healthy Pokémon!");
+            return;
+          }
+
+          item.qty = Math.max(0, item.qty - 1);
+          renderBagSidebar();
+          saveInventoryToLocalStorage();
+
+          targetPkmn.hp = Math.round(targetPkmn.maxHp * 0.5);
+          if (targetIdx === activePlayerPkmnIndex) {
+            playerActiveHp = targetPkmn.hp;
+            // Clear faint class and restore opacity
+            const pSprite = document.getElementById("stage-player-sprite");
+            if (pSprite) {
+              pSprite.className = "battle-pokemon-sprite player-pkmn";
+              pSprite.style.opacity = "1";
+            }
+            syncBattleHUDs();
+          }
+          
+          renderTeamSidebar();
+          playSynthSound("aurasphere");
+
+          spawnGreenHealPopup(targetPkmn.hp, targetIdx === activePlayerPkmnIndex);
+          appendLogLine("Shashank used Revive! " + targetPkmn.name + " was revived to half health.", "player-action");
+
+          saveBattleStateToLocalStorage();
+
+          // Opponent turn
+          battleState = "ANIMATING";
+          disableMoveButtons(true);
+          setTimeout(() => {
+            battleState = "IDLE";
+            disableMoveButtons(false);
+            setTimeout(opponentTurn, 1000);
+          }, 1000);
+          return;
+        }
+
+        // Max Revive fainted Pokemon
+        if (key === "maxrevive") {
+          if (targetPkmn.hp > 0) {
+            appendLogLine(`Cannot use Max Revive on healthy Pokémon ${targetPkmn.name}.`, "system");
+            showToast("Cannot revive healthy Pokémon!");
+            return;
+          }
+
+          item.qty = Math.max(0, item.qty - 1);
+          renderBagSidebar();
+          saveInventoryToLocalStorage();
+
+          targetPkmn.hp = targetPkmn.maxHp;
+          if (targetIdx === activePlayerPkmnIndex) {
+            playerActiveHp = targetPkmn.hp;
+            // Clear faint class and restore opacity
+            const pSprite = document.getElementById("stage-player-sprite");
+            if (pSprite) {
+              pSprite.className = "battle-pokemon-sprite player-pkmn";
+              pSprite.style.opacity = "1";
+            }
+            syncBattleHUDs();
+          }
+          
+          renderTeamSidebar();
+          playSynthSound("aurasphere");
+
+          spawnGreenHealPopup(targetPkmn.hp, targetIdx === activePlayerPkmnIndex);
+          appendLogLine("Shashank used Max Revive! " + targetPkmn.name + " was revived to full health.", "player-action");
+
+          saveBattleStateToLocalStorage();
+
+          // Opponent turn
+          battleState = "ANIMATING";
+          disableMoveButtons(true);
+          setTimeout(() => {
+            battleState = "IDLE";
+            disableMoveButtons(false);
+            setTimeout(opponentTurn, 1000);
+          }, 1000);
+          return;
+        }
+
+        // Full Heal status recovery
+        if (key === "fullheal") {
+          if (targetPkmn.hp <= 0) {
+            appendLogLine(`Cannot use Full Heal on fainted Pokémon ${targetPkmn.name}.`, "system");
+            showToast("Cannot use on fainted Pokémon!");
+            return;
+          }
+          if (targetIdx === activePlayerPkmnIndex && playerStatus === "") {
+            appendLogLine("No status condition to heal.", "system");
+            showToast("No status condition to heal.");
+            return;
+          }
+
+          item.qty = Math.max(0, item.qty - 1);
+          renderBagSidebar();
+          saveInventoryToLocalStorage();
+          playSynthSound("aurasphere");
+          appendLogLine("Shashank used Full Heal! Cured status on " + targetPkmn.name + ".", "player-action");
+          if (targetIdx === activePlayerPkmnIndex) {
+            playerStatus = ""; // Clear status
+          }
+
+          playCleanseAnimation(); // Blue sparkle animation
+
+          // Opponent turn
+          battleState = "ANIMATING";
+          disableMoveButtons(true);
+          setTimeout(() => {
+            battleState = "IDLE";
+            disableMoveButtons(false);
+            setTimeout(opponentTurn, 1000);
+          }, 1000);
+          return;
+        }
+
+      } catch (error) {
+        console.error(error);
+        cleanupCaptureEffects();
+        appendLogLine("Action failed. Try again.", "system");
+      }
+    }
+
+    function triggerUseBagItem() {
+      useItem();
+    }
+
+    // Tab highlighter trigger for Bag
+    function triggerBagTab() {
+      const bagPanel = document.querySelector(".right-sidebar");
+      if (bagPanel) {
+        bagPanel.scrollIntoView({ behavior: 'smooth' });
+        bagPanel.style.boxShadow = "0 0 35px var(--yellow)";
+        bagPanel.style.transition = "box-shadow 0.5s ease";
+        setTimeout(() => {
+          bagPanel.style.boxShadow = "";
+        }, 1500);
+      }
+      showToast("Selected BAG tab! Click items in the Bag panel and use them.");
+    }
+
+    function generateEnvironmentParticles(val) {
+      const container = document.getElementById("particles-container");
+      if (!container) return;
+      container.innerHTML = ""; // Clear current particles
+
+      let count = 30;
+      let particleClass = "";
+      
+      if (val === "volcano") {
+        count = 35;
+        particleClass = "particle-ember";
+      } else if (val === "forest") {
+        count = 30;
+        particleClass = "particle-leaf";
+        // Also spawn forest glow dots
+        for (let i = 0; i < 15; i++) {
+          const glow = document.createElement("div");
+          glow.className = "particle-forest-glow";
+          glow.style.left = Math.random() * 100 + "vw";
+          glow.style.animationDuration = (8 + Math.random() * 6) + "s";
+          glow.style.animationDelay = (Math.random() * 5) + "s";
+          container.appendChild(glow);
+        }
+      } else if (val === "snow") {
+        count = 45;
+        particleClass = "particle-snowflake";
+      } else if (val === "beach") {
+        count = 5;
+        particleClass = "particle-bird";
+      } else if (val === "temple") {
+        count = 25;
+        particleClass = "particle-gold-dust";
+        // Spawn temple runes
+        const runeChars = ["☀", "⚡", "❄", "★", "⚜", "☯"];
+        for (let i = 0; i < 8; i++) {
+          const rune = document.createElement("div");
+          rune.className = "particle-rune";
+          rune.textContent = runeChars[Math.floor(Math.random() * runeChars.length)];
+          rune.style.left = (10 + Math.random() * 80) + "vw";
+          rune.style.animationDuration = (12 + Math.random() * 6) + "s";
+          rune.style.animationDelay = (Math.random() * 4) + "s";
+          container.appendChild(rune);
+        }
+      } else if (val === "night") {
+        count = 20;
+        particleClass = "particle-firefly";
+        // Spawn stars in sky area
+        for (let i = 0; i < 40; i++) {
+          const star = document.createElement("div");
+          star.className = "particle-star";
+          star.style.left = Math.random() * 100 + "vw";
+          star.style.top = (Math.random() * 45) + "vh";
+          star.style.animationDelay = (Math.random() * 3) + "s";
+          container.appendChild(star);
+        }
+      }
+
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement("div");
+        p.className = particleClass;
+        p.style.left = Math.random() * 100 + "vw";
+        p.style.animationDuration = (6 + Math.random() * 6) + "s";
+        p.style.animationDelay = (Math.random() * 5) + "s";
+        container.appendChild(p);
+      }
+    }
+
+    function addBattleLog(msg) {
+      if (typeof appendLogLine === 'function') {
+        appendLogLine(msg, 'system');
+      } else {
+        console.log('[Battle Log]:', msg);
+      }
+    }
+
+    function updateArenaStats(arenaKey) {
+      const arena = arenaData[arenaKey];
+      if (!arena) return;
+
+      document.body.style.backgroundColor = arena.bgColor;
+
+      // Update platform color variables
+      const playerPedestal = document.querySelector(".player-pedestal");
+      const opponentPedestal = document.querySelector(".opponent-pedestal");
+      
+      if (playerPedestal) {
+        playerPedestal.style.setProperty("--arena-glow", "rgba(0, 229, 255, 0.27)");
+        playerPedestal.style.setProperty("--arena-border", "#00bcd4");
+      }
+      if (opponentPedestal) {
+        opponentPedestal.style.setProperty("--arena-glow", "rgba(239, 68, 68, 0.30)");
+        opponentPedestal.style.setProperty("--arena-border", "#ef4444");
+      }
+
+      // Update Weather panel card values
+      const titleTxt = document.getElementById("weather-title-txt");
+      if (titleTxt) titleTxt.textContent = arena.weather;
+      
+      const descTxt = document.getElementById("weather-desc-txt");
+      if (descTxt) descTxt.textContent = arena.weatherDesc;
+      
+      const iconBubble = document.getElementById("weather-icon-bubble");
+      if (iconBubble) iconBubble.style.borderColor = arena.weatherColor;
+      
+      // Update details
+      const fieldModVal = document.getElementById("field-modifier-val");
+      if (fieldModVal) fieldModVal.textContent = arena.field;
+      
+      const weatherModVal = document.getElementById("weather-modifier-val");
+      if (weatherModVal) {
+        weatherModVal.textContent = arena.weather;
+        weatherModVal.style.color = arena.weatherColor;
+      }
+      
+      const windVal = document.getElementById("wind-velocity-val");
+      if (windVal) windVal.textContent = arena.wind;
+
+      const fieldWindVal = document.getElementById("field-wind-val");
+      if (fieldWindVal) fieldWindVal.textContent = arena.wind;
+
+      // Color tint and fog overlays classes
+      const colorOverlay = document.getElementById("weather-color-overlay");
+      const fogOverlay = document.getElementById("weather-fog-overlay");
+      if (colorOverlay) {
+        colorOverlay.className = "weather-color-overlay weather-" + arenaKey;
+      }
+      if (fogOverlay) {
+        fogOverlay.className = "arena-fog-layer fog-" + arenaKey;
+      }
+
+      // Heat distortion visibility
+      const distortion = document.querySelector(".heat-distortion");
+      if (distortion) {
+        distortion.style.display = (arenaKey === "volcano") ? "block" : "none";
+      }
+
+      // Generate environmental weather particles
+      generateEnvironmentParticles(arenaKey);
+    }
+
+    function changeArenaBackground(arenaName) {
+      const stage = domCache.battleFieldStage || document.querySelector(".battle-field-stage");
+      const arenaMap = {
+        'Volcano Arena': './assets/arenas/volcano-arena.jpg',
+        'Forest Arena': './assets/arenas/forest-arena.jpg',
+        'Snow Arena': './assets/arenas/snow-arena.jpg',
+        'Beach Arena': './assets/arenas/beach-arena.jpg',
+        'Ancient Temple': './assets/arenas/ancient-temple-arena.jpg',
+        'Night Arena': './assets/arenas/night-arena.jpg'
+      };
+
+      let imagePath = arenaMap[arenaName];
+
+      if (!stage || !imagePath) return;
+
+      const preloadedImg = bgImagesCache[imagePath];
+      if (preloadedImg && preloadedImg.complete) {
+        applyBackground(imagePath);
+      } else {
+        const imgCheck = new Image();
+        imgCheck.onload = function() {
+          applyBackground(imagePath);
+        };
+        imgCheck.onerror = function() {
+          const fallbackPath = './assets/arenas/volcano-arena.jpg';
+          applyBackground(fallbackPath);
+        };
+        imgCheck.src = imagePath;
+      }
+
+      function applyBackground(path) {
+        stage.style.backgroundImage =
+          `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)), url("${path}")`;
+        stage.style.backgroundSize = 'cover';
+        stage.style.backgroundPosition = 'center';
+        stage.style.backgroundRepeat = 'no-repeat';
+        addBattleLog(`Switched environment to ${arenaName}!`);
+      }
+    }
+
+    function selectOpponentPokemon(nameOrRandom) {
+      const pool = [
+        {
+          name: "Charizard",
+          lvl: 82,
+          id: 6,
+          type: "Fire",
+          hp: 240,
+          maxHp: 240,
+          border: "#f97316",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+          moves: [
+            { name: "Flamethrower", type: "Fire", pp: "15/15" },
+            { name: "Air Slash", type: "Flying", pp: "20/20" },
+            { name: "Dragon Claw", type: "Dragon", pp: "15/15" },
+            { name: "Fire Blast", type: "Fire", pp: "5/5" }
+          ]
+        },
+        {
+          name: "Blastoise",
+          lvl: 80,
+          id: 9,
+          type: "Water",
+          hp: 250,
+          maxHp: 250,
+          border: "#3b82f6",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png",
+          moves: [
+            { name: "Hydro Pump", type: "Water", pp: "5/5" },
+            { name: "Aqua Tail", type: "Water", pp: "10/10" },
+            { name: "Bite", type: "Dark", pp: "25/25" },
+            { name: "Skull Bash", type: "Normal", pp: "15/15" }
+          ]
+        },
+        {
+          name: "Venusaur",
+          lvl: 80,
+          id: 3,
+          type: "Grass",
+          hp: 260,
+          maxHp: 260,
+          border: "#10b981",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+          moves: [
+            { name: "Solar Beam", type: "Grass", pp: "10/10" },
+            { name: "Vine Whip", type: "Grass", pp: "25/25" },
+            { name: "Razor Leaf", type: "Grass", pp: "25/25" },
+            { name: "Sleep Powder", type: "Grass", pp: "15/15" }
+          ]
+        },
+        {
+          name: "Gengar",
+          lvl: 81,
+          id: 94,
+          type: "Ghost",
+          hp: 220,
+          maxHp: 220,
+          border: "#a855f7",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
+          moves: [
+            { name: "Shadow Ball", type: "Ghost", pp: "15/15" },
+            { name: "Dark Pulse", type: "Dark", pp: "15/15" },
+            { name: "Hex", type: "Ghost", pp: "10/10" },
+            { name: "Hypnosis", type: "Psychic", pp: "20/20" }
+          ]
+        },
+        {
+          name: "Dragonite",
+          lvl: 85,
+          id: 149,
+          type: "Dragon",
+          hp: 270,
+          maxHp: 270,
+          border: "#fbbf24",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png",
+          moves: [
+            { name: "Dragon Rush", type: "Dragon", pp: "10/10" },
+            { name: "Hurricane", type: "Flying", pp: "10/10" },
+            { name: "Fire Punch", type: "Fire", pp: "15/15" },
+            { name: "Slam", type: "Normal", pp: "20/20" }
+          ]
+        },
+        {
+          name: "Mewtwo",
+          lvl: 90,
+          id: 150,
+          type: "Psychic",
+          hp: 290,
+          maxHp: 290,
+          border: "#ec4899",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png",
+          moves: [
+            { name: "Psychic", type: "Psychic", pp: "10/10" },
+            { name: "Aura Sphere", type: "Fighting", pp: "20/20" },
+            { name: "Shadow Ball", type: "Ghost", pp: "15/15" },
+            { name: "Recover", type: "Normal", pp: "10/10" }
+          ]
+        },
+        {
+          name: "Lapras",
+          lvl: 80,
+          id: 131,
+          type: "Ice",
+          hp: 280,
+          maxHp: 280,
+          border: "#38bdf8",
+          sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png",
+          moves: [
+            { name: "Ice Beam", type: "Ice", pp: "10/10" },
+            { name: "Hydro Pump", type: "Water", pp: "5/5" },
+            { name: "Body Slam", type: "Normal", pp: "15/15" },
+            { name: "Sing", type: "Normal", pp: "15/15" }
+          ]
+        }
+      ];
+
+      let pkmn;
+      if (nameOrRandom && nameOrRandom !== "random") {
+        pkmn = pool.find(p => p.name.toLowerCase() === nameOrRandom.toLowerCase());
+      }
+      
+      if (!pkmn) {
+        pkmn = pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      opponentTeamData[0] = JSON.parse(JSON.stringify(pkmn));
+      opponentActiveHp = opponentTeamData[0].hp;
+
+      const nameEl = document.getElementById("opponent-hud-name");
+      if (nameEl) nameEl.textContent = pkmn.name;
+
+      const lvlEl = document.getElementById("opponent-hud-lvl");
+      if (lvlEl) lvlEl.textContent = "Lv. " + pkmn.lvl;
+
+      const spriteEl = document.getElementById("opponent-hud-sprite");
+      if (spriteEl) spriteEl.src = pkmn.sprite;
+
+      const stageSpriteEl = document.getElementById("stage-opponent-sprite");
+      if (stageSpriteEl) {
+        stageSpriteEl.src = pkmn.sprite;
+        stageSpriteEl.alt = pkmn.name;
+        stageSpriteEl.style.filter = `drop-shadow(0 15px 25px rgba(0,0,0,0.65)) drop-shadow(0 0 12px ${pkmn.border})`;
+      }
+
+      const hpValEl = document.getElementById("opponent-hud-hp-val");
+      if (hpValEl) hpValEl.textContent = opponentActiveHp;
+
+      syncBattleHUDs();
+    }
+
+    // Connect dropdown
+    document.getElementById('arenaSelect').addEventListener('change', function(e) {
+      const arenaMapReverse = {
+        'Volcano Arena': 'volcano',
+        'Forest Arena': 'forest',
+        'Snow Arena': 'snow',
+        'Beach Arena': 'beach',
+        'Ancient Temple': 'temple',
+        'Night Arena': 'night'
+      };
+      const key = arenaMapReverse[e.target.value];
+      if (key) {
+        currentArenaKey = key;
+        saveArenaToLocalStorage(key);
+        changeArenaBackground(e.target.value);
+        updateArenaStats(key);
+        
+        const opponentMap = {
+          'volcano': 'Charizard',
+          'forest': 'Venusaur',
+          'snow': 'Lapras',
+          'beach': 'Blastoise',
+          'temple': 'Mewtwo',
+          'night': 'Gengar'
+        };
+        const oppName = opponentMap[key];
+        if (oppName) {
+          selectOpponentPokemon(oppName);
+        }
+      }
+    });
+
+    // ==========================================
+    // PHASE 3.1: BATTLE ANIMATION ENGINE (CANVAS)
+    // ==========================================
+    const animCanvas = document.getElementById("battle-animation-canvas");
+    const animCtx = animCanvas.getContext("2d");
+    let activeVisualEffects = [];
+    let isPlayingEffectLoop = false;
+
+    function resizeAnimCanvas() {
+      const rect = animCanvas.parentElement.getBoundingClientRect();
+      animCanvas.width = rect.width;
+      animCanvas.height = rect.height;
+    }
+    window.addEventListener("resize", resizeAnimCanvas);
+    resizeAnimCanvas();
+
+    function getSpriteCenter(element) {
+      const canvasRect = animCanvas.getBoundingClientRect();
+      const spriteRect = element.getBoundingClientRect();
+      return {
+        x: spriteRect.left - canvasRect.left + spriteRect.width / 2,
+        y: spriteRect.top - canvasRect.top + spriteRect.height / 2
+      };
+    }
+
+    function getAnimationPositions(isPlayerAttacker) {
+      const pSprite = document.getElementById("stage-player-sprite");
+      const oSprite = document.getElementById("stage-opponent-sprite");
+      const pCenter = getSpriteCenter(pSprite);
+      const oCenter = getSpriteCenter(oSprite);
+      return isPlayerAttacker 
+        ? { start: pCenter, end: oCenter, attacker: pSprite, target: oSprite }
+        : { start: oCenter, end: pCenter, attacker: oSprite, target: pSprite };
+    }
+
+    function startEffectLoop() {
+      if (isPlayingEffectLoop) return;
+      isPlayingEffectLoop = true;
+      function tick() {
+        animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+        activeVisualEffects = activeVisualEffects.filter(fx => {
+          fx.update();
+          fx.draw(animCtx);
+          return fx.life > 0;
+        });
+        if (activeVisualEffects.length > 0) {
+          requestAnimationFrame(tick);
+        } else {
+          isPlayingEffectLoop = false;
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Disable or Enable UI combat control buttons
+    function disableMoveButtons(disabled) {
+      const buttons = document.querySelectorAll(".move-btn-slot, .hex-fight-btn, .aux-btn, .bag-use-btn, .bag-item-card");
+      buttons.forEach(btn => {
+        btn.disabled = disabled;
+        if (disabled) {
+          btn.style.opacity = "0.6";
+          btn.style.pointerEvents = "none";
+        } else {
+          btn.style.opacity = "1";
+          btn.style.pointerEvents = "auto";
+        }
+      });
+      
+      const cards = document.querySelectorAll(".team-member-card");
+      cards.forEach(c => {
+        // Only disable team switching cards during standard animations, not when fainted (forced switch)
+        const isSwitchAllowed = battleState === "FAINTED" || !disabled;
+        if (!isSwitchAllowed) {
+          c.style.opacity = "0.6";
+          c.style.pointerEvents = "none";
+        } else {
+          c.style.opacity = "1";
+          c.style.pointerEvents = "auto";
+        }
+      });
+    }
+
+    function cleanupVisualEffects() {
+      try {
+        activeVisualEffects = [];
+        if (animCtx) animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+        isPlayingEffectLoop = false;
+        
+        // Hide precreated capture ball
+        const precreatedBall = document.getElementById("battle-capture-ball");
+        if (precreatedBall) precreatedBall.style.display = "none";
+        
+        // Remove any leftover sparkle/dot elements
+        document.querySelectorAll('.sparkle, .status-dot, .capture-spark, .heal-particle, .effect-particle, .electric-particle, .floating-dot, .capture-effect, .shake-effect')
+          .forEach(el => el.remove());
+          
+        const overlay = document.getElementById('combat-effect-overlay');
+        if (overlay) overlay.innerHTML = '';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Prepare Animation states, remove old classes, clear canvas arrays and trigger reflow
+    function prepareAnimation(isPlayer) {
+      const pos = getAnimationPositions(isPlayer);
+
+      cleanupVisualEffects();
+
+      // Remove classes
+      const pSprite = document.getElementById("stage-player-sprite");
+      const oSprite = document.getElementById("stage-opponent-sprite");
+      const stage = document.querySelector(".battle-field-stage");
+
+      pSprite.classList.remove("animate-jump");
+      oSprite.classList.remove("animate-jump");
+      pSprite.classList.remove("flash-red");
+      oSprite.classList.remove("flash-red");
+      stage.classList.remove("shake-stage");
+      document.body.classList.remove("screen-flash");
+
+      // Reflow
+      void pSprite.offsetWidth;
+      void oSprite.offsetWidth;
+      void stage.offsetWidth;
+      void document.body.offsetWidth;
+
+      // Lock buttons
+      disableMoveButtons(true);
+
+      return pos;
+    }
+
+    // Spawns floating damage numbers popup in HTML structure
+    function spawnDamagePopup(amount, isPlayerSide, isSuperEffective) {
+      const container = document.querySelector(".battle-field-stage");
+      const popup = document.createElement("div");
+      popup.className = "damage-popup";
+      if (isSuperEffective) {
+        popup.classList.add("super-effective");
+        popup.textContent = "-" + amount + " Super Effective!";
+      } else {
+        popup.textContent = "-" + amount;
+      }
+      
+      if (isPlayerSide) {
+        popup.classList.add("player-side");
+      } else {
+        popup.classList.add("opponent-side");
+      }
+      
+      container.appendChild(popup);
+      
+      // Auto-remove after animation completes
+      setTimeout(() => {
+        popup.remove();
+      }, 1200);
+    }
+
+    function spawnGreenHealPopup(amount, isPlayerSide) {
+      const container = document.querySelector(".battle-field-stage");
+      const popup = document.createElement("div");
+      popup.className = "damage-popup";
+      popup.style.color = "#10b981"; // green color
+      popup.textContent = "+" + amount;
+      
+      if (isPlayerSide) {
+        popup.classList.add("player-side");
+      } else {
+        popup.classList.add("opponent-side");
+      }
+      
+      container.appendChild(popup);
+      
+      setTimeout(() => {
+        popup.remove();
+      }, 1200);
+    }
+
+    // Red flash hit target function
+    function flashTargetRed(targetElement) {
+      targetElement.classList.add("flash-red");
+      setTimeout(() => {
+        targetElement.classList.remove("flash-red");
+      }, 600);
+    }
+
+    // Faint animation trigger & Victory/Defeat screen popup
+    function triggerFaintAnimation(isPlayer) {
+      battleState = "FAINTED";
+      playSynthSound('faint');
+      
+      const sprite = isPlayer 
+        ? document.getElementById("stage-player-sprite")
+        : document.getElementById("stage-opponent-sprite");
+        
+      sprite.classList.add("animate-faint");
+      
+      validateActiveIndices();
+      const name = isPlayer 
+        ? playerTeamData[activePlayerPkmnIndex].name
+        : opponentTeamData[activeOpponentPkmnIndex].name;
+        
+      appendLogLine(name + " fainted!", "system");
+      showToast(name + " has fainted!");
+      disableMoveButtons(true);
+
+      // Check if player has other healthy Pokémon (Task 3)
+      if (isPlayer) {
+        const hasHealthy = playerTeamData.some(p => p && p.hp > 0);
+        if (hasHealthy) {
+          setTimeout(() => {
+            const overlay = document.getElementById("result-modal-overlay");
+            const title = document.getElementById("result-modal-title");
+            const bodyText = document.getElementById("result-modal-text");
+            const card = document.getElementById("result-modal-card");
+
+            overlay.style.display = "flex";
+            title.textContent = "CHOOSE NEXT POKÉMON";
+            title.className = "result-title win";
+            bodyText.textContent = `Your active Pokémon ${name} fainted. Choose your next Pokémon to continue the battle:`;
+            card.className = "battle-result-modal win";
+
+            const selectContainer = document.getElementById("pokemon-select-container");
+            const selectEl = document.getElementById("next-pokemon-select");
+            if (selectContainer && selectEl) {
+              selectContainer.style.display = "block";
+              selectEl.innerHTML = "";
+              playerTeamData.forEach((p, idx) => {
+                if (p && p.hp > 0) {
+                  const opt = document.createElement("option");
+                  opt.value = idx;
+                  opt.textContent = `${p.name} (Lv. ${p.lvl}) - HP: ${p.hp}/${p.maxHp}`;
+                  selectEl.appendChild(opt);
+                }
+              });
+            }
+
+            // Temporarily replace restart button action for force switch
+            const restartBtn = document.querySelector(".restart-btn");
+            if (restartBtn) {
+              restartBtn.textContent = "SWITCH POKÉMON";
+              restartBtn.setAttribute("onclick", "confirmForceSwitch()");
+            }
+          }, 1000);
+          return;
+        }
+      }
+
+      // Display final results modal for true win/lose outcome
+      setTimeout(async () => {
+        const overlay = document.getElementById("result-modal-overlay");
+        const title = document.getElementById("result-modal-title");
+        const bodyText = document.getElementById("result-modal-text");
+        const card = document.getElementById("result-modal-card");
+
+        overlay.style.display = "flex";
+        
+        // Restore standard button settings
+        const restartBtn = document.querySelector(".restart-btn");
+        if (restartBtn) {
+          restartBtn.textContent = "BATTLE AGAIN";
+          restartBtn.setAttribute("onclick", "resetBattleGame()");
+        }
+
+        if (isPlayer) {
+          title.textContent = "DEFEAT";
+          title.className = "result-title lose";
+          bodyText.textContent = "All of your Pokémon have fainted! You lost the battle.";
+          card.className = "battle-result-modal";
+
+          const selectContainer = document.getElementById("pokemon-select-container");
+          if (selectContainer) {
+            selectContainer.style.display = "none";
+          }
+        } else {
+          title.textContent = "VICTORY";
+          title.className = "result-title win";
+          bodyText.textContent = "You successfully defeated the wild " + opponentTeamData[activeOpponentPkmnIndex].name + "! Your team gained 450 EXP.";
+          card.className = "battle-result-modal win";
+
+          const selectContainer = document.getElementById("pokemon-select-container");
+          if (selectContainer) {
+            selectContainer.style.display = "none";
+          }
+        }
+
+        // Immediately submit battle result to backend API
+        if (typeof recordBattleToBackend === "function") {
+          try {
+            await recordBattleToBackend(isPlayer);
+          } catch (e) {
+            console.error("Failed to submit battle outcome:", e);
+          }
+        }
+      }, 1000);
+    }
+
+    // Confirm force switch action when active faints (Task 3)
+    function confirmForceSwitch() {
+      const selectEl = document.getElementById("next-pokemon-select");
+      if (!selectEl) return;
+      const idx = parseInt(selectEl.value);
+      validateActiveIndices();
+      if (isNaN(idx) || idx < 0 || idx >= playerTeamData.length) return;
+      
+      const targetPkmn = playerTeamData[idx];
+      if (targetPkmn.hp <= 0) {
+        showToast("Select a healthy Pokémon!");
+        return;
+      }
+
+      // Hide modal
+      document.getElementById("result-modal-overlay").style.display = "none";
+      
+      // Perform switch
+      activePlayerPkmnIndex = idx;
+      selectedMoveIndex = 0;
+      playerActiveHp = targetPkmn.hp;
+
+      // Restore sprite opacity and class
+      const pSprite = document.getElementById("stage-player-sprite");
+      if (pSprite) {
+        pSprite.className = "battle-pokemon-sprite player-pkmn";
+        pSprite.style.opacity = "1";
+      }
+
+      syncBattleHUDs();
+      renderTeamSidebar();
+      renderMovesGrid();
+
+      appendLogLine("Shashank sent out " + targetPkmn.name + "!", "player-action");
+      showToast("Swapped active Pokémon to: " + targetPkmn.name);
+      
+      // Restore standard restart button action in the modal
+      const restartBtn = document.querySelector(".restart-btn");
+      if (restartBtn) {
+        restartBtn.textContent = "BATTLE AGAIN";
+        restartBtn.setAttribute("onclick", "resetBattleGame()");
+      }
+
+      // Resume battle state
+      battleState = "IDLE";
+      disableMoveButtons(false);
+      
+      saveBattleStateToLocalStorage();
+    }
+
+    // Reset battle stats back to defaults
+    function resetBattleGame(bypassDebounce = false) {
+      if (!bypassDebounce && !checkClickDebounce()) return;
+
+      const selectContainer = document.getElementById("pokemon-select-container");
+      const selectEl = document.getElementById("next-pokemon-select");
+      if (selectContainer && selectEl && selectContainer.style.display === "block") {
+        activePlayerPkmnIndex = parseInt(selectEl.value);
+        selectContainer.style.display = "none";
+      }
+
+      // Hide modal
+      document.getElementById("result-modal-overlay").style.display = "none";
+      
+      // Restore standard button settings
+      const restartBtn = document.querySelector(".restart-btn");
+      if (restartBtn) {
+        restartBtn.textContent = "BATTLE AGAIN";
+        restartBtn.setAttribute("onclick", "resetBattleGame()");
+      }
+      
+      // Reset values based on currently selected arena
+      const opponentMap = {
+        'volcano': 'Charizard',
+        'forest': 'Venusaur',
+        'snow': 'Lapras',
+        'beach': 'Blastoise',
+        'temple': 'Mewtwo',
+        'night': 'Gengar'
+      };
+      const oppName = opponentMap[currentArenaKey] || "Charizard";
+      selectOpponentPokemon(oppName);
+      if (playerTeamData[activePlayerPkmnIndex]) {
+        playerActiveHp = playerTeamData[activePlayerPkmnIndex].maxHp;
+      }
+
+      // Restore health lists
+      playerTeamData.forEach(p => {
+        if (p) p.hp = p.maxHp;
+      });
+      if (playerTeamData[activePlayerPkmnIndex]) {
+        playerActiveHp = playerTeamData[activePlayerPkmnIndex].maxHp;
+      }
+
+      // Restore PP counts
+      playerTeamData.forEach(p => {
+        if (p && p.moves) {
+          p.moves.forEach(m => {
+            if (m && m.pp && typeof m.pp === 'string' && m.pp.includes('/')) {
+              let max = m.pp.split("/")[1];
+              m.pp = max + "/" + max;
+            }
+          });
+        }
+      });
+
+      // Clear faint and sprites layout classes
+      const pSprite = document.getElementById("stage-player-sprite");
+      const oSprite = document.getElementById("stage-opponent-sprite");
+      pSprite.className = "battle-pokemon-sprite player-pkmn";
+      oSprite.className = "battle-pokemon-sprite opponent-pkmn";
+      pSprite.style.opacity = "1";
+      oSprite.style.opacity = "1";
+
+      // Reset turn
+      turnCount = 7;
+      document.getElementById("battle-turn-counter").textContent = "07";
+
+      // Reset battle logs ticker
+      const arenaLabel = document.getElementById("arenaSelect")?.value || "Volcano Arena";
+      document.getElementById("battle-log-lines").innerHTML = `<div class="log-line system">Battle started in ${arenaLabel}!</div>`;
+      playerStatus = "paralysis"; // reset status for testing Full Heal
+
+      // Sync and render
+      syncBattleHUDs();
+      renderMovesGrid();
+      renderTeamSidebar();
+      
+      // Reset UI controls
+      disableMoveButtons(false);
+      battleState = "IDLE";
+
+      appendLogLine(`New battle started in ${arenaLabel}!`, "system");
+      showToast("Battle restarted!");
+      
+      saveBattleStateToLocalStorage();
+    }
+
+    // Smoothly calculate and deduct damage
+    function dealDamage(amount, isToOpponent, isSuperEffective) {
+      if (isToOpponent) {
+        opponentActiveHp = Math.max(0, opponentActiveHp - amount);
+        
+        // Update HP fill smoothly
+        const fill = document.getElementById("opponent-hud-hp-fill");
+        const val = document.getElementById("opponent-hud-hp-val");
+        const percent = Math.round((opponentActiveHp / opponentTeamData[activeOpponentPkmnIndex].maxHp) * 100);
+        fill.style.width = percent + "%";
+        val.textContent = opponentActiveHp;
+
+        spawnDamagePopup(amount, false, isSuperEffective);
+        
+        appendLogLine("Opponent's " + opponentTeamData[activeOpponentPkmnIndex].name + " took " + amount + " damage!", "opponent-action");
+        if (isSuperEffective) {
+          appendLogLine("It's super effective!", "effect");
+        }
+
+        if (opponentActiveHp <= 0) {
+          setTimeout(() => {
+            triggerFaintAnimation(false);
+          }, 600);
+        }
+      } else {
+        playerActiveHp = Math.max(0, playerActiveHp - amount);
+        playerTeamData[activePlayerPkmnIndex].hp = playerActiveHp;
+        
+        // Update player HP smoothly
+        const fill = document.getElementById("player-hud-hp-fill");
+        const val = document.getElementById("player-hud-hp-val");
+        const percent = Math.round((playerActiveHp / playerTeamData[activePlayerPkmnIndex].maxHp) * 100);
+        fill.style.width = percent + "%";
+        val.textContent = playerActiveHp;
+
+        spawnDamagePopup(amount, true, isSuperEffective);
+        renderTeamSidebar();
+
+        appendLogLine(playerTeamData[activePlayerPkmnIndex].name + " took " + amount + " damage!", "player-action");
+        if (isSuperEffective) {
+          appendLogLine("It's super effective!", "effect");
+        }
+
+        if (playerActiveHp <= 0) {
+          setTimeout(() => {
+            triggerFaintAnimation(true);
+          }, 600);
+        }
+      }
+      
+      saveBattleStateToLocalStorage();
+    }
+
+    // Central turn ending sequence
+    function finishTurn(isPlayerAttacker) {
+      cleanupVisualEffects();
+
+      if (isPlayerAttacker) {
+        if (opponentActiveHp > 0) {
+          setTimeout(opponentTurn, 1000);
+        } else {
+          // Opponent is fainted, keep controls locked for faint transition
+          console.log("Opponent fainted; keeping fight controls disabled.");
+        }
+      } else {
+        if (playerActiveHp > 0 && opponentActiveHp > 0) {
+          battleState = "IDLE";
+          disableMoveButtons(false);
+        } else {
+          console.log("Player fainted or battle ended; keeping fight controls disabled.");
+        }
+      }
+    }
+
+    // Thunderbolt implementation
+    function playThunderbolt(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('thunderbolt');
+      
+      pos.attacker.classList.add("animate-jump");
+      setTimeout(() => pos.attacker.classList.remove("animate-jump"), 500);
+
+      for (let i = 0; i < 25; i++) {
+        activeVisualEffects.push({
+          x: pos.start.x + (Math.random() - 0.5) * 80,
+          y: pos.start.y + (Math.random() - 0.5) * 80,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          life: 30 + Math.random() * 20,
+          maxLife: 50,
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+          },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Math.max(0, 3 * (this.life / this.maxLife)), 0, Math.PI * 2);
+            ctx.fillStyle = "#ffeb3b";
+            ctx.fill();
+            // Performant glow simulation
+            ctx.fillStyle = "rgba(255, 235, 59, 0.3)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Math.max(0, 6 * (this.life / this.maxLife)), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+
+      setTimeout(() => {
+        let segments = [];
+        let curX = pos.start.x;
+        let curY = pos.start.y;
+        const dx = pos.end.x - pos.start.x;
+        const dy = pos.end.y - pos.start.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const steps = 12;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const targetX = pos.start.x + dx * t;
+          const targetY = pos.start.y + dy * t;
+          if (i === 0 || i === steps) {
+            segments.push({x: targetX, y: targetY});
+          } else {
+            const normalX = -dy / dist;
+            const normalY = dx / dist;
+            const offset = (Math.random() - 0.5) * 35;
+            segments.push({
+              x: targetX + normalX * offset,
+              y: targetY + normalY * offset
+            });
+          }
+        }
+
+        activeVisualEffects.push({
+          life: 15,
+          update() { this.life--; },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(segments[0].x, segments[0].y);
+            for (let i = 1; i < segments.length; i++) {
+              ctx.lineTo(segments[i].x, segments[i].y);
+            }
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            
+            // Performant line glow simulation
+            ctx.strokeStyle = "rgba(255, 235, 59, 0.5)";
+            ctx.lineWidth = 15;
+            ctx.stroke();
+          }
+        });
+
+        setTimeout(() => {
+          document.body.classList.add("screen-flash");
+          setTimeout(() => document.body.classList.remove("screen-flash"), 120);
+
+          flashTargetRed(pos.target);
+          playSynthSound('hit');
+
+          if (onFinishedCallback) onFinishedCallback();
+          finishTurn(isPlayer);
+
+          for (let i = 0; i < 30; i++) {
+            activeVisualEffects.push({
+              x: pos.end.x,
+              y: pos.end.y,
+              vx: (Math.random() - 0.5) * 12,
+              vy: (Math.random() - 0.5) * 12 - 3,
+              life: 40 + Math.random() * 20,
+              maxLife: 60,
+              update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.15; // gravity
+                this.life--;
+              },
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(0, 4 * (this.life / this.maxLife)), 0, Math.PI * 2);
+                ctx.fillStyle = "#ff6f00";
+                ctx.fill();
+                // Performant glow simulation
+                ctx.fillStyle = "rgba(255, 235, 59, 0.3)";
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(0, 8 * (this.life / this.maxLife)), 0, Math.PI * 2);
+                ctx.fill();
+              }
+            });
+          }
+        }, 100);
+
+        startEffectLoop();
+      }, 200);
+
+      startEffectLoop();
+    }
+
+    // Flamethrower implementation
+    function playFlamethrower(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('flamethrower');
+      
+      runAnimationLoop(1000, 40, (tickCount) => {
+        // Spawn fire embers
+        for (let k = 0; k < 3; k++) {
+          activeVisualEffects.push({
+            x: pos.start.x,
+            y: pos.start.y - 30,
+            targetX: pos.end.x,
+            targetY: pos.end.y,
+            t: 0,
+            speed: 0.035 + Math.random() * 0.015,
+            spreadX: (Math.random() - 0.5) * 35,
+            spreadY: (Math.random() - 0.5) * 35,
+            size: 8 + Math.random() * 10,
+            life: 1,
+            update() {
+              this.t += this.speed;
+              if (this.t >= 1.0) {
+                this.life = 0;
+              }
+              const currentT = this.t;
+              this.x = (1 - currentT) * pos.start.x + currentT * this.targetX + this.spreadX * Math.sin(currentT * Math.PI);
+              this.y = (1 - currentT) * (pos.start.y - 30) + currentT * this.targetY + this.spreadY * Math.sin(currentT * Math.PI);
+              this.size *= 0.96;
+            },
+            draw(ctx) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+              const r = Math.floor(255);
+              const g = Math.floor(100 + Math.random() * 100);
+              ctx.fillStyle = `rgba(${r}, ${g}, 0, ${1.0 - this.t})`;
+              ctx.fill();
+              // Performant glow instead of shadowBlur
+              ctx.fillStyle = `rgba(255, 61, 0, ${(1.0 - this.t) * 0.3})`;
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+        }
+        startEffectLoop();
+      }, () => {
+        setTimeout(() => {
+          flashTargetRed(pos.target);
+          playSynthSound('hit');
+          if (onFinishedCallback) onFinishedCallback();
+          finishTurn(isPlayer);
+
+          for (let i = 0; i < 12; i++) {
+            activeVisualEffects.push({
+              x: pos.end.x + (Math.random() - 0.5) * 40,
+              y: pos.end.y + (Math.random() - 0.5) * 40,
+              vx: (Math.random() - 0.5) * 2,
+              vy: -Math.random() * 2 - 0.5,
+              size: 15 + Math.random() * 15,
+              life: 40 + Math.random() * 20,
+              maxLife: 60,
+              update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.size += 0.25;
+                this.life--;
+              },
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(100, 100, 100, ${0.4 * (this.life / this.maxLife)})`;
+                ctx.fill();
+              }
+            });
+          }
+          startEffectLoop();
+        }, 400);
+      });
+    }
+
+    // Hydro Pump implementation
+    function playHydroPump(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('hydropump');
+      
+      runAnimationLoop(800, 40, (tickCount) => {
+        for (let k = 0; k < 5; k++) {
+          activeVisualEffects.push({
+            x: pos.start.x,
+            y: pos.start.y - 20,
+            targetX: pos.end.x,
+            targetY: pos.end.y,
+            t: 0,
+            speed: 0.05 + Math.random() * 0.02,
+            size: 6 + Math.random() * 8,
+            offsetY: (Math.random() - 0.5) * 20,
+            life: 1,
+            update() {
+              this.t += this.speed;
+              if (this.t >= 1) {
+                this.life = 0;
+                flashTargetRed(pos.target);
+                playSynthSound('hit');
+                if (onFinishedCallback) {
+                  onFinishedCallback();
+                  onFinishedCallback = null; // trigger once
+                }
+                finishTurn(isPlayer);
+
+                for (let i = 0; i < 2; i++) {
+                  activeVisualEffects.push({
+                    x: this.targetX,
+                    y: this.targetY,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8 - 2,
+                    size: 3 + Math.random() * 4,
+                    life: 20,
+                    update() {
+                      this.x += this.vx;
+                      this.y += this.vy;
+                      this.vy += 0.2;
+                      this.life--;
+                    },
+                    draw(ctx) {
+                      ctx.beginPath();
+                      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                      ctx.fillStyle = "rgba(100, 200, 255, 0.75)";
+                      ctx.fill();
+                    }
+                  });
+                }
+              }
+              const ct = this.t;
+              this.x = (1 - ct) * pos.start.x + ct * this.targetX;
+              this.y = (1 - ct) * (pos.start.y - 20) + ct * this.targetY + this.offsetY * Math.sin(ct * Math.PI);
+            },
+            draw(ctx) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+              ctx.fillStyle = "rgba(0, 150, 255, 0.8)";
+              ctx.fill();
+              // Performant glow instead of shadowBlur
+              ctx.fillStyle = "rgba(0, 188, 212, 0.3)";
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+        }
+        startEffectLoop();
+      });
+    }
+
+    // Aura Sphere / Fighting Sphere implementation
+    function playAuraSphere(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('aurasphere');
+
+      activeVisualEffects.push({
+        x: pos.start.x,
+        y: pos.start.y - 25,
+        targetX: pos.end.x,
+        targetY: pos.end.y,
+        t: 0,
+        speed: 0.025,
+        size: 32,
+        life: 1,
+        update() {
+          this.t += this.speed;
+          if (this.t >= 1) {
+            this.life = 0;
+            flashTargetRed(pos.target);
+            playSynthSound('hit');
+            if (onFinishedCallback) onFinishedCallback();
+            finishTurn(isPlayer);
+
+            activeVisualEffects.push({
+              x: this.targetX,
+              y: this.targetY,
+              size: 10,
+              maxSize: 120,
+              life: 25,
+              update() {
+                this.size += (this.maxSize - this.size) * 0.15;
+                this.life--;
+              },
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0, 229, 255, ${this.life / 25})`;
+                ctx.lineWidth = 4;
+                ctx.stroke();
+              }
+            });
+          }
+          const ct = this.t;
+          this.x = (1 - ct) * pos.start.x + ct * this.targetX;
+          this.y = (1 - ct) * (pos.start.y - 25) + ct * this.targetY;
+        },
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          const grad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, this.size);
+          grad.addColorStop(0, "#ffffff");
+          grad.addColorStop(0.3, "#00e5ff");
+          grad.addColorStop(1, "rgba(0, 145, 234, 0.0)");
+          ctx.fillStyle = grad;
+          ctx.fill();
+        }
+      });
+      startEffectLoop();
+    }
+
+    // Solar Beam / heavy beam implementation
+    function playSolarBeam(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('solarbeam');
+
+      // Charging Leaf / Energy particles floating in
+      for (let i = 0; i < 30; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const rad = 100 + Math.random() * 60;
+        activeVisualEffects.push({
+          x: pos.start.x + Math.cos(angle) * rad,
+          y: pos.start.y - 20 + Math.sin(angle) * rad,
+          targetX: pos.start.x,
+          targetY: pos.start.y - 20,
+          t: 0,
+          speed: 0.02 + Math.random() * 0.015,
+          life: 1,
+          update() {
+            this.t += this.speed;
+            if (this.t >= 1) this.life = 0;
+            this.x = (1 - this.t) * (pos.start.x + Math.cos(angle) * rad) + this.t * this.targetX;
+            this.y = (1 - this.t) * (pos.start.y - 20 + Math.sin(angle) * rad) + this.t * this.targetY;
+          },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "#81c784";
+            ctx.fill();
+            // Performant glow simulation
+            ctx.fillStyle = "rgba(76, 175, 80, 0.3)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+
+      // Draw blinding green laser beam after 600ms
+      setTimeout(() => {
+        flashTargetRed(pos.target);
+        playSynthSound('hit');
+        if (onFinishedCallback) onFinishedCallback();
+        finishTurn(isPlayer);
+
+        activeVisualEffects.push({
+          life: 25,
+          maxLife: 25,
+          update() { this.life--; },
+          draw(ctx) {
+            const ratio = this.life / this.maxLife;
+            ctx.beginPath();
+            ctx.moveTo(pos.start.x, pos.start.y - 20);
+            ctx.lineTo(pos.end.x, pos.end.y);
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 22 * ratio;
+            ctx.shadowColor = "#2e7d32";
+            ctx.shadowBlur = 30;
+            ctx.stroke();
+
+            ctx.strokeStyle = "#4caf50";
+            ctx.lineWidth = 10 * ratio;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
+        });
+
+        // Floating leaves drifting down
+        for (let i = 0; i < 20; i++) {
+          activeVisualEffects.push({
+            x: pos.end.x + (Math.random() - 0.5) * 80,
+            y: pos.end.y - 60 - Math.random() * 60,
+            vx: (Math.random() - 0.5) * 3,
+            vy: 2 + Math.random() * 3,
+            angle: Math.random() * Math.PI,
+            rotSpeed: (Math.random() - 0.5) * 0.1,
+            life: 50,
+            update() {
+              this.x += this.vx;
+              this.y += this.vy;
+              this.angle += this.rotSpeed;
+              this.life--;
+            },
+            draw(ctx) {
+              ctx.save();
+              ctx.translate(this.x, this.y);
+              ctx.rotate(this.angle);
+              ctx.beginPath();
+              ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+              ctx.fillStyle = "#2e7d32";
+              ctx.fill();
+              ctx.restore();
+            }
+          });
+        }
+        startEffectLoop();
+      }, 600);
+
+      startEffectLoop();
+    }
+
+    // Earthquake / ground crack implementation
+    function playEarthquake(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('earthquake');
+      const stage = document.querySelector(".battle-field-stage");
+      
+      stage.classList.add("shake-stage");
+      setTimeout(() => stage.classList.remove("shake-stage"), 700);
+
+      const cracks = document.querySelector(".magma-crack-svg");
+      if (cracks) {
+        cracks.style.filter = "drop-shadow(0 0 15px #ff0000) brightness(2)";
+        setTimeout(() => cracks.style.filter = "", 700);
+      }
+
+      flashTargetRed(pos.target);
+      playSynthSound('hit');
+      if (onFinishedCallback) onFinishedCallback();
+      finishTurn(isPlayer);
+
+      for (let i = 0; i < 30; i++) {
+        activeVisualEffects.push({
+          x: animCanvas.width * 0.15 + Math.random() * (animCanvas.width * 0.7),
+          y: animCanvas.height * 0.65 + (Math.random() - 0.5) * 40,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 4 - 1,
+          size: 10 + Math.random() * 12,
+          life: 40 + Math.random() * 30,
+          maxLife: 70,
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.size += 0.15;
+            this.life--;
+          },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(180, 100, 50, ${0.35 * (this.life / this.maxLife)})`;
+            ctx.fill();
+          }
+        });
+      }
+      startEffectLoop();
+    }
+
+    // Physical speed-dash move animation (Quick Attack, Slash, etc.)
+    function playPhysicalAttack(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('aurasphere');
+
+      const sprite = pos.attacker;
+      sprite.style.transition = "transform 0.15s ease-out";
+      
+      const dirX = isPlayer ? 100 : -100;
+      const dirY = isPlayer ? -40 : 40;
+      
+      const normalScale = isPlayer ? "scaleX(-1)" : "scaleX(1)";
+      sprite.style.transform = `translate(${dirX}px, ${dirY}px) ${normalScale}`;
+
+      setTimeout(() => {
+        sprite.style.transform = normalScale;
+        
+        flashTargetRed(pos.target);
+        playSynthSound('hit');
+        
+        if (onFinishedCallback) onFinishedCallback();
+        finishTurn(isPlayer);
+
+        for (let i = 0; i < 15; i++) {
+          activeVisualEffects.push({
+            x: pos.end.x + (Math.random() - 0.5) * 40,
+            y: pos.end.y + (Math.random() - 0.5) * 40,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 20,
+            update() {
+              this.x += this.vx;
+              this.y += this.vy;
+              this.life--;
+            },
+            draw(ctx) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+              ctx.fillStyle = "#ffffff";
+              ctx.fill();
+              // Performant glow simulation
+              ctx.fillStyle = "rgba(255, 235, 59, 0.3)";
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+        }
+        startEffectLoop();
+      }, 150);
+
+      setTimeout(() => {
+        sprite.style.transition = "";
+      }, 800);
+    }
+
+    // Dragon Purple Slash animation
+    function playDragonSlash(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('aurasphere');
+
+      // Slash visual line
+      activeVisualEffects.push({
+        life: 20,
+        update() { this.life--; },
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.moveTo(pos.end.x - 50, pos.end.y - 50);
+          ctx.lineTo(pos.end.x + 50, pos.end.y + 50);
+          ctx.moveTo(pos.end.x + 50, pos.end.y - 50);
+          ctx.lineTo(pos.end.x - 50, pos.end.y + 50);
+          ctx.strokeStyle = "#a855f7";
+          ctx.lineWidth = 7;
+          ctx.stroke();
+          // Performant line glow simulation
+          ctx.strokeStyle = "rgba(236, 72, 153, 0.5)";
+          ctx.lineWidth = 18;
+          ctx.stroke();
+        }
+      });
+
+      flashTargetRed(pos.target);
+      playSynthSound('hit');
+      if (onFinishedCallback) onFinishedCallback();
+      finishTurn(isPlayer);
+
+      // Emit purple particles
+      for (let i = 0; i < 20; i++) {
+        activeVisualEffects.push({
+          x: pos.end.x,
+          y: pos.end.y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          life: 30,
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+          },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "#a855f7";
+            ctx.fill();
+          }
+        });
+      }
+      startEffectLoop();
+    }
+
+    // Glowing pink/purple energy orb (Psychic / Moonblast / Shadow Ball)
+    function playGlowingOrb(isPlayer = true, onFinishedCallback) {
+      const pos = prepareAnimation(isPlayer);
+      playSynthSound('aurasphere');
+
+      activeVisualEffects.push({
+        x: pos.start.x,
+        y: pos.start.y - 25,
+        targetX: pos.end.x,
+        targetY: pos.end.y,
+        t: 0,
+        speed: 0.03,
+        size: 28,
+        life: 1,
+        update() {
+          this.t += this.speed;
+          if (this.t >= 1) {
+            this.life = 0;
+            flashTargetRed(pos.target);
+            playSynthSound('hit');
+            if (onFinishedCallback) onFinishedCallback();
+            finishTurn(isPlayer);
+          }
+          this.x = (1 - this.t) * pos.start.x + this.t * this.targetX;
+          this.y = (1 - this.t) * (pos.start.y - 25) + this.t * this.targetY;
+        },
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          let grad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, this.size);
+          grad.addColorStop(0, "#ffffff");
+          grad.addColorStop(0.3, "#f472b6");
+          grad.addColorStop(1, "rgba(236, 72, 153, 0)");
+          ctx.fillStyle = grad;
+          ctx.fill();
+        }
+      });
+      startEffectLoop();
+    }
+
+    // Cleanse status blue sparkles animation
+    function playCleanseAnimation() {
+      const pos = getAnimationPositions(true); // Player side
+      for (let i = 0; i < 20; i++) {
+        activeVisualEffects.push({
+          x: pos.start.x + (Math.random() - 0.5) * 60,
+          y: pos.start.y + Math.random() * 40 - 20,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: -Math.random() * 3 - 1,
+          size: 3 + Math.random() * 4,
+          life: 40 + Math.random() * 20,
+          maxLife: 60,
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+          },
+          draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0, 229, 255, 0.85)";
+            ctx.fill();
+            // Performant glow simulation
+            ctx.fillStyle = "rgba(0, 229, 255, 0.3)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+      startEffectLoop();
+    }
+
+    // Poké Ball shake and capture animation sequence
+    
+    function cleanupCaptureEffects() {
+      try {
+        cleanupVisualEffects();
+        battleState = 'IDLE';
+        enableControls();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function enableControls() {
+      disableMoveButtons(false);
+    }
+
+    function playCaptureAnimation(ballName, catchRate) {
+      try {
+        cleanupCaptureEffects();
+        
+        battleState = "ANIMATING";
+        disableMoveButtons(true);
+        appendLogLine("Shashank threw a " + ballName + "!", "player-action");
+        playSynthSound("aurasphere");
+
+        // Hide opponent sprite representing caught state
+        document.getElementById("stage-opponent-sprite").style.opacity = "0.2";
+
+        // Reuse precreated capture ball element
+        const ball = document.getElementById("battle-capture-ball");
+        if (ball) {
+          ball.style.display = "block";
+          ball.style.animation = 'none';
+          ball.offsetHeight; // trigger reflow
+          ball.style.animation = '';
+        }
+
+        // After 1500ms, cleanup effects, run capture logic (success or fail)
+        setTimeout(() => {
+          try {
+            cleanupCaptureEffects();
+
+            // Check if captured successfully
+            if (Math.random() <= catchRate) {
+              // Success!
+              opponentActiveHp = 0;
+              syncBattleHUDs();
+              playSynthSound("hit");
+              appendLogLine("Gotcha! " + opponentTeamData[activeOpponentPkmnIndex].name + " was caught!", "effect");
+              setTimeout(() => {
+                triggerFaintAnimation(false);
+              }, 400);
+            } else {
+              // Failed!
+              appendLogLine("Oh no! " + opponentTeamData[activeOpponentPkmnIndex].name + " broke free!", "system");
+              document.getElementById("stage-opponent-sprite").style.opacity = "1";
+              
+              setTimeout(() => {
+                battleState = "IDLE";
+                disableMoveButtons(false);
+                setTimeout(opponentTurn, 1000);
+              }, 400);
+            }
+          } catch (e) {
+            console.error(e);
+            cleanupCaptureEffects();
+          }
+        }, 1500);
+
+      } catch (error) {
+        console.error(error);
+        cleanupCaptureEffects();
+      }
+    }
+
+
+    function executeMove(move) {
+      validateActiveIndices();
+      if (battleState !== "IDLE") return;
+
+      try {
+        const activePkmn = playerTeamData[activePlayerPkmnIndex];
+        
+        if (!move.pp || typeof move.pp !== 'string' || !move.pp.includes('/')) {
+          move.pp = "15/15";
+        }
+        if (!move.type) {
+          const nameLower = (move.name || "").toLowerCase();
+          if (nameLower.includes("vine") || nameLower.includes("whip") || nameLower.includes("solar") || nameLower.includes("leaf")) {
+            move.type = "Grass";
+          } else {
+            move.type = "Normal";
+          }
+        }
+
+        let [current, max] = move.pp.split("/").map(Number);
+        if (current <= 0) {
+          showToast("No PP left for this move!");
+          return;
+        }
+
+        // Decrease PP
+        current--;
+        move.pp = current + "/" + max;
+        renderMovesGrid();
+
+        battleState = "ANIMATING";
+        disableMoveButtons(true);
+
+        // Turn Counter
+        turnCount++;
+        document.getElementById("battle-turn-counter").textContent = String(turnCount).padStart(2, '0');
+
+        appendLogLine(activePkmn.name + " used " + move.name + "!", "player-action");
+        showToast("Cast: " + move.name);
+
+        // Routing Move type animation
+        const lowerType = move.type.toLowerCase();
+        const lowerName = move.name.toLowerCase();
+
+        // 1. Electric moves
+        if (lowerType === "electric") {
+          playThunderbolt(true, () => applyMoveDamage(move, true));
+        }
+        // 2. Fire moves
+        else if (lowerType === "fire") {
+          playFlamethrower(true, () => applyMoveDamage(move, true));
+        }
+        // 3. Water / Flying moves
+        else if (lowerType === "water" || lowerType === "flying") {
+          playHydroPump(true, () => applyMoveDamage(move, true));
+        }
+        // 4. Fighting moves
+        else if (lowerType === "fighting") {
+          playAuraSphere(true, () => applyMoveDamage(move, true));
+        }
+        // 5. Dragon moves
+        else if (lowerType === "dragon") {
+          playDragonSlash(true, () => applyMoveDamage(move, true));
+        }
+        // 6. Ground moves
+        else if (lowerType === "ground") {
+          playEarthquake(true, () => applyMoveDamage(move, true));
+        }
+        // 7. Grass moves (Task 4)
+        else if (lowerType === "grass") {
+          playSolarBeam(true, () => applyMoveDamage(move, true));
+        }
+        // 8. Psychic / Fairy / Dark
+        else if (lowerType === "psychic" || lowerType === "fairy" || lowerType === "dark") {
+          playGlowingOrb(true, () => applyMoveDamage(move, true));
+        }
+        // 9. Normal / Steel moves
+        else {
+          playPhysicalAttack(true, () => applyMoveDamage(move, true));
+        }
+
+      } catch (error) {
+        console.error(error);
+        cleanupCaptureEffects();
+        appendLogLine("Action failed. Try again.", "system");
+      }
+    }
+
+    function applyMoveDamage(move, isPlayer) {
+      let dmg = 22;
+      const lower = move.name.toLowerCase();
+      
+      if (lower.includes("thunderbolt") || lower.includes("fireblast") || lower.includes("solarbeam") || lower.includes("combat")) {
+        dmg = 35;
+      } else if (lower.includes("super") || lower.includes("hyper") || lower.includes("blast") || lower.includes("quake")) {
+        dmg = 28;
+      }
+
+      let isSuperEffective = false;
+      if (isPlayer) {
+        const oppType = opponentTeamData[activeOpponentPkmnIndex].type;
+        if (move.type === "Electric" && oppType === "Water") isSuperEffective = true;
+        if (move.type === "Electric" && oppType === "Flying") isSuperEffective = true;
+        if (move.type === "Fire" && oppType === "Grass") isSuperEffective = true;
+        if (move.type === "Fire" && oppType === "Ice") isSuperEffective = true;
+        if (move.type === "Water" && oppType === "Fire") isSuperEffective = true;
+        if (move.type === "Grass" && oppType === "Water") isSuperEffective = true;
+        if (move.type === "Fighting" && oppType === "Normal") isSuperEffective = true;
+        if (move.type === "Ghost" && oppType === "Psychic") isSuperEffective = true;
+      } else {
+        const playerType = playerTeamData[activePlayerPkmnIndex] ? playerTeamData[activePlayerPkmnIndex].type : "Normal";
+        if (move.type === "Electric" && playerType === "Water") isSuperEffective = true;
+        if (move.type === "Electric" && playerType === "Flying") isSuperEffective = true;
+        if (move.type === "Fire" && playerType === "Grass") isSuperEffective = true;
+        if (move.type === "Fire" && playerType === "Ice") isSuperEffective = true;
+        if (move.type === "Water" && playerType === "Fire") isSuperEffective = true;
+        if (move.type === "Grass" && playerType === "Water") isSuperEffective = true;
+        if (move.type === "Fighting" && playerType === "Normal") isSuperEffective = true;
+        if (move.type === "Ghost" && playerType === "Psychic") isSuperEffective = true;
+      }
+
+      dealDamage(dmg, isPlayer, isSuperEffective);
+    }
+
+    // Opponent auto AI turn implementation
+    function opponentTurn() {
+      validateActiveIndices();
+      try {
+        if (opponentActiveHp <= 0 || playerActiveHp <= 0) return;
+        
+        battleState = "ANIMATING";
+        disableMoveButtons(true);
+
+        const moves = opponentTeamData[activeOpponentPkmnIndex].moves;
+        const move = moves[Math.floor(Math.random() * moves.length)];
+        
+        appendLogLine("Opponent's " + opponentTeamData[activeOpponentPkmnIndex].name + " used " + move.name + "!", "opponent-action");
+        showToast("Opponent used: " + move.name);
+
+        const lowerType = (move.type || move.move_type || "Normal").toLowerCase();
+
+        if (lowerType === "electric") {
+          playThunderbolt(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "fire") {
+          playFlamethrower(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "water" || lowerType === "flying") {
+          playHydroPump(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "fighting") {
+          playAuraSphere(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "dragon") {
+          playDragonSlash(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "ground") {
+          playEarthquake(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "grass") { // Task 4
+          playSolarBeam(false, () => applyMoveDamage(move, false));
+        } else if (lowerType === "psychic" || lowerType === "fairy" || lowerType === "dark") {
+          playGlowingOrb(false, () => applyMoveDamage(move, false));
+        } else {
+          playPhysicalAttack(false, () => applyMoveDamage(move, false));
+        }
+
+      } catch (error) {
+        console.error(error);
+        cleanupCaptureEffects();
+        appendLogLine("Action failed. Try again.", "system");
+      }
+    }
+
+    // TRIGGER CAST MOVE wrapper pointing to executeMove
+    function triggerCastMove(name, type) {
+      const activePkmn = playerTeamData[activePlayerPkmnIndex];
+      const move = activePkmn.moves.find(m => m.name === name);
+      if (move) {
+        executeMove(move);
+      }
+    }
+
+    // TRIGGER FIGHT ATTACK
+    function triggerFightAttack() {
+      if (!checkClickDebounce()) return;
+      if (battleState !== "IDLE") return;
+      
+      const movesContainer = document.getElementById("fight-moves-box");
+      if (movesContainer) {
+        movesContainer.style.boxShadow = "0 0 25px var(--yellow)";
+        movesContainer.style.transition = "box-shadow 0.4s ease";
+        setTimeout(() => {
+          movesContainer.style.boxShadow = "";
+        }, 1000);
+      }
+
+      const pkmn = playerTeamData[activePlayerPkmnIndex];
+      const move = pkmn.moves[selectedMoveIndex];
+      executeMove(move);
+    }
+
+    // RUN AWAY
+    function triggerRunAway() {
+      if (!checkClickDebounce()) return;
+      if (battleState !== "IDLE") return;
+      const confirmRun = confirm("Do you want to escape from this Pokémon trainer battle?");
+      if (confirmRun) {
+        location.href = "index.html";
+      }
+    }
+
+    // UTILITY: APPEND BATTLE LOG LINE
+    function appendLogLine(text, styleClass) {
+      const logLines = domCache.battleLogLines || document.getElementById("battle-log-lines");
+      if (!logLines) return;
+      const newLine = document.createElement("div");
+      newLine.className = "log-line " + styleClass;
+      newLine.textContent = text;
+      logLines.appendChild(newLine);
+      
+      // Auto scroll
+      logLines.scrollTop = logLines.scrollHeight;
+    }
+
+    // TOAST NOTIFICATIONS
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    // INITIALIZATION RUNS
+    const cachedArenaKey = localStorage.getItem("pokemonNexusArena") || "volcano";
+    currentArenaKey = cachedArenaKey;
+
+    const arenaMapKeys = {
+      'volcano': 'Volcano Arena',
+      'forest': 'Forest Arena',
+      'snow': 'Snow Arena',
+      'beach': 'Beach Arena',
+      'temple': 'Ancient Temple',
+      'night': 'Night Arena'
+    };
+    const initialArenaName = arenaMapKeys[currentArenaKey] || 'Volcano Arena';
+
+    const opponentMap = {
+      'volcano': 'Charizard',
+      'forest': 'Venusaur',
+      'snow': 'Lapras',
+      'beach': 'Blastoise',
+      'temple': 'Mewtwo',
+      'night': 'Gengar'
+    };
+    const initialOpponent = opponentMap[currentArenaKey] || 'Charizard';
+    selectOpponentPokemon(initialOpponent);
+
+    const cachedBattleStateStr = localStorage.getItem("pokemonNexusBattleState");
+    if (cachedBattleStateStr) {
+      try {
+        const stateObj = JSON.parse(cachedBattleStateStr);
+        if (stateObj) {
+          if (stateObj.turnCount !== undefined) turnCount = stateObj.turnCount;
+          if (stateObj.battleState !== undefined) {
+            battleState = stateObj.battleState;
+            if (battleState === "ANIMATING") {
+              battleState = "IDLE";
+            }
+          }
+          if (stateObj.playerActiveHp !== undefined) playerActiveHp = stateObj.playerActiveHp;
+          if (stateObj.opponentActiveHp !== undefined) opponentActiveHp = stateObj.opponentActiveHp;
+          if (stateObj.activePlayerPkmnIndex !== undefined) activePlayerPkmnIndex = stateObj.activePlayerPkmnIndex;
+          if (stateObj.activeOpponentPkmnIndex !== undefined) activeOpponentPkmnIndex = stateObj.activeOpponentPkmnIndex;
+          if (stateObj.selectedMoveIndex !== undefined) selectedMoveIndex = stateObj.selectedMoveIndex;
+          if (stateObj.playerStatus !== undefined) playerStatus = stateObj.playerStatus;
+        }
+      } catch (err) {
+        console.error("Failed to parse cachedBattleStateStr:", err);
+      }
+    }
+
+    // Safety validation on active Pokémon index (Task 1)
+    validateActiveIndices();
+
+    if (playerTeamData[activePlayerPkmnIndex]) {
+      playerTeamData[activePlayerPkmnIndex].hp = playerActiveHp;
+    }
+    if (opponentTeamData[activeOpponentPkmnIndex]) {
+      opponentTeamData[activeOpponentPkmnIndex].hp = opponentActiveHp;
+    }
+
+    const dropdown = document.getElementById("arenaSelect");
+    if (dropdown) {
+      dropdown.value = initialArenaName;
+    }
+
+    renderTeamSidebar();
+    renderBagSidebar();
+    renderMovesGrid();
+    syncBattleHUDs(); // Syncs both player and opponent HUD elements
+    changeArenaBackground(initialArenaName);
+    updateArenaStats(currentArenaKey);
+
+    if (!localStorage.getItem("pokemonNexusTeam")) {
+      localStorage.setItem("pokemonNexusTeam", JSON.stringify(playerTeamData));
+    }
+    if (!localStorage.getItem("pokemonNexusInventory")) {
+      localStorage.setItem("pokemonNexusInventory", JSON.stringify(bagItemsData));
+    }
+    if (!localStorage.getItem("pokemonNexusArena")) {
+      localStorage.setItem("pokemonNexusArena", currentArenaKey);
+    }
+    if (!localStorage.getItem("pokemonNexusBattleState")) {
+      saveBattleStateToLocalStorage();
+    }
+
+    if (battleState === "FAINTED" || playerActiveHp <= 0 || opponentActiveHp <= 0) {
+      resetBattleGame(true);
+    }
+
+
+
+    function checkUserWelcome() {
+      const userStr = localStorage.getItem("pokemonNexusUser");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user) {
+            if (user.role === 'admin' || user.isAdmin) {
+              const adminLink = document.getElementById("adminLink") || document.getElementById("adminNavLink");
+              if (adminLink) {
+                adminLink.style.display = "inline-flex";
+                adminLink.style.visibility = "visible";
+                adminLink.style.opacity = "1";
+              }
+            }
+            if (user.trainerName) {
+              document.getElementById("trainerWelcome").textContent = "Welcome, " + user.trainerName;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    checkUserWelcome();
+
+    // Page load console print
+    console.log("userRole =", localStorage.getItem("userRole"));
+
+    // Admin visibility logic
+    let parsedIsAdmin = false;
+    const userStr = localStorage.getItem("pokemonNexusUser");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && (user.role === "admin" || user.isAdmin)) {
+          parsedIsAdmin = true;
+        }
+      } catch (e) {}
+    }
+
+    const role =
+      localStorage.getItem("userRole") ||
+      localStorage.getItem("currentUserRole") ||
+      localStorage.getItem("role");
+
+    const isAdmin =
+      role === "admin" ||
+      localStorage.getItem("isAdmin") === "true" ||
+      parsedIsAdmin;
+
+    const adminNavLink = document.getElementById("adminNavLink") || document.getElementById("adminLink");
+    if (adminNavLink) {
+      if (isAdmin) {
+        adminNavLink.style.display = "inline-flex";
+        adminNavLink.style.visibility = "visible";
+        adminNavLink.style.opacity = "1";
+      } else {
+        adminNavLink.style.display = "none";
+      }
+    }
+
+    // GLOBAL ALIASES AND GETTERS/SETTERS FOR EXTERNAL TESTING FRAMEWORKS & game-sync.js
+    Object.defineProperty(window, 'activePokemon', {
+      get() { return playerTeamProxy[activePlayerPkmnIndex]; },
+      set(val) { }
+    });
+    Object.defineProperty(window, 'currentPlayer', {
+      get() { return "Shashank"; },
+      set(val) { }
+    });
+    Object.defineProperty(window, 'playerTeamData', {
+      get() { return playerTeamProxy; },
+      set(val) { }
+    });
+    Object.defineProperty(window, 'opponentTeamData', {
+      get() { return opponentTeamData; },
+      set(val) { }
+    });
+    Object.defineProperty(window, 'bagItemsData', {
+      get() { return bagItemsProxy; },
+      set(val) { }
+    });
+    Object.defineProperty(window, 'activePlayerPkmnIndex', {
+      get() { return activePlayerPkmnIndex; },
+      set(val) { activePlayerPkmnIndex = val; }
+    });
+    Object.defineProperty(window, 'activeOpponentPkmnIndex', {
+      get() { return activeOpponentPkmnIndex; },
+      set(val) { activeOpponentPkmnIndex = val; }
+    });
+    Object.defineProperty(window, 'selectedBagItemIndex', {
+      get() { return selectedBagItemIndex; },
+      set(val) { selectedBagItemIndex = val; }
+    });
+    Object.defineProperty(window, 'selectedBagItem', {
+      get() { return selectedBagItemIndex !== -1 ? bagItemsData[selectedBagItemIndex] : null; },
+      set(val) {
+        if (val === null) selectedBagItemIndex = -1;
+        else {
+          const idx = bagItemsData.findIndex(item => item.name === val.name);
+          if (idx !== -1) selectedBagItemIndex = idx;
+        }
+      }
+    });
+    Object.defineProperty(window, 'selectedItem', {
+      get() { return window.selectedBagItem; },
+      set(val) { window.selectedBagItem = val; }
+    });
+
+    function updateHP(isPlayer, hpValue) {
+      if (isPlayer) {
+        playerActiveHp = Math.max(0, Math.min(playerTeamData[activePlayerPkmnIndex].maxHp, hpValue));
+        playerTeamData[activePlayerPkmnIndex].hp = playerActiveHp;
+      } else {
+        opponentActiveHp = Math.max(0, Math.min(opponentTeamData[activeOpponentPkmnIndex].maxHp, hpValue));
+        opponentTeamData[activeOpponentPkmnIndex].hp = opponentActiveHp;
+      }
+      syncBattleHUDs();
+    }
+
+    function renderBag() {
+      renderBagSidebar();
+    }
+    
+    // Ensure button onclick refers to new useItem function directly
+    const bagBtn = document.querySelector(".bag-use-btn");
+    if (bagBtn) {
+      bagBtn.setAttribute("onclick", "useItem()");
+    }
+  </script>
+</body>
+</html>
